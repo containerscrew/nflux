@@ -1,6 +1,15 @@
 # ebpfw
-
 Firewall using EBPF, XDP and TC. Powered by Aya-rs
+
+<!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
+**Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
+- [ebpfw](#ebpfw)
+- [Features](#features)
+- [Using `ebpfw`](#using-ebpfw)
+  - [Config.toml](#configtoml)
+- [Useful commands](#useful-commands)
+- [License](#license)
+<!-- END OF TOC -->
 
 > [!IMPORTANT]  
 > By the moment this tool is under development
@@ -40,6 +49,7 @@ nvim config.toml # change the interface name
 
 > [!CAUTION]
 > This ebpfw uses XDP for packet processing. Only works with physical interfaces. If you want to use it with a virtual interface, you need to use the `tc` mode which is not implemented yet.
+> For example, you want to monitor incoming traffic using a virtual interface like `tun0` (VPN), you need to use the `tc` mode.
 
 Ok now you can try to open a port in your local machine, for example, port 8081, using a simple docker container:
 
