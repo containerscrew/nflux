@@ -9,6 +9,7 @@ ebpfw-common = { path = "../ebpfw-common" }
 aya-ebpf = { workspace = true }
 aya-log-ebpf = { workspace = true }
 network-types = "0.0.7"
+log = "0.4.22"
 
 [build-dependencies]
 which = { workspace = true }
