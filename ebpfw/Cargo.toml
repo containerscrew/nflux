@@ -17,6 +17,8 @@ tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread", "net"
 clap = { workspace = true, features = ["derive"] }
 tracing-subscriber = { version = "0.3.18", features = ["json"] }
 tracing = "0.1.40"
+serde = { version = "1.0.210", features = ["derive"] }
+toml = "0.8.19"
 
 [build-dependencies]
 cargo_metadata = { workspace = true }

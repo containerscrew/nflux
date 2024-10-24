@@ -1,0 +1,9 @@
+[log]
+log_level = "info"
+
+[ebpfw]
+interface_name = "wlo1"
+
+[firewall]
+# All incoming connections will be blocked by default
+allowed_ports = [8080] # Specify ports you want to allow
