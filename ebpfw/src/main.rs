@@ -1,5 +1,6 @@
 mod logger;
 mod config;
+mod utils;
 
 use std::env;
 use anyhow::Context;
@@ -9,9 +10,10 @@ use aya::programs::{Xdp, XdpFlags};
 use log::{debug, warn};
 use logger::setup_logger;
 use tokio::signal;
-use tracing::info;
+use tracing::{error, info};
 use ebpfw_common::MAX_ALLOWED_PORTS;
 use crate::config::Config;
+use crate::utils::is_root_user;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -20,6 +22,12 @@ async fn main() -> anyhow::Result<()> {
 
     // Enable logging
     setup_logger(config.log.log_level);
+
+    // Check if user is root.
+    if !is_root_user() {
+        error!("This program must be run as root.");
+        std::process::exit(1);
+    }
 
     info!("starting ebpfw");
 

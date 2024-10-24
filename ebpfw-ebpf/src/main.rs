@@ -5,14 +5,14 @@
 use aya_ebpf::{
     bindings::xdp_action,
     macros::{map, xdp},
-    maps::HashMap,
+    maps::{Array, LruHashMap, HashMap},
     programs::XdpContext,
 };
 use aya_log_ebpf::{debug, info};
 use ebpfw_common::{MAX_ALLOWED_PORTS, MAX_FIREWALL_RULES, MAX_RULES_PORT};
 
 use core::mem;
-use aya_ebpf::maps::Array;
+use aya_ebpf::helpers::bpf_ktime_get_ns;
 use network_types::{
     eth::{EthHdr, EtherType},
     ip::{Ipv4Hdr, IpProto},
@@ -20,21 +20,28 @@ use network_types::{
     udp::UdpHdr,
     icmp::IcmpHdr,
 };
+
 #[cfg(not(test))]
 #[panic_handler]
 fn panic(_info: &core::panic::PanicInfo) -> ! {
     loop {}
 }
+
 #[map]
 static ALLOWED_PORTS: Array<u32> = Array::with_max_entries(MAX_ALLOWED_PORTS as u32, 0);
-
-// #[map]
-// static BLOCKLIST: HashMap<u32, u32> =
-//     HashMap::<u32, u32>::with_max_entries(1024, 0);
 
 #[map]
 static BLOCKLIST_IPV4: HashMap<u32, [u16; MAX_RULES_PORT]> =
     HashMap::<u32, [u16; MAX_RULES_PORT]>::with_max_entries(MAX_FIREWALL_RULES, 0);
+
+#[repr(C)]
+struct IpPort {
+    ip: u32,
+    port: u16,
+}
+
+#[map]
+static RECENT_LOGS: LruHashMap<IpPort, u64> = LruHashMap::with_max_entries(1024, 0);
 
 #[xdp]
 pub fn ebpfw(ctx: XdpContext) -> u32 {
@@ -54,11 +61,10 @@ unsafe fn ptr_at<T>(ctx: &XdpContext, offset: usize) -> Result<*const T, ()> {
         return Err(());
     }
 
-    let ptr = (start + offset) as *const T;
-    Ok(&*ptr)
+    Ok((start + offset) as *const T)
 }
 
-// Check if port is allowed
+// Check if a port is allowed
 fn is_port_allowed(port: u16) -> bool {
     for i in 0..MAX_ALLOWED_PORTS as u32 {
         if let Some(allowed_port) = ALLOWED_PORTS.get(i) {
@@ -70,6 +76,28 @@ fn is_port_allowed(port: u16) -> bool {
     false
 }
 
+// Helper function to get the current time in nanoseconds
+fn current_time_ns() -> u64 {
+    unsafe { bpf_ktime_get_ns() }
+}
+
+// Function to check if we should log a dropped SYN packet to avoid excessive logging
+unsafe fn should_log(ip: u32, port: u16) -> bool {
+    let key = IpPort { ip, port };
+    let now = current_time_ns();
+
+    if let Some(&last_logged) = RECENT_LOGS.get(&key) {
+        // Only log if more than 5 second has passed
+        if now - last_logged < 5_000_000_000 {
+            return false;
+        }
+    }
+
+    // Update the map with the new timestamp
+    RECENT_LOGS.insert(&key, &now, 0).ok();
+    true
+}
+
 fn start_ebpfw(ctx: XdpContext) -> Result<u32, ()> {
     let ethhdr: *const EthHdr = unsafe { ptr_at(&ctx, 0)? };
     return match unsafe { (*ethhdr).ether_type } {
@@ -79,7 +107,7 @@ fn start_ebpfw(ctx: XdpContext) -> Result<u32, ()> {
             let proto = unsafe { (*ipv4hdr).proto };
 
             match proto {
-                IpProto::Tcp => {
+                IpProto::Tcp => unsafe {
                     // Parse the TCP header
                     let tcphdr: *const TcpHdr = unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
                     let dst_port = u16::from_be(unsafe { (*tcphdr).dest });
@@ -92,21 +120,22 @@ fn start_ebpfw(ctx: XdpContext) -> Result<u32, ()> {
 
                     // Deny incoming connections instead syn-ack packets to allow using browsing or other outgoing TCP connections the user did
                     if unsafe { (*tcphdr).syn() == 1 && (*tcphdr).ack() == 0 } {
-                        info!(
-                            &ctx,
-                            "TCP syn packet dropped (new incomming connection): from ip: {:i}, to your local port: {}",
-                            source,
-                            dst_port
-                        );
+                        if should_log(source, dst_port) {
+                            info!(
+                                &ctx,
+                                "TCP SYN packet dropped (new incoming connection): from IP: {:i}, to local port: {}",
+                                source,
+                                dst_port
+                            );
+                        }
                         return Ok(xdp_action::XDP_DROP);
                     }
-                    debug!(&ctx, "TCP syn-ack packet accepted: from ip: {:i}, to your local port: {}", source, dst_port);
-                    Ok(xdp_action::XDP_PASS) // Adjust as needed
+                    debug!(&ctx, "TCP SYN-ACK packet accepted: from IP: {:i}, to local port: {}", source, dst_port);
+                    Ok(xdp_action::XDP_DROP) // Adjust as needed
                 }
                 IpProto::Udp => {
                     // Parse UDP header
                     let udphdr: *const UdpHdr = unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
-                    //let src_port = u16::from_be(unsafe { (*udphdr).source });
                     let dst_port = u16::from_be(unsafe { (*udphdr).dest });
                     debug!(&ctx, "UDP Packet: SRC IP {:i}, DST PORT {}", source, dst_port);
 
