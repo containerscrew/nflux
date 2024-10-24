@@ -129,8 +129,8 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
 
                     // Check if the IP address is blocked
                     if is_ipv4_allowed(source) {
-                        info!(&ctx, "Blocked incoming connection from IP: {:i}", source);
-                        return Ok(xdp_action::XDP_DROP);
+                        info!(&ctx, "Allowed incoming connection from IP: {:i}", source);
+                        return Ok(xdp_action::XDP_PASS);
                     }
 
                     // Deny incoming connections instead syn-ack packets to allow using browsing or other outgoing TCP connections the user did
