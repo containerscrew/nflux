@@ -36,7 +36,6 @@ pub struct PacketLog {
 
 #[cfg(feature = "user")]
 unsafe impl aya::Pod for PacketLog {}
-
-
 pub const MAX_FIREWALL_RULES: u32 = 32;
 pub const MAX_RULES_PORT: usize = 32;
+pub const MAX_ALLOWED_PORTS: usize = 1024;

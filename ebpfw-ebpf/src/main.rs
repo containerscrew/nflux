@@ -9,9 +9,10 @@ use aya_ebpf::{
     programs::XdpContext,
 };
 use aya_log_ebpf::{debug, info};
-use ebpfw_common::{MAX_FIREWALL_RULES, MAX_RULES_PORT};
+use ebpfw_common::{MAX_ALLOWED_PORTS, MAX_FIREWALL_RULES, MAX_RULES_PORT};
 
 use core::mem;
+use aya_ebpf::maps::Array;
 use network_types::{
     eth::{EthHdr, EtherType},
     ip::{Ipv4Hdr, IpProto},
@@ -24,10 +25,12 @@ use network_types::{
 fn panic(_info: &core::panic::PanicInfo) -> ! {
     loop {}
 }
-
 #[map]
-static BLOCKLIST: HashMap<u32, u32> =
-    HashMap::<u32, u32>::with_max_entries(1024, 0);
+static ALLOWED_PORTS: Array<u32> = Array::with_max_entries(MAX_ALLOWED_PORTS as u32, 0);
+
+// #[map]
+// static BLOCKLIST: HashMap<u32, u32> =
+//     HashMap::<u32, u32>::with_max_entries(1024, 0);
 
 #[map]
 static BLOCKLIST_IPV4: HashMap<u32, [u16; MAX_RULES_PORT]> =
@@ -55,21 +58,37 @@ unsafe fn ptr_at<T>(ctx: &XdpContext, offset: usize) -> Result<*const T, ()> {
     Ok(&*ptr)
 }
 
+// Check if port is allowed
+fn is_port_allowed(port: u16) -> bool {
+    for i in 0..MAX_ALLOWED_PORTS as u32 {
+        if let Some(allowed_port) = ALLOWED_PORTS.get(i) {
+            if port as u32 == *allowed_port {
+                return true;
+            }
+        }
+    }
+    false
+}
+
 fn start_ebpfw(ctx: XdpContext) -> Result<u32, ()> {
     let ethhdr: *const EthHdr = unsafe { ptr_at(&ctx, 0)? };
     return match unsafe { (*ethhdr).ether_type } {
         EtherType::Ipv4 => {
             let ipv4hdr: *const Ipv4Hdr = unsafe { ptr_at(&ctx, EthHdr::LEN)? };
             let source = u32::from_be(unsafe { (*ipv4hdr).src_addr });
-            //let dest = u32::from_be(unsafe { (*ipv4hdr).dst_addr });
             let proto = unsafe { (*ipv4hdr).proto };
 
             match proto {
                 IpProto::Tcp => {
                     // Parse the TCP header
                     let tcphdr: *const TcpHdr = unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
-                    //let src_port = u16::from_be(unsafe { (*tcphdr).source });
                     let dst_port = u16::from_be(unsafe { (*tcphdr).dest });
+
+                    // Check allowed ports
+                    if is_port_allowed(dst_port) {
+                        info!(&ctx, "Allowed incoming connection to port: {} from: {:i}", dst_port, source);
+                        return Ok(xdp_action::XDP_PASS);
+                    }
 
                     // Deny incoming connections instead syn-ack packets to allow using browsing or other outgoing TCP connections the user did
                     if unsafe { (*tcphdr).syn() == 1 && (*tcphdr).ack() == 0 } {
@@ -79,8 +98,6 @@ fn start_ebpfw(ctx: XdpContext) -> Result<u32, ()> {
                             source,
                             dst_port
                         );
-                        let key = (source, 0, 0, dst_port);
-                        //CONNECTION_TRACKER.insert(&key, &TCP_STATE_SYN_SENT, 0).expect("Failed to insert connection tracker entry");
                         return Ok(xdp_action::XDP_DROP);
                     }
                     debug!(&ctx, "TCP syn-ack packet accepted: from ip: {:i}, to your local port: {}", source, dst_port);
@@ -105,7 +122,7 @@ fn start_ebpfw(ctx: XdpContext) -> Result<u32, ()> {
 
                     // Add logic to allow/deny ICMP based on rules
 
-                    Ok(xdp_action::XDP_PASS) // Adjust as needed
+                    Ok(xdp_action::XDP_DROP) // Adjust as needed
                 }
                 _ => {
                     // For other protocols, drop by default

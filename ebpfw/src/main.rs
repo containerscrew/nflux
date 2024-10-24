@@ -1,30 +1,25 @@
 mod logger;
+mod config;
 
 use std::env;
-use std::net::Ipv4Addr;
-
 use anyhow::Context;
 use aya::{include_bytes_aligned, Ebpf};
-use aya::maps::HashMap;
+use aya::maps::{Array};
 use aya::programs::{Xdp, XdpFlags};
-use clap::Parser;
 use log::{debug, warn};
 use logger::setup_logger;
 use tokio::signal;
 use tracing::info;
-
-#[derive(Debug, Parser)]
-struct Opt {
-    #[clap(short, long, default_value = "wlo1")]
-    iface: String,
-}
+use ebpfw_common::MAX_ALLOWED_PORTS;
+use crate::config::Config;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let opt = Opt::parse();
+    // Load configuration file. Set the CONFIG_FILE_PATH env var. Example: CONFIG_FILE_PATH=./config.toml
+    let config = Config::load_config();
 
     // Enable logging
-    setup_logger("info".to_string());
+    setup_logger(config.log.log_level);
 
     info!("starting ebpfw");
 
@@ -45,25 +40,35 @@ async fn main() -> anyhow::Result<()> {
     }
 
     // Attach XDP program
-    // TODO: check if the interface you want to attach is valid (phisical)
+    // TODO: check if the interface you want to attach is valid (physical)
     // XDP program can only be attached to physical interfaces
     let program: &mut Xdp = bpf.program_mut("ebpfw").unwrap().try_into()?;
     program.load()?;
-    program.attach(&opt.iface, XdpFlags::default())
+    program.attach(config.ebpfw.interface_name.as_str(), XdpFlags::default())
         .context("failed to attach the XDP program with default flags - try changing XdpFlags::default() to XdpFlags::SKB_MODE")?;
 
     // Some basic info
-    info!("Successfully attached XDP program to iface: {}", &opt.iface);
+    info!("Successfully attached XDP program to iface: {}", config.ebpfw.interface_name);
     info!("Checking incoming packets...");
 
-    // Initialize blocklist
-    let mut blocklist: HashMap<_, u32, u32> =
-        HashMap::try_from(bpf.map_mut("BLOCKLIST").unwrap())?;
-    let block_addr: u32 = Ipv4Addr::new(1, 1, 1, 1).try_into()?;
-    blocklist.insert(block_addr, 0, 0)?;
+    // Allowed list
+    // Set up the allowed ports array
+    let mut allowed_ports: Array<_, u32> = Array::try_from(bpf.map_mut("ALLOWED_PORTS").unwrap())?;
+
+    // Iterate over the vector and add each port to the eBPF array
+    for (index, &port) in config.firewall.allowed_ports.iter().enumerate() {
+        if index < MAX_ALLOWED_PORTS {
+            allowed_ports
+                .set(index as u32, port as u32, 0)
+                .context(format!("Failed to set port {} in the allowed ports list", port))?;
+        } else {
+            warn!("Skipping port {} because the maximum allowed ports limit was reached", port);
+        }
+    }
+
+    info!("Allowed ports: {:?}", config.firewall.allowed_ports);
 
     let ctrl_c = signal::ctrl_c();
-
     info!("Waiting for Ctrl-C...");
     ctrl_c.await?;
     warn!("Exiting...");
