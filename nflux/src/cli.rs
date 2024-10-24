@@ -5,7 +5,7 @@ use clap::Parser;
     about = "nflux",
     version = env!("CARGO_PKG_VERSION"),
     author = "Containerscrew info@containerscrew.com",
-    about = "Firewall using EBPF, XDP and TC. Powered by Aya-rs",
+    about = "Network monitoring and firewall using EBPF, XDP and TC. Powered by Aya-rs",
     arg_required_else_help = false
 )]
 
