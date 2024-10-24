@@ -12,6 +12,7 @@ pub struct Ebpfw {
 
 #[derive(Deserialize)]
 pub struct FirewallConfig {
+    pub(crate) allowed_ipv4: Vec<String>,
     pub(crate) allowed_ports : Vec<u32>,
 }
 
@@ -24,9 +25,8 @@ pub struct Config {
 
 impl Config {
     // This function loads the configuration from the file
-    pub(crate) fn load_config() -> Self {
-        let path = Config::get_config_path(); // Get the config file path
-        let config_content = fs::read_to_string(path).expect("Failed to read configuration file");
+    pub(crate) fn load_config(config_file: &str) -> Self {
+        let config_content = fs::read_to_string(config_file.to_string()).expect("Failed to read configuration file");
         match toml::from_str(&config_content) {
             Ok(config) => {
                 trace!("Configuration loaded successfully");
@@ -36,10 +36,5 @@ impl Config {
                 panic!("Failed to parse configuration file: {}", e);
             }
         }
-    }
-
-    // Helper function to get the configuration file path
-    fn get_config_path() -> String {
-        std::env::var("CONFIG_FILE_PATH").unwrap_or_else(|_| "./config.toml".to_string())
     }
 }

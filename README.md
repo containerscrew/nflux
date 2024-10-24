@@ -1,5 +1,6 @@
 # ebpfw
-Firewall using EBPF, XDP and TC. Powered by Aya-rs
+
+Network monitoring and firewall using EBPF, XDP and TC. Powered by Aya-rs
 
 <!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
 **Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
@@ -16,10 +17,16 @@ Firewall using EBPF, XDP and TC. Powered by Aya-rs
 
 # Features
 
+## Basic XDP firewall
+
 * Block TCP SYN incoming packets
 * Allow incoming SYN-ACK incoming packets (for example, you are using your browser)
 * Block ICMP incoming packets
 * User can allow traffic for specific incoming ports
+
+## Outgoing traffic monitoring
+
+in progress
 
 # Using `ebpfw`
 
