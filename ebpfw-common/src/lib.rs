@@ -26,3 +26,17 @@ impl Action {
         }
     }
 }
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct PacketLog {
+    pub ipv4_address: u32,
+    pub action: u32,
+}
+
+#[cfg(feature = "user")]
+unsafe impl aya::Pod for PacketLog {}
+
+
+pub const MAX_FIREWALL_RULES: u32 = 32;
+pub const MAX_RULES_PORT: usize = 32;

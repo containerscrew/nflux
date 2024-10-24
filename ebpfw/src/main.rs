@@ -3,9 +3,10 @@ mod logger;
 use std::env;
 use std::net::Ipv4Addr;
 
+use anyhow::Context;
 use aya::{include_bytes_aligned, Ebpf};
 use aya::maps::HashMap;
-use aya::programs::{tc, SchedClassifier, TcAttachType};
+use aya::programs::{Xdp, XdpFlags};
 use clap::Parser;
 use log::{debug, warn};
 use logger::setup_logger;
@@ -43,13 +44,17 @@ async fn main() -> anyhow::Result<()> {
         warn!("failed to initialize eBPF logger: {}", e);
     }
 
-    // Attach egress program
-    let _ = tc::qdisc_add_clsact(&opt.iface);
-    let program: &mut SchedClassifier =
-        bpf.program_mut("ebpfw").unwrap().try_into()?;
+    // Attach XDP program
+    // TODO: check if the interface you want to attach is valid (phisical)
+    // XDP program can only be attached to physical interfaces
+    let program: &mut Xdp = bpf.program_mut("ebpfw").unwrap().try_into()?;
     program.load()?;
-    program.attach(&opt.iface, TcAttachType::Egress)?;
-    program.attach(&opt.iface, TcAttachType::Ingress)?;
+    program.attach(&opt.iface, XdpFlags::default())
+        .context("failed to attach the XDP program with default flags - try changing XdpFlags::default() to XdpFlags::SKB_MODE")?;
+
+    // Some basic info
+    info!("Successfully attached XDP program to iface: {}", &opt.iface);
+    info!("Checking incoming packets...");
 
     // Initialize blocklist
     let mut blocklist: HashMap<_, u32, u32> =
@@ -61,7 +66,7 @@ async fn main() -> anyhow::Result<()> {
 
     info!("Waiting for Ctrl-C...");
     ctrl_c.await?;
-    println!("Exiting...");
+    warn!("Exiting...");
 
     Ok(())
 }

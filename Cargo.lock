@@ -374,6 +374,7 @@ dependencies = [
  "aya-ebpf",
  "aya-log-ebpf",
  "ebpfw-common",
+ "log",
  "network-types",
  "which",
  "xtask",
