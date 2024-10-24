@@ -1,10 +1,10 @@
 [package]
-name = "ebpfw"
+name = "nflux"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-ebpfw-common = { path = "../ebpfw-common", features = ["user"] }
+nflux-common = { path = "../nflux-common", features = ["user"] }
 
 anyhow = { workspace = true, default-features = true }
 aya = { workspace = true }
@@ -34,9 +34,9 @@ cargo_metadata = { workspace = true }
 # Finally note that *any* usage of `artifact = ...` in *any* Cargo.toml in the workspace breaks
 # workflows with stable cargo; stable cargo outright refuses to load manifests that use unstable
 # features.
-ebpfw-ebpf = { path = "../ebpfw-ebpf" }
+nflux-ebpf = { path = "../nflux-ebpf" }
 xtask = { path = "../xtask" }
 
 [[bin]]
-name = "ebpfw"
+name = "nflux"
 path = "src/main.rs"

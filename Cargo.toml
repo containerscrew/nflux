@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
-members = ["xtask", "ebpfw", "ebpfw-common", "ebpfw-ebpf"]
-default-members = ["xtask", "ebpfw", "ebpfw-common"]
+members = ["xtask", "nflux", "nflux-common", "nflux-ebpf"]
+default-members = ["xtask", "nflux", "nflux-common"]
 
 [workspace.dependencies]
 aya = { version = "0.13.0", default-features = false }
@@ -27,6 +27,6 @@ panic = "abort"
 [profile.release]
 panic = "abort"
 
-[profile.release.package.ebpfw-ebpf]
+[profile.release.package.nflux-ebpf]
 debug = 2
 codegen-units = 1

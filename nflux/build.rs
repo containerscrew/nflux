@@ -10,7 +10,7 @@ use cargo_metadata::{
 };
 use xtask::AYA_BUILD_EBPF;
 
-/// This crate has a runtime dependency on artifacts produced by the `ebpfw-ebpf` crate.
+/// This crate has a runtime dependency on artifacts produced by the `nflux-ebpf` crate.
 /// This would be better expressed as one or more [artifact-dependencies][bindeps] but issues such
 /// as:
 ///
@@ -22,16 +22,16 @@ use xtask::AYA_BUILD_EBPF;
 ///
 /// This file, along with the xtask crate, allows analysis tools such as `cargo check`, `cargo
 /// clippy`, and even `cargo build` to work as users expect. Prior to this file's existence, this
-/// crate's undeclared dependency on artifacts from `ebpfw-ebpf` would cause build (and
+/// crate's undeclared dependency on artifacts from `nflux-ebpf` would cause build (and
 /// `cargo check`, and `cargo clippy`) failures until the user ran certain other commands in the
 /// workspace. Conversely, those same tools (e.g. cargo test --no-run) would produce stale results
 /// if run naively because they'd make use of artifacts from a previous build of
-/// `ebpfw-ebpf`.
+/// `nflux-ebpf`.
 ///
 /// Note that this solution is imperfect: in particular it has to balance correctness with
-/// performance; an environment variable is used to replace true builds of `ebpfw-ebpf`
+/// performance; an environment variable is used to replace true builds of `nflux-ebpf`
 /// with stubs to preserve the property that code generation and linking (in
-/// `ebpfw-ebpf`) do not occur on metadata-only actions such as `cargo check` or `cargo
+/// `nflux-ebpf`) do not occur on metadata-only actions such as `cargo check` or `cargo
 /// clippy` of this crate. This means that naively attempting to `cargo test --no-run` this crate
 /// will produce binaries that fail at runtime because the stubs are inadequate for actually running
 /// the tests.
@@ -49,7 +49,7 @@ fn main() {
     let Metadata { packages, .. } = MetadataCommand::new().no_deps().exec().unwrap();
     let ebpf_package = packages
         .into_iter()
-        .find(|Package { name, .. }| name == "ebpfw-ebpf")
+        .find(|Package { name, .. }| name == "nflux-ebpf")
         .unwrap();
 
     let out_dir = env::var_os("OUT_DIR").unwrap();
@@ -72,9 +72,9 @@ fn main() {
         let Package { manifest_path, .. } = ebpf_package;
         let ebpf_dir = manifest_path.parent().unwrap();
 
-        // We have a build-dependency on `ebpfw-ebpf`, so cargo will automatically rebuild us
-        // if `ebpfw-ebpf`'s *library* target or any of its dependencies change. Since we
-        // depend on `ebpfw-ebpf`'s *binary* targets, that only gets us half of the way. This
+        // We have a build-dependency on `nflux-ebpf`, so cargo will automatically rebuild us
+        // if `nflux-ebpf`'s *library* target or any of its dependencies change. Since we
+        // depend on `nflux-ebpf`'s *binary* targets, that only gets us half of the way. This
         // stanza ensures cargo will rebuild us on changes to the binaries too, which gets us the
         // rest of the way.
         println!("cargo:rerun-if-changed={}", ebpf_dir.as_str());
@@ -100,7 +100,7 @@ fn main() {
         cmd.current_dir(ebpf_dir);
 
         // Workaround for https://github.com/rust-lang/cargo/issues/6412 where cargo flocks itself.
-        let ebpf_target_dir = out_dir.join("ebpfw-ebpf");
+        let ebpf_target_dir = out_dir.join("../nflux-ebpf");
         cmd.arg("--target-dir").arg(&ebpf_target_dir);
 
         let mut child = cmd

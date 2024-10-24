@@ -6,7 +6,7 @@ pub struct LoggingConfig {
     pub(crate) log_level: String,
 }
 #[derive(Deserialize)]
-pub struct Ebpfw {
+pub struct Nflux {
     pub(crate) interface_name: String,
 }
 
@@ -20,7 +20,7 @@ pub struct FirewallConfig {
 pub struct Config {
     pub(crate) log: LoggingConfig,
     pub(crate) firewall: FirewallConfig,
-    pub(crate) ebpfw: Ebpfw,
+    pub(crate) nflux: Nflux,
 }
 
 impl Config {

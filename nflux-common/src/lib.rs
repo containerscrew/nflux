@@ -1,10 +1,9 @@
 #![no_std]
-
 #[derive(Debug)]
 pub enum Action {
     Dropped,
     Accepted,
-    Unknown, // Para manejar posibles valores no esperados
+    Unknown,
 }
 
 impl From<i32> for Action {

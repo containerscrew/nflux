@@ -27,7 +27,7 @@ pub fn build(opts: Options) -> Result<()> {
 
     let mut cmd = Command::new("cargo");
     cmd.env(AYA_BUILD_EBPF, "true");
-    cmd.args(["build", "--package", "ebpfw", "--config"]);
+    cmd.args(["build", "--package", "nflux", "--config"]);
     if release {
         cmd.arg(format!("target.\"cfg(all())\".runner=\"{}\"", runner));
         cmd.arg("--release");
