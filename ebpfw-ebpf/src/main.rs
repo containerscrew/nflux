@@ -9,7 +9,7 @@ use aya_ebpf::{
     programs::XdpContext,
 };
 use aya_log_ebpf::{debug, info};
-use ebpfw_common::{MAX_ALLOWED_PORTS, MAX_FIREWALL_RULES, MAX_RULES_PORT};
+use ebpfw_common::{MAX_ALLOWED_IPV4, MAX_ALLOWED_PORTS, MAX_FIREWALL_RULES, MAX_RULES_PORT};
 
 use core::mem;
 use aya_ebpf::helpers::bpf_ktime_get_ns;
@@ -26,13 +26,10 @@ use network_types::{
 fn panic(_info: &core::panic::PanicInfo) -> ! {
     loop {}
 }
-
 #[map]
 static ALLOWED_PORTS: Array<u32> = Array::with_max_entries(MAX_ALLOWED_PORTS as u32, 0);
-
 #[map]
-static BLOCKLIST_IPV4: HashMap<u32, [u16; MAX_RULES_PORT]> =
-    HashMap::<u32, [u16; MAX_RULES_PORT]>::with_max_entries(MAX_FIREWALL_RULES, 0);
+static ALLOWED_IPV4: Array<u32> = Array::with_max_entries(MAX_ALLOWED_IPV4 as u32, 0);
 
 #[repr(C)]
 struct IpPort {
@@ -69,6 +66,18 @@ fn is_port_allowed(port: u16) -> bool {
     for i in 0..MAX_ALLOWED_PORTS as u32 {
         if let Some(allowed_port) = ALLOWED_PORTS.get(i) {
             if port as u32 == *allowed_port {
+                return true;
+            }
+        }
+    }
+    false
+}
+
+// Check if an IP address is allowed
+fn is_ipv4_allowed(ip: u32) -> bool {
+    for i in 0..MAX_ALLOWED_IPV4 as u32 {
+        if let Some(&allowed_ip) = ALLOWED_IPV4.get(i) {
+            if ip == allowed_ip {
                 return true;
             }
         }
@@ -116,6 +125,12 @@ fn start_ebpfw(ctx: XdpContext) -> Result<u32, ()> {
                     if is_port_allowed(dst_port) {
                         info!(&ctx, "Allowed incoming connection to port: {} from: {:i}", dst_port, source);
                         return Ok(xdp_action::XDP_PASS);
+                    }
+
+                    // Check if the IP address is blocked
+                    if is_ipv4_allowed(source) {
+                        info!(&ctx, "Blocked incoming connection from IP: {:i}", source);
+                        return Ok(xdp_action::XDP_DROP);
                     }
 
                     // Deny incoming connections instead syn-ack packets to allow using browsing or other outgoing TCP connections the user did
