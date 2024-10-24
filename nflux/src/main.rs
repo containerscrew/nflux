@@ -16,7 +16,7 @@ use log::{warn};
 use logger::setup_logger;
 use tokio::signal;
 use tracing::{error, info};
-use ebpfw_common::MAX_ALLOWED_PORTS;
+use nflux_common::MAX_ALLOWED_PORTS;
 use crate::cli::Args;
 use crate::config::Config;
 use crate::core::set_mem_limit;
@@ -43,7 +43,7 @@ async fn main() -> anyhow::Result<()> {
     set_mem_limit();
 
     // Load eBPF program
-    let mut bpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/ebpfw")))?;
+    let mut bpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/nflux")))?;
     if let Err(e) = aya_log::EbpfLogger::init(&mut bpf) {
         warn!("failed to initialize eBPF logger: {}", e);
     }
@@ -51,14 +51,14 @@ async fn main() -> anyhow::Result<()> {
     // Attach XDP program
     // TODO: check if the interface you want to attach is valid (physical)
     // XDP program can only be attached to physical interfaces
-    let program: &mut Xdp = bpf.program_mut("ebpfw").unwrap().try_into()?;
+    let program: &mut Xdp = bpf.program_mut("nflux").unwrap().try_into()?;
     program.load()?;
-    program.attach(config.ebpfw.interface_name.as_str(), XdpFlags::default())
+    program.attach(config.nflux.interface_name.as_str(), XdpFlags::default())
         .context("failed to attach the XDP program with default flags - try changing XdpFlags::default() to XdpFlags::SKB_MODE")?;
 
     // Some basic info
-    info!("starting ebpfw");
-    info!("Successfully attached XDP program to iface: {}", config.ebpfw.interface_name);
+    info!("starting nflux");
+    info!("Successfully attached XDP program to iface: {}", config.nflux.interface_name);
     info!("Checking incoming packets...");
 
     // Iterate over the vector of allowed IPv4 addresses

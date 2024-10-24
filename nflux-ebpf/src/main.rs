@@ -9,7 +9,7 @@ use aya_ebpf::{
     programs::XdpContext,
 };
 use aya_log_ebpf::{debug, info};
-use ebpfw_common::{MAX_ALLOWED_IPV4, MAX_ALLOWED_PORTS, MAX_FIREWALL_RULES, MAX_RULES_PORT};
+use nflux_common::{MAX_ALLOWED_IPV4, MAX_ALLOWED_PORTS, MAX_FIREWALL_RULES, MAX_RULES_PORT};
 
 use core::mem;
 use aya_ebpf::helpers::bpf_ktime_get_ns;
@@ -41,8 +41,8 @@ struct IpPort {
 static RECENT_LOGS: LruHashMap<IpPort, u64> = LruHashMap::with_max_entries(1024, 0);
 
 #[xdp]
-pub fn ebpfw(ctx: XdpContext) -> u32 {
-    match start_ebpfw(ctx) {
+pub fn nflux(ctx: XdpContext) -> u32 {
+    match start_nflux(ctx) {
         Ok(ret) => ret,
         Err(_) => xdp_action::XDP_ABORTED,
     }
@@ -107,7 +107,7 @@ unsafe fn should_log(ip: u32, port: u16) -> bool {
     true
 }
 
-fn start_ebpfw(ctx: XdpContext) -> Result<u32, ()> {
+fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
     let ethhdr: *const EthHdr = unsafe { ptr_at(&ctx, 0)? };
     return match unsafe { (*ethhdr).ether_type } {
         EtherType::Ipv4 => {

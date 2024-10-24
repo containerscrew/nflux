@@ -2,7 +2,7 @@ use clap::Parser;
 
 #[derive(Parser, Debug)]
 #[clap(
-    about = "ebpfw",
+    about = "nflux",
     version = env!("CARGO_PKG_VERSION"),
     author = "Containerscrew info@containerscrew.com",
     about = "Firewall using EBPF, XDP and TC. Powered by Aya-rs",

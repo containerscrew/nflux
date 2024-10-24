@@ -1,12 +1,14 @@
-# ebpfw
+# nflux
 
 Network monitoring and firewall using EBPF, XDP and TC. Powered by Aya-rs
 
 <!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
 **Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
-- [ebpfw](#ebpfw)
+- [nflux](#nflux)
 - [Features](#features)
-- [Using `ebpfw`](#using-ebpfw)
+  - [Basic XDP firewall](#basic-xdp-firewall)
+  - [Outgoing traffic monitoring](#outgoing-traffic-monitoring)
+- [Using `nflux`](#using-nflux)
   - [Config.toml](#configtoml)
 - [Useful commands](#useful-commands)
 - [License](#license)
@@ -28,12 +30,12 @@ Network monitoring and firewall using EBPF, XDP and TC. Powered by Aya-rs
 
 in progress
 
-# Using `ebpfw`
+# Using `nflux`
 
 First of all, clone the repo:
 
 ```shell
-git clone https://github.com/containerscrew/ebpfw.git
+git clone https://github.com/containerscrew/nflux.git
 ```
 
 Since this project is under development just for fun and learning, you need to compile the project in your local:
@@ -55,7 +57,7 @@ nvim config.toml # change the interface name
 ```
 
 > [!CAUTION]
-> This ebpfw uses XDP for packet processing. Only works with physical interfaces. If you want to use it with a virtual interface, you need to use the `tc` mode which is not implemented yet.
+> nflux uses XDP for packet processing. Only works with physical interfaces. If you want to use it with a virtual interface, you need to use the `tc` mode which is not implemented yet.
 > For example, you want to monitor incoming traffic using a virtual interface like `tun0` (VPN), you need to use the `tc` mode.
 
 Ok now you can try to open a port in your local machine, for example, port 8081, using a simple docker container:
