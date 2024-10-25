@@ -1,10 +1,12 @@
-# nflux
-
-Network monitoring and firewall using EBPF, XDP and TC. Powered by Aya-rs
+<p align="center">
+    <h3 align="center">nflux</h3>
+    <p align="center">Network monitoring and firewall using EBPF, XDP and TC. Powered by Aya-rs</p>
+    <p align="center">Built with ❤ in Rust</p>
+</p>
 
 <!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
 **Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
-- [nflux](#nflux)
+- [Intro](#intro)
 - [Features](#features)
   - [Basic XDP firewall](#basic-xdp-firewall)
   - [Outgoing traffic monitoring](#outgoing-traffic-monitoring)
@@ -16,6 +18,16 @@ Network monitoring and firewall using EBPF, XDP and TC. Powered by Aya-rs
 
 > [!IMPORTANT]  
 > By the moment this tool is under development
+
+# Intro
+
+Look at what level it works XDP:
+
+![xdp](./xdp.png)
+
+Powerful, right? Same for traffic control (TC).
+
+![tc](./tc.png)
 
 # Features
 
