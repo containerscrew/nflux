@@ -19,6 +19,9 @@ tracing-subscriber = { version = "0.3.18", features = ["json"] }
 tracing = "0.1.40"
 serde = { version = "1.0.210", features = ["derive"] }
 toml = "0.8.19"
+prometheus = "0.13.4"
+axum = "0.7.7"
+bytes = "1.8.0"
 
 [build-dependencies]
 cargo_metadata = { workspace = true }

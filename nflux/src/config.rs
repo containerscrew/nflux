@@ -13,7 +13,7 @@ pub struct Nflux {
 #[derive(Deserialize)]
 pub struct FirewallConfig {
     pub(crate) allowed_ipv4: Vec<String>,
-    pub(crate) allowed_ports : Vec<u32>,
+    pub(crate) allowed_ports: Vec<u32>,
 }
 
 #[derive(Deserialize)]
@@ -26,7 +26,8 @@ pub struct Config {
 impl Config {
     // This function loads the configuration from the file
     pub(crate) fn load_config(config_file: &str) -> Self {
-        let config_content = fs::read_to_string(config_file.to_string()).expect("Failed to read configuration file");
+        let config_content =
+            fs::read_to_string(config_file.to_string()).expect("Failed to read configuration file");
         match toml::from_str(&config_content) {
             Ok(config) => {
                 trace!("Configuration loaded successfully");

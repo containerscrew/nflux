@@ -1,6 +1,6 @@
 use tracing_subscriber::fmt::format::FmtSpan;
 
-pub fn setup_logger(log_level: String) {
+pub fn setup_logger(log_level: &String) {
     let log_level = match log_level.as_str() {
         "trace" => tracing::Level::TRACE,
         "debug" => tracing::Level::DEBUG,
