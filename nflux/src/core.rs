@@ -1,6 +1,6 @@
 use tracing::debug;
 
-pub fn set_mem_limit(){
+pub fn set_mem_limit() {
     // Bump the memlock rlimit
     let rlim = libc::rlimit {
         rlim_cur: libc::RLIM_INFINITY,

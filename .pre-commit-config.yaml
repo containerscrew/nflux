@@ -1,0 +1,40 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      -  id: check-byte-order-marker
+      -  id: check-case-conflict
+      -  id: check-merge-conflict
+      -  id: check-symlinks
+      -  id: end-of-file-fixer
+      -  id: mixed-line-ending
+      -  id: trailing-whitespace
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.0
+    hooks:
+      - id: gitleaks
+  - repo: https://github.com/containerscrew/mtoc
+    rev: v0.4.1
+    hooks:
+      - id: mtoc
+        args: [ "-e", ".target/" ]
+  - repo: https://github.com/pre-commit/pre-commit
+    rev: v3.5.0
+    hooks:
+      -   id: validate_manifest
+  - repo: https://github.com/doublify/pre-commit-rust
+    rev: v1.0
+    hooks:
+      - id: fmt
+        args: ['--verbose', '--']
+      - id: cargo-check
+#      - id: clippy
+#        args: ["--", "-D", "warnings", "-D", "unused-imports"]
+#  - repo: local
+#    hooks:
+#      - id: git-cliff
+#        name: "CHANGELOG generator"
+#        entry: git cliff --output CHANGELOG.md
+#        language: system
+#        description: "Generate a CHANGELOG.md file using git-cliff"
+#        pass_filenames: false

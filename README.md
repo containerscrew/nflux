@@ -13,10 +13,11 @@
 - [Using `nflux`](#using-nflux)
   - [Config.toml](#configtoml)
 - [Useful commands](#useful-commands)
+- [Contribution](#contribution)
 - [License](#license)
 <!-- END OF TOC -->
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > By the moment this tool is under development
 
 # Intro
@@ -75,7 +76,7 @@ nvim config.toml # change the interface name
 Ok now you can try to open a port in your local machine, for example, port 8081, using a simple docker container:
 
 ```shell
-docker run -itd --rm --name test -p 8081:80 docker.io/nginx:latest 
+docker run -itd --rm --name test -p 8081:80 docker.io/nginx:latest
 ```
 
 Run the firewall:
@@ -90,7 +91,7 @@ If everything works as expected, you will see the application log. By default, w
 
 Let's test it:
 
-From other laptop/device in your network: 
+From other laptop/device in your network:
 
 ```shell
 curl http://192.168.0.X:8081 # the ip where the firewall is running
@@ -105,8 +106,12 @@ You will be blocked! Try to stop the firewall, change the port to 8081 in the [c
 ```bash
 sudo bpftool prog list # show ebpf running programs
 ip link show dev wlo1 # xdp attached to your interface
-``` 
+```
+
+# Contribution
+
+Any improvement is welcome! If you want to help me improve in Rust and eBPF, I'd be delighted!
 
 # License
 
-[LICENSE](./LICENSE)
+**`nflow`** is distributed under the terms of the [AGPL3](./LICENSE) license.
