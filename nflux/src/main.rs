@@ -11,29 +11,21 @@ use crate::utils::{is_root_user, wait_for_shutdown};
 use anyhow::Context;
 use aya::maps::{Array, AsyncPerfEventArray};
 use aya::programs::{Xdp, XdpFlags};
+use aya::util::online_cpus;
 use aya::{include_bytes_aligned, Ebpf};
 use bytes::BytesMut;
 use clap::Parser;
 use log::warn;
 use logger::setup_logger;
-use nflux_common::MAX_ALLOWED_PORTS;
-use std::env;
+use nflux_common::{ConnectionEvent, MAX_ALLOWED_PORTS};
 use std::net::Ipv4Addr;
 use std::str::FromStr;
+use std::{env, mem, ptr};
 use tokio::{signal, task};
-use tracing::{error, info};
-
-#[repr(C)]
-struct ConnectionEvent {
-    src_addr: u32,
-    dst_addr: u32,
-    src_port: u16,
-    dst_port: u16,
-    protocol: u8, // 6 for TCP, 17 for UDP
-}
+use tracing::{error, event, info};
 
 #[tokio::main]
-async fn main() -> anyhow::Result<()> {
+async fn main() -> anyhow::Result<(), anyhow::Error> {
     // Parse command-line arguments
     let args = Args::parse();
 
@@ -79,6 +71,29 @@ async fn main() -> anyhow::Result<()> {
 
     // Populate allowed ports
     populate_allowed_ports(&mut bpf, &config)?;
+
+    // Read events from ringbuffer
+    let cpus = online_cpus().unwrap();
+    let num_cpus = cpus.len();
+    let mut events = AsyncPerfEventArray::try_from(bpf.map_mut("CONNECTION_EVENTS").unwrap())?;
+
+    for cpu in cpus {
+        let mut buf = events.open(cpu, None)?;
+
+        tokio::spawn(async move {
+            let mut buffers = (0..num_cpus)
+                .map(|_| BytesMut::with_capacity(9000))
+                .collect::<Vec<_>>();
+            loop {
+                let events = buf.read_events(&mut buffers).await.unwrap();
+                for i in 0..events.read {
+                    let buf = &mut buffers[i];
+                    let conn_event = unsafe { ptr::read(buf.as_ptr() as *const ConnectionEvent) };
+                    info!("Connection event: {:?}", conn_event);
+                }
+            }
+        });
+    }
 
     // Wait for shutdown signal
     wait_for_shutdown().await?;

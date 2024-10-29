@@ -18,7 +18,7 @@ use network_types::{
     tcp::TcpHdr,
     udp::UdpHdr,
 };
-use nflux_common::{MAX_ALLOWED_IPV4, MAX_ALLOWED_PORTS};
+use nflux_common::{ConnectionEvent, MAX_ALLOWED_IPV4, MAX_ALLOWED_PORTS};
 
 #[cfg(not(test))]
 #[panic_handler]
@@ -30,15 +30,6 @@ fn panic(_info: &core::panic::PanicInfo) -> ! {
 static ALLOWED_PORTS: Array<u32> = Array::with_max_entries(MAX_ALLOWED_PORTS as u32, 0);
 #[map]
 static ALLOWED_IPV4: Array<u32> = Array::with_max_entries(MAX_ALLOWED_IPV4 as u32, 0);
-
-#[repr(C)]
-pub struct ConnectionEvent {
-    pub src_addr: u32,
-    pub dst_addr: u32,
-    pub src_port: u16,
-    pub dst_port: u16,
-    pub protocol: u8, // 6 for TCP, 17 for UDP
-}
 
 #[map]
 static CONNECTION_EVENTS: PerfEventArray<ConnectionEvent> = PerfEventArray::new(0);
