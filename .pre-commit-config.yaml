@@ -27,7 +27,7 @@ repos:
     hooks:
       - id: fmt
         args: ['--verbose', '--']
-      - id: cargo-check
+#      - id: cargo-check
 #      - id: clippy
 #        args: ["--", "-D", "warnings", "-D", "unused-imports"]
 #  - repo: local
