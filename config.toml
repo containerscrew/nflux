@@ -8,5 +8,5 @@ interface_name = "wlo1"
 # All incoming connections will be blocked by default
 # You can specify allowed IP addresses and ports
 # This is a basic approach
-allowed_ipv4 = ["192.168.0.49"] # Specify IP addresses you want to allow
+allowed_ipv4 = ["192.168.0.26"] # Specify IP addresses you want to allow
 allowed_ports = [8080] # Specify ports you want to allow
