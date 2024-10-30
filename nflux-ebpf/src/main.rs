@@ -171,14 +171,20 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                         "UDP Packet: SRC IP {:i}, DST PORT {}", source, dst_port
                     );
 
+                    // Check if the IP address is blocked
+                    if is_ipv4_allowed(source) {
+                        info!(&ctx, "Allowed incoming connection from IP: {:i}", source);
+                        return Ok(xdp_action::XDP_PASS);
+                    }
+
                     log_connection_event(&ctx, source, 0, 0, dst_port, 17); // Protocol 17 for UDP
-                    Ok(xdp_action::XDP_PASS)
+                    Ok(xdp_action::XDP_DROP)
                 }
                 IpProto::Icmp => {
                     // Parse ICMP header
                     let icmphdr: *const IcmpHdr =
                         unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
-                    debug!(&ctx, "ICMP Packet: SRC IP {:i}", source);
+                    info!(&ctx, "ICMP Packet: SRC IP {:i}", source);
                     Ok(xdp_action::XDP_PASS)
                 }
                 _ => Ok(xdp_action::XDP_PASS),

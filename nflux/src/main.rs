@@ -18,11 +18,10 @@ use clap::Parser;
 use log::warn;
 use logger::setup_logger;
 use nflux_common::{ConnectionEvent, MAX_ALLOWED_PORTS};
+use std::env;
 use std::net::Ipv4Addr;
 use std::str::FromStr;
-use std::{env, mem, ptr};
-use tokio::{signal, task};
-use tracing::{error, event, info};
+use tracing::{error, info};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<(), anyhow::Error> {
@@ -72,28 +71,38 @@ async fn main() -> anyhow::Result<(), anyhow::Error> {
     // Populate allowed ports
     populate_allowed_ports(&mut bpf, &config)?;
 
-    // Read events from ringbuffer
+    // Read events from ring buffer
     let cpus = online_cpus().unwrap();
     let num_cpus = cpus.len();
     let mut events = AsyncPerfEventArray::try_from(bpf.map_mut("CONNECTION_EVENTS").unwrap())?;
 
-    for cpu in cpus {
-        let mut buf = events.open(cpu, None)?;
-
-        tokio::spawn(async move {
-            let mut buffers = (0..num_cpus)
-                .map(|_| BytesMut::with_capacity(9000))
-                .collect::<Vec<_>>();
-            loop {
-                let events = buf.read_events(&mut buffers).await.unwrap();
-                for i in 0..events.read {
-                    let buf = &mut buffers[i];
-                    let conn_event = unsafe { ptr::read(buf.as_ptr() as *const ConnectionEvent) };
-                    info!("Connection event: {:?}", conn_event);
-                }
-            }
-        });
-    }
+    // for cpu in cpus {
+    //     let mut buf = events.open(cpu, None)?;
+    //
+    //     tokio::spawn(async move {
+    //         let mut buffers = (0..num_cpus)
+    //             .map(|_| BytesMut::with_capacity(9000))
+    //             .collect::<Vec<_>>();
+    //
+    //         loop {
+    //             // Attempt to read events from the perf buffer into the prepared buffers.
+    //             let events = match buf.read_events(&mut buffers).await {
+    //                 Ok(events) => events,
+    //                 Err(e) => {
+    //                     warn!("Error reading events: {}", e);
+    //                     continue;
+    //                 }
+    //             };
+    //
+    //             // Iterate over the number of events read. `events.read` indicates how many events were read.
+    //             // for i in 0..events.read {
+    //             //     let buf = &mut buffers[i];
+    //             //     let data = buf.as_ptr() as *const ConnectionEvent; // Cast the buffer pointer to a Data pointer.
+    //             //     info!("{:?}", unsafe { *data });
+    //             // }
+    //         }
+    //     });
+    // }
 
     // Wait for shutdown signal
     wait_for_shutdown().await?;
