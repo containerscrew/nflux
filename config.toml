@@ -10,3 +10,4 @@ interface_name = "wlo1"
 # This is a basic approach
 allowed_ipv4 = ["192.168.0.26"] # Specify IP addresses you want to allow
 allowed_ports = [8080] # Specify ports you want to allow
+allow_icmp = false

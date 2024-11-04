@@ -14,6 +14,7 @@ pub struct Nflux {
 pub struct FirewallConfig {
     pub(crate) allowed_ipv4: Vec<String>,
     pub(crate) allowed_ports: Vec<u32>,
+    pub(crate) allow_icmp: bool,
 }
 
 #[derive(Deserialize)]
