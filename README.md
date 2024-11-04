@@ -12,9 +12,8 @@
   - [Outgoing traffic monitoring](#outgoing-traffic-monitoring)
 - [Using `nflux`](#using-nflux)
   - [Config.toml](#configtoml)
-- [Useful commands](#useful-commands)
-- [Contribution](#contribution)
-- [License](#license)
+- [Testing firewall](#testing-firewall)
+- [Debugging](#debugging)
 <!-- END OF TOC -->
 
 > [!IMPORTANT]
@@ -53,10 +52,25 @@ git clone https://github.com/containerscrew/nflux.git
 
 Since this project is under development just for fun and learning, you need to compile the project in your local:
 
-1. Install rust `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
-2. `rustup install stable && rustup toolchain install nightly --component rust-src`
-3. Optional, if using mac or other linux: `LLVM_SYS_180_PREFIX=$(brew --prefix llvm) cargo install --no-default-features bpf-linker`
-3. **MANDATORY:** `cargo install bpf-linker`
+1. Install rust:
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+2. Install nightly toolchain:
+```
+rustup install stable && rustup toolchain install nightly --component rust-src
+```
+
+3. Optional, if using mac or other linux:
+```bash
+LLVM_SYS_180_PREFIX=$(brew --prefix llvm) cargo install --no-default-features bpf-linker
+```
+
+3. **MANDATORY:**
+```bash
+cargo install bpf-linker
+```
 
 ## Config.toml
 
@@ -73,36 +87,56 @@ nvim config.toml # change the interface name
 > nflux uses XDP for packet processing. Only works with physical interfaces. If you want to use it with a virtual interface, you need to use the `tc` mode which is not implemented yet.
 > For example, you want to monitor incoming traffic using a virtual interface like `tun0` (VPN), you need to use the `tc` mode.
 
-Ok now you can try to open a port in your local machine, for example, port 8081, using a simple docker container:
+# Testing firewall
+Now you can try to map some services using docker. For example, let's expose an nginx server (tcp) and bind9 (udp):
 
 ```shell
-docker run -itd --rm --name test -p 8081:80 docker.io/nginx:latest
+make compose-up
 ```
 
-Run the firewall:
+Test the exposed services works. (Recommended) test the services from other device in the same network:
+
+* Nginx server:
+
+```bash
+curl http://ip:8081 # Welcome to nginx!
+```
+
+* Bind9 server:
+
+```bash
+dig @ip -p 5053 mycompany.org A
+```
+
+> Change `ip` to the ip of the machine where you are running the docker-compose and where you will run the firewall.
+
+Now, since the exposed port of `nginx` for example is `8081`, let's run the firewall without any allowed port:
+
+For example, in `config.toml`:
+
+```toml
+[log]
+log_level = "info"
+
+[nflux]
+interface_name = "wlo1"
+
+[firewall]
+# All incoming connections will be blocked by default
+# You can specify allowed IP addresses and ports
+# This is a basic approach
+allowed_ipv4 = [] # Specify IP addresses you want to allow
+allowed_ports = [] # Specify ports you want to allow
+allow_icmp = false
+```
+
+Try again `curl http://ip:8081` and you will see that the connection is blocked.
+
+Change the `interface_name` to your physical interface name, also you can play changing the `allowed_ipv4` and `allowed_ports` to allow some traffic.
+
+# Debugging
 
 ```shell
-# if you cloned the repo in the first step
-# in the root directory of the project
-cargo xtask run --
-```
-
-If everything works as expected, you will see the application log. By default, will only allow port `8080`, as the [config.toml](./config.toml) file says.
-
-Let's test it:
-
-From other laptop/device in your network:
-
-```shell
-curl http://192.168.0.X:8081 # the ip where the firewall is running
-```
-
-You will be blocked! Try to stop the firewall, change the port to 8081 in the [config.toml](./config.toml) file and run the firewall again.
-
-**Now you can access!**
-
-# Useful commands
-
 ```bash
 sudo bpftool prog list # show ebpf running programs
 ip link show dev wlo1 # xdp attached to your interface

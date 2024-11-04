@@ -30,9 +30,8 @@ fn panic(_info: &core::panic::PanicInfo) -> ! {
 static ALLOWED_PORTS: Array<u32> = Array::with_max_entries(MAX_ALLOWED_PORTS as u32, 0);
 #[map]
 static ALLOWED_IPV4: Array<u32> = Array::with_max_entries(MAX_ALLOWED_IPV4 as u32, 0);
-
 #[map]
-static CONNECTION_EVENTS: PerfEventArray<ConnectionEvent> = PerfEventArray::new(0);
+pub static CONNECTION_EVENTS: PerfEventArray<ConnectionEvent> = PerfEventArray::new(0);
 
 #[repr(C)]
 struct IpPort {
@@ -140,25 +139,26 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                         return Ok(xdp_action::XDP_PASS);
                     }
 
-                    // Deny incoming connections, except SYN-ACK packets
-                    if unsafe { (*tcphdr).syn() == 1 && (*tcphdr).ack() == 0 } {
-                        if should_log(source, dst_port) {
-                            info!(
-                                &ctx,
-                                "TCP SYN packet dropped (new incoming connection): from IP: {:i}, to local port: {}",
-                                source,
-                                dst_port
-                            );
-                        }
-                        log_connection_event(&ctx, source, 0, 0, dst_port, 6); // Protocol 6 for TCP
-                        return Ok(xdp_action::XDP_DROP);
-                    }
-                    debug!(
-                        &ctx,
-                        "TCP SYN-ACK packet accepted: from IP: {:i}, to local port: {}",
-                        source,
-                        dst_port
-                    );
+                    log_connection_event(&ctx, source, 0, 0, dst_port, 6); // Protocol 6 for TCP
+                                                                           // Deny incoming connections, except SYN-ACK packets
+                                                                           // if unsafe { (*tcphdr).syn() == 1 && (*tcphdr).ack() == 0 } {
+                                                                           //     if should_log(source, dst_port) {
+                                                                           //         info!(
+                                                                           //             &ctx,
+                                                                           //             "TCP SYN packet dropped (new incoming connection): from IP: {:i}, to local port: {}",
+                                                                           //             source,
+                                                                           //             dst_port
+                                                                           //         );
+                                                                           //     }
+                                                                           //     log_connection_event(&ctx, source, 0, 0, dst_port, 6); // Protocol 6 for TCP
+                                                                           //     return Ok(xdp_action::XDP_DROP);
+                                                                           // }
+                                                                           // debug!(
+                                                                           //     &ctx,
+                                                                           //     "TCP SYN-ACK packet dropped: from IP: {:i}, to local port: {}",
+                                                                           //     source,
+                                                                           //     dst_port
+                                                                           // );
                     Ok(xdp_action::XDP_DROP)
                 },
                 IpProto::Udp => {

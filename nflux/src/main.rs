@@ -95,11 +95,11 @@ async fn main() -> anyhow::Result<(), anyhow::Error> {
     //             };
     //
     //             // Iterate over the number of events read. `events.read` indicates how many events were read.
-    //             // for i in 0..events.read {
-    //             //     let buf = &mut buffers[i];
-    //             //     let data = buf.as_ptr() as *const ConnectionEvent; // Cast the buffer pointer to a Data pointer.
-    //             //     info!("{:?}", unsafe { *data });
-    //             // }
+    //             for i in 0..events.read {
+    //                 let buf = &mut buffers[i];
+    //                 let data = buf.as_ptr() as *const ConnectionEvent; // Cast the buffer pointer to a Data pointer.
+    //                 info!("{:?}", unsafe { *data });
+    //             }
     //         }
     //     });
     // }
