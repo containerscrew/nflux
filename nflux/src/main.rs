@@ -32,7 +32,7 @@ async fn main() -> anyhow::Result<(), anyhow::Error> {
     let config = Config::load_config(args.config_file.as_str());
 
     // Enable logging
-    setup_logger(&config.log.log_level);
+    setup_logger(&config.log.log_level, &config.log.log_type);
 
     // Check if user is root.
     if !is_root_user() {
@@ -72,9 +72,9 @@ async fn main() -> anyhow::Result<(), anyhow::Error> {
     populate_allowed_ports(&mut bpf, &config)?;
 
     // Read events from ring buffer
-    let cpus = online_cpus().unwrap();
-    let num_cpus = cpus.len();
-    let mut events = AsyncPerfEventArray::try_from(bpf.map_mut("CONNECTION_EVENTS").unwrap())?;
+    // let cpus = online_cpus().unwrap();
+    // let num_cpus = cpus.len();
+    // let mut events = AsyncPerfEventArray::try_from(bpf.map_mut("CONNECTION_EVENTS").unwrap())?;
 
     // for cpu in cpus {
     //     let mut buf = events.open(cpu, None)?;
