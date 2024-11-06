@@ -29,3 +29,13 @@ compose-up: ## Run docker-compose up
 
 compose-down: ## Run docker-compose down
 	docker-compose -f docker/compose.yml down
+
+remote-sync: ## Sync this repository to remote machine using rsync.
+	rsync -avzh --exclude='.git/' --exclude='target/' --exclude='.idea/' $(shell pwd)/ $(USER)@$(IP):/tmp/nflux
+
+install-systemd-service: ## Copy systemd service to /etc/systemd/system/
+	sudo cp systemd/$(app_name).service /etc/systemd/system/$(app_name).service
+
+install-binary: ## Install binary to /usr/local/bin/
+	cargo xtask build --release ;\
+	sudo cp target/release/$(app_name) /usr/local/bin/$(app_name)
