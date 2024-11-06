@@ -161,6 +161,7 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                         return Ok(xdp_action::XDP_PASS);
                     }
 
+                    log_new_connection(ctx, source, dst_port, "drop", "tcp");
                     Ok(xdp_action::XDP_DROP)
                 },
                 IpProto::Udp => unsafe {
@@ -172,18 +173,21 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
 
                     // Check if the IP address is blocked
                     if is_ipv4_allowed(source) {
+                        log_new_connection(ctx, source, dst_port, "pass", "udp");
                         return Ok(xdp_action::XDP_PASS);
                     }
                     // Check allowed ports
                     if is_port_allowed(dst_port) {
+                        log_new_connection(ctx, source, dst_port, "pass", "udp");
                         return Ok(xdp_action::XDP_PASS);
                     }
 
-                    // If the source port (DNS) or destination port (DNS) is 53, allow the packet
+                    // If the source port (DNS) is 53, allow the packet. Internet connection
                     if src_port == 53 {
                         return Ok(xdp_action::XDP_PASS);
                     }
 
+                    log_new_connection(ctx, source, dst_port, "drop", "tcp");
                     Ok(xdp_action::XDP_DROP)
                 },
                 IpProto::Icmp => unsafe {
@@ -194,7 +198,7 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                     // Retrieve the ICMP enable flag
                     let enabled = ICMP_ENABLED.get(0).unwrap_or(&0);
                     if *enabled == 1 {
-                        info!(
+                        debug!(
                             &ctx,
                             "ICMP Packet: SRC IP {:i}, DST IP {:i}",
                             source,
