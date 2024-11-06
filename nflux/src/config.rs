@@ -4,6 +4,7 @@ use tracing::trace;
 #[derive(Deserialize)]
 pub struct LoggingConfig {
     pub(crate) log_level: String,
+    pub(crate) log_type: String,
 }
 #[derive(Deserialize)]
 pub struct Nflux {
