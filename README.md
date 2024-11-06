@@ -11,7 +11,7 @@
   - [Basic XDP firewall](#basic-xdp-firewall)
   - [Outgoing traffic monitoring](#outgoing-traffic-monitoring)
 - [Using `nflux`](#using-nflux)
-  - [Config.toml](#configtoml)
+  - [nflux.toml](#nfluxtoml)
 - [Testing firewall](#testing-firewall)
 - [Debugging](#debugging)
 <!-- END OF TOC -->
@@ -72,15 +72,15 @@ LLVM_SYS_180_PREFIX=$(brew --prefix llvm) cargo install --no-default-features bp
 cargo install bpf-linker
 ```
 
-## Config.toml
+## nflux.toml
 
-You can manage the firewall from the file [config.toml](./config.toml). The most important setting is the network interface.
+You can manage the firewall from the file [nflux.toml](./nflux.toml). The most important setting is the network interface.
 Set your network interface correctly.
 
 ```shell
 ip route # check default via
-ip link show # then copy the name of the interface and put it in the config.toml
-nvim config.toml # change the interface name
+ip link show # then copy the name of the interface and put it in the nflux.toml
+nvim nflux.toml # change the interface name
 ```
 
 > [!CAUTION]
@@ -112,7 +112,7 @@ dig @ip -p 5053 mycompany.org A
 
 Now, since the exposed port of `nginx` for example is `8081`, let's run the firewall without any allowed port:
 
-For example, in `config.toml`:
+For example, in `nflux.toml`:
 
 ```toml
 [log]
