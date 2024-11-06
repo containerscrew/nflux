@@ -87,7 +87,34 @@ nvim nflux.toml # change the interface name
 > nflux uses XDP for packet processing. Only works with physical interfaces. If you want to use it with a virtual interface, you need to use the `tc` mode which is not implemented yet.
 > For example, you want to monitor incoming traffic using a virtual interface like `tun0` (VPN), you need to use the `tc` mode.
 
+Now, copy the `nflux.toml` to `/etc/nflux/nflux.toml`:
+
+```shell
+sudo mkdir -p /etc/nflux
+sudo cp nflux.toml /etc/nflux/nflux.toml
+```
+
+Install the binary in your bin path:
+
+```shell
+make install-binary
+```
+
+Now, copy the custom `systemd service` to `/etc/systemd/system/nflux.service`:
+
+```shell
+make install-systemd-service
+```
+
+Finally, start your `nflux` service:
+
+```shell
+sudo systemctl start nflux.service
+sudo systemctl status nflux.service
+```
+
 # Testing firewall
+
 Now you can try to map some services using docker. For example, let's expose an nginx server (tcp) and bind9 (udp):
 
 ```shell
@@ -116,18 +143,19 @@ For example, in `nflux.toml`:
 
 ```toml
 [log]
-log_level = "info"
+log_level = "info" # trace, debug, info, warn or error. Defaults to info if not set
+log_type = "text" # text or json. Defaults to text if not set
 
 [nflux]
-interface_name = "wlo1"
+interface_name = "wlp2s0"
 
 [firewall]
 # All incoming connections will be blocked by default
 # You can specify allowed IP addresses and ports
-# This is a basic approach
-allowed_ipv4 = [] # Specify IP addresses you want to allow
-allowed_ports = [] # Specify ports you want to allow
-allow_icmp = false
+# This will allow both, udp and tcp connections
+allowed_ipv4 = [] # Specify IP addresses you want to allow. Will be able to access full ports tcp/udp
+allowed_ports = [22, 5353] # Specify ports you want to allow. Everyone will be able to access these ports. No ip filtering
+allow_icmp = true
 ```
 
 Try again `curl http://ip:8081` and you will see that the connection is blocked.
