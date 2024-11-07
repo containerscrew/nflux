@@ -39,3 +39,14 @@ install-systemd-service: ## Copy systemd service to /etc/systemd/system/
 install-binary: ## Install binary to /usr/local/bin/
 	cargo xtask build --release ;\
 	sudo cp target/release/$(app_name) /usr/local/bin/$(app_name)
+
+paru-install: ## Install nflux with paru
+	paru -U .
+	#ls /usr/local/bin/nflux              # Check if the binary is installed
+	#ls /etc/systemd/system/nflux.service  # Check if the service file is in place
+
+paru-uninstall: ## Uninstall nflux with paru
+	pacman -Rns nflux
+
+run: ## Run nflux
+	cargo xtask run --

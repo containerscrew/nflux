@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -e
+
+case "$1" in
+    remove|purge)
+        # Stop the systemd service if it's running
+        if systemctl is-active --quiet nflux.service; then
+            systemctl stop nflux.service
+        fi
+
+        # Disable the systemd service
+        systemctl disable nflux.service
+
+        # Remove the systemd service file
+        rm -f /etc/systemd/system/nflux.service
+        systemctl daemon-reload
+        ;;
+esac

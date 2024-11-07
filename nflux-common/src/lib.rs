@@ -8,8 +8,6 @@ pub const MAX_ALLOWED_IPV4: usize = 1024;
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ConnectionEvent {
     pub src_addr: u32,
-    pub dst_addr: u32,
-    pub src_port: u16,
     pub dst_port: u16,
     pub protocol: u8, // 6 for TCP, 17 for UDP
 }

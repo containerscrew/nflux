@@ -9,16 +9,20 @@ use crate::config::Config;
 use crate::core::set_mem_limit;
 use crate::utils::{is_root_user, wait_for_shutdown};
 use anyhow::Context;
-use aya::maps::Array;
+use aya::maps::perf::{AsyncPerfEventArrayBuffer, PerfBufferError};
+use aya::maps::{Array, AsyncPerfEventArray, MapData};
 use aya::programs::{Xdp, XdpFlags};
+use aya::util::online_cpus;
 use aya::{include_bytes_aligned, Ebpf};
+use bytes::BytesMut;
 use clap::Parser;
 use log::warn;
 use logger::setup_logger;
-use nflux_common::MAX_ALLOWED_PORTS;
-use std::env;
+use nflux_common::{ConnectionEvent, MAX_ALLOWED_PORTS};
 use std::net::Ipv4Addr;
 use std::str::FromStr;
+use std::{env, ptr};
+use tokio::task;
 use tracing::{error, info};
 
 #[tokio::main]
@@ -63,14 +67,19 @@ async fn main() -> anyhow::Result<(), anyhow::Error> {
     );
     info!("Checking incoming packets...");
 
-    // Populate allowed IPv4 addresses
-    populate_allowed_ipv4(&mut bpf, &config)?;
+    // Populate eBPF maps
+    populate_allowed_ipv4_map(&mut bpf, &config)?;
+    populate_allowed_ports_map(&mut bpf, &config)?;
+    populate_icmp_map(&mut bpf, config.firewall.allow_icmp)?;
 
-    // Populate allowed ports
-    populate_allowed_ports(&mut bpf, &config)?;
+    let mut events = AsyncPerfEventArray::try_from(bpf.take_map("CONNECTION_EVENTS").unwrap())?;
+    let cpus = online_cpus().map_err(|(_, error)| error)?;
 
-    // ICMP enabled
-    set_icmp_enabled(&mut bpf, config.firewall.allow_icmp)?;
+    for cpu_id in cpus {
+        let mut buf = events.open(cpu_id, None)?;
+
+        task::spawn(process_events(buf, cpu_id));
+    }
 
     // Wait for shutdown signal
     wait_for_shutdown().await?;
@@ -78,8 +87,50 @@ async fn main() -> anyhow::Result<(), anyhow::Error> {
     Ok(())
 }
 
+async fn process_events(
+    mut buf: AsyncPerfEventArrayBuffer<MapData>,
+    cpu_id: u32,
+) -> Result<(), PerfBufferError> {
+    let mut buffers = vec![BytesMut::with_capacity(1024); 10];
+
+    loop {
+        // Wait for events
+        let events = buf.read_events(&mut buffers).await?;
+
+        // Process each event in the buffer
+        for i in 0..events.read {
+            let buf = &buffers[i];
+            match parse_connection_event(buf) {
+                Ok(event) => {
+                    info!(
+                        "CPU={} program=xdp protocol={} port={} ip={}",
+                        cpu_id,
+                        event.protocol,
+                        event.dst_port,
+                        Ipv4Addr::from(event.src_addr)
+                    );
+                }
+                Err(e) => error!("Failed to parse event on CPU {}: {}", cpu_id, e),
+            }
+        }
+    }
+}
+
+fn parse_connection_event(buf: &BytesMut) -> anyhow::Result<ConnectionEvent> {
+    if buf.len() >= std::mem::size_of::<ConnectionEvent>() {
+        let ptr = buf.as_ptr() as *const ConnectionEvent;
+        // Safety: we've confirmed the buffer is large enough
+        let event = unsafe { ptr::read_unaligned(ptr) };
+        Ok(event)
+    } else {
+        Err(anyhow::anyhow!(
+            "Buffer size is too small for ConnectionEvent"
+        ))
+    }
+}
+
 // Populate the eBPF array map for allowed IPv4 addresses
-fn populate_allowed_ipv4(bpf: &mut Ebpf, config: &Config) -> anyhow::Result<()> {
+fn populate_allowed_ipv4_map(bpf: &mut Ebpf, config: &Config) -> anyhow::Result<()> {
     let mut allowed_ipv4: Array<_, u32> = Array::try_from(bpf.map_mut("ALLOWED_IPV4").unwrap())?;
     for (index, ip_str) in config.firewall.allowed_ipv4.iter().enumerate() {
         let ip: Ipv4Addr = Ipv4Addr::from_str(ip_str)
@@ -93,7 +144,7 @@ fn populate_allowed_ipv4(bpf: &mut Ebpf, config: &Config) -> anyhow::Result<()> 
 }
 
 // Populate the eBPF array map for allowed ports
-fn populate_allowed_ports(bpf: &mut Ebpf, config: &Config) -> anyhow::Result<()> {
+fn populate_allowed_ports_map(bpf: &mut Ebpf, config: &Config) -> anyhow::Result<()> {
     let mut allowed_ports: Array<_, u32> = Array::try_from(bpf.map_mut("ALLOWED_PORTS").unwrap())?;
     for (index, &port) in config.firewall.allowed_ports.iter().enumerate() {
         if index < MAX_ALLOWED_PORTS {
@@ -114,7 +165,7 @@ fn populate_allowed_ports(bpf: &mut Ebpf, config: &Config) -> anyhow::Result<()>
     Ok(())
 }
 
-fn set_icmp_enabled(bpf: &mut Ebpf, enabled: bool) -> anyhow::Result<()> {
+fn populate_icmp_map(bpf: &mut Ebpf, enabled: bool) -> anyhow::Result<()> {
     let mut icmp_enabled: Array<_, u32> = Array::try_from(bpf.map_mut("ICMP_ENABLED").unwrap())?;
     icmp_enabled.set(0, if enabled { 1 } else { 0 }, 0)?;
     info!("ICMP enabled set to: {}", enabled);

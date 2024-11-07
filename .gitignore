@@ -11,3 +11,7 @@ target/
 
 # IDE
 .idea/
+
+
+# Debian builds
+deb-build/
