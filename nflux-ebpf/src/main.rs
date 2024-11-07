@@ -34,6 +34,9 @@ static ALLOWED_IPV4: Array<u32> = Array::with_max_entries(MAX_ALLOWED_IPV4 as u3
 #[map]
 static ICMP_ENABLED: Array<u32> = Array::with_max_entries(1, 0);
 
+#[map]
+static CONNECTION_EVENTS: PerfEventArray<ConnectionEvent> = PerfEventArray::new(0);
+
 #[xdp]
 pub fn nflux(ctx: XdpContext) -> u32 {
     match start_nflux(ctx) {
@@ -140,15 +143,24 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                         unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
                     let dst_port = u16::from_be(unsafe { (*tcphdr).dest });
 
+                    // Try to send info to perf event
+                    let event = ConnectionEvent {
+                        src_addr: source,
+                        dst_port,
+                        protocol: 6,
+                    };
+
+                    CONNECTION_EVENTS.output(&ctx, &event, 0);
+
                     // Check allowed ports
                     if is_port_allowed(dst_port) {
-                        log_new_connection(ctx, source, dst_port, "pass", "tcp");
+                        //log_new_connection(&ctx, source, dst_port, "pass", "tcp");
                         return Ok(xdp_action::XDP_PASS);
                     }
 
                     // Check if the IP address is blocked
                     if is_ipv4_allowed(source) {
-                        log_new_connection(ctx, source, dst_port, "pass", "tcp");
+                        //log_new_connection(&ctx, source, dst_port, "pass", "tcp");
                         return Ok(xdp_action::XDP_PASS);
                     }
 
@@ -161,7 +173,8 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                         return Ok(xdp_action::XDP_PASS);
                     }
 
-                    log_new_connection(ctx, source, dst_port, "drop", "tcp");
+                    //log_new_connection(&ctx, source, dst_port, "drop", "tcp");
+
                     Ok(xdp_action::XDP_DROP)
                 },
                 IpProto::Udp => unsafe {
@@ -173,12 +186,12 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
 
                     // Check if the IP address is blocked
                     if is_ipv4_allowed(source) {
-                        log_new_connection(ctx, source, dst_port, "pass", "udp");
+                        //log_new_connection(&ctx, source, dst_port, "pass", "udp");
                         return Ok(xdp_action::XDP_PASS);
                     }
                     // Check allowed ports
                     if is_port_allowed(dst_port) {
-                        log_new_connection(ctx, source, dst_port, "pass", "udp");
+                        //log_new_connection(&ctx, source, dst_port, "pass", "udp");
                         return Ok(xdp_action::XDP_PASS);
                     }
 
@@ -187,7 +200,7 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                         return Ok(xdp_action::XDP_PASS);
                     }
 
-                    log_new_connection(ctx, source, dst_port, "drop", "tcp");
+                    //log_new_connection(&ctx, source, dst_port, "drop", "tcp");
                     Ok(xdp_action::XDP_DROP)
                 },
                 IpProto::Icmp => unsafe {
@@ -204,14 +217,14 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                             source,
                             u32::from_be(unsafe { (*ipv4hdr).dst_addr })
                         );
-                        Ok(xdp_action::XDP_PASS) // Allow ICMP if enabled
+                        Ok(xdp_action::XDP_PASS)
                     } else {
-                        Ok(xdp_action::XDP_DROP) // Drop ICMP if disabled
+                        Ok(xdp_action::XDP_DROP)
                     }
                 },
-                _ => Ok(xdp_action::XDP_PASS),
+                _ => Ok(xdp_action::XDP_DROP),
             }
         }
-        _ => Ok(xdp_action::XDP_PASS),
+        _ => Ok(xdp_action::XDP_DROP),
     };
 }

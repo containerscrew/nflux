@@ -9,9 +9,16 @@ interface_name = "wlp2s0"
 # All incoming connections will be blocked by default
 # You can specify allowed IP addresses and ports
 # This will allow both, udp and tcp connections
-allowed_ipv4 = [] # Specify IP addresses you want to allow. Will be able to access full ports tcp/udp
-allowed_ports = [22, 5353] # Specify ports you want to allow. Everyone will be able to access these ports. No ip filtering
+
+# Specify IP addresses you want to allow. Will be able to access full ports tcp/udp
+allowed_ipv4 = []
+# Specify ports you want to allow. Everyone will be able to access these ports. No ip filtering
+allowed_ports = [22, 5353]
+# Allow ICMP packets (ping)
 allow_icmp = true
+# If strict_mode enabled, no Internet connection will be allowed TCP SYN-ACK packets or UDP port 53 packets
+strict_mode = false
+
 
 # TODO: Add more configurations
 # User can decide which ports to block based in TCP/UDP ip->port mapping

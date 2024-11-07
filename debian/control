@@ -1,0 +1,7 @@
+Package: nflux
+Version: 0.1.0
+Section: utils
+Priority: optional
+Architecture: amd64
+Maintainer: Daniels <info@containerscrew.com>
+Description: Network monitoring and firewall using EBPF, XDP, and TC. Powered by Aya-rs
