@@ -9,15 +9,15 @@ use aya_ebpf::{
     maps::{Array, LruHashMap, PerfEventArray},
     programs::XdpContext,
 };
-use aya_log_ebpf::{debug, info};
+
 use core::mem;
 use network_types::{
     eth::{EthHdr, EtherType},
-    icmp::IcmpHdr,
     ip::{IpProto, Ipv4Hdr},
     tcp::TcpHdr,
     udp::UdpHdr,
 };
+
 use nflux_common::{ConnectionEvent, MAX_ALLOWED_IPV4, MAX_ALLOWED_PORTS};
 
 #[cfg(not(test))]
@@ -97,14 +97,16 @@ struct IpPort {
 static RECENT_LOGS: LruHashMap<IpPort, u64> = LruHashMap::with_max_entries(1024, 0);
 
 // Function to check if we should log a dropped SYN packet to avoid excessive logging
-unsafe fn should_log(ip: u32, port: u16) -> bool {
+fn should_log(ip: u32, port: u16, log_interval_secs: u64) -> bool {
     let key = IpPort { ip, port };
     let now = current_time_ns();
 
-    if let Some(&last_logged) = RECENT_LOGS.get(&key) {
-        // Only log if more than 5 seconds have passed
-        if now - last_logged < 5_000_000_000 {
-            return false;
+    unsafe {
+        if let Some(&last_logged) = RECENT_LOGS.get(&key) {
+            // Only log if more than 5 seconds have passed
+            if now - last_logged < log_interval_secs * 1_000_000_000 {
+                return false;
+            }
         }
     }
 
@@ -113,118 +115,104 @@ unsafe fn should_log(ip: u32, port: u16) -> bool {
     true
 }
 
-unsafe fn log_new_connection(
+fn log_new_connection(
     ctx: XdpContext,
-    source: u32,
+    src_addr: u32,
     dst_port: u16,
-    action: &str,
-    protocol: &str,
+    protocol: u8,
+    log_interval_secs: u64,
 ) {
-    if should_log(source, dst_port) {
-        debug!(
-            &ctx,
-            "program=xdp protocol={} port={} ip={:i} action={}", protocol, dst_port, source, action
-        );
+    let event = ConnectionEvent {
+        src_addr,
+        dst_port,
+        protocol,
+    };
+
+    if should_log(src_addr, dst_port, log_interval_secs) {
+        CONNECTION_EVENTS.output(&ctx, &event, 0);
     }
 }
 
 fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
     let ethhdr: *const EthHdr = unsafe { ptr_at(&ctx, 0)? };
-    return match unsafe { (*ethhdr).ether_type } {
+    match unsafe { (*ethhdr).ether_type } {
         EtherType::Ipv4 => {
             let ipv4hdr: *const Ipv4Hdr = unsafe { ptr_at(&ctx, EthHdr::LEN)? };
             let source = u32::from_be(unsafe { (*ipv4hdr).src_addr });
             let proto = unsafe { (*ipv4hdr).proto };
 
             match proto {
-                IpProto::Tcp => unsafe {
+                IpProto::Tcp => {
                     // Parse the TCP header
                     let tcphdr: *const TcpHdr =
                         unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
                     let dst_port = u16::from_be(unsafe { (*tcphdr).dest });
 
-                    // Try to send info to perf event
-                    let event = ConnectionEvent {
-                        src_addr: source,
-                        dst_port,
-                        protocol: 6,
-                    };
-
-                    CONNECTION_EVENTS.output(&ctx, &event, 0);
-
-                    // Check allowed ports
-                    if is_port_allowed(dst_port) {
-                        //log_new_connection(&ctx, source, dst_port, "pass", "tcp");
-                        return Ok(xdp_action::XDP_PASS);
-                    }
-
-                    // Check if the IP address is blocked
-                    if is_ipv4_allowed(source) {
-                        //log_new_connection(&ctx, source, dst_port, "pass", "tcp");
-                        return Ok(xdp_action::XDP_PASS);
-                    }
-
                     // Deny incoming connections, except SYN-ACK packets
                     if unsafe { (*tcphdr).syn() == 1 && (*tcphdr).ack() == 0 } {
                         // Block unsolicited incoming SYN packets (deny incoming connections)
+                        // Except, allowed ports and IP addresses
+
+                        // Check ip port is allowed
+                        if is_port_allowed(dst_port) {
+                            log_new_connection(ctx, source, dst_port, 6, 5);
+                            return Ok(xdp_action::XDP_PASS);
+                        }
+
+                        // Check if the IP address is allowed
+                        if is_ipv4_allowed(source) {
+                            log_new_connection(ctx, source, dst_port, 6, 5);
+                            return Ok(xdp_action::XDP_PASS);
+                        }
+
                         return Ok(xdp_action::XDP_DROP);
                     } else if unsafe { (*tcphdr).ack() == 1 } {
                         // Permit ACK packets (responses to outgoing connections)
+                        log_new_connection(ctx, source, dst_port, 6, 5);
                         return Ok(xdp_action::XDP_PASS);
                     }
 
-                    //log_new_connection(&ctx, source, dst_port, "drop", "tcp");
-
                     Ok(xdp_action::XDP_DROP)
-                },
-                IpProto::Udp => unsafe {
+                }
+                IpProto::Udp => {
                     // Parse UDP header
                     let udphdr: *const UdpHdr =
                         unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
                     let dst_port = u16::from_be(unsafe { (*udphdr).dest });
                     let src_port = u16::from_be(unsafe { (*udphdr).source });
 
-                    // Check if the IP address is blocked
-                    if is_ipv4_allowed(source) {
-                        //log_new_connection(&ctx, source, dst_port, "pass", "udp");
-                        return Ok(xdp_action::XDP_PASS);
-                    }
-                    // Check allowed ports
-                    if is_port_allowed(dst_port) {
-                        //log_new_connection(&ctx, source, dst_port, "pass", "udp");
-                        return Ok(xdp_action::XDP_PASS);
-                    }
-
                     // If the source port (DNS) is 53, allow the packet. Internet connection
                     if src_port == 53 {
                         return Ok(xdp_action::XDP_PASS);
                     }
 
-                    //log_new_connection(&ctx, source, dst_port, "drop", "tcp");
-                    Ok(xdp_action::XDP_DROP)
-                },
-                IpProto::Icmp => unsafe {
-                    // Parse ICMP header
-                    // let icmphdr: *const IcmpHdr =
-                    //     unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
+                    // Check if the IP address is blocked
+                    if is_ipv4_allowed(source) {
+                        log_new_connection(ctx, source, dst_port, 17, 5);
+                        return Ok(xdp_action::XDP_PASS);
+                    }
 
+                    // Check allowed ports
+                    if is_port_allowed(dst_port) {
+                        log_new_connection(ctx, source, dst_port, 17, 5);
+                        return Ok(xdp_action::XDP_PASS);
+                    }
+
+                    Ok(xdp_action::XDP_DROP)
+                }
+                IpProto::Icmp => {
                     // Retrieve the ICMP enable flag
                     let enabled = ICMP_ENABLED.get(0).unwrap_or(&0);
                     if *enabled == 1 {
-                        debug!(
-                            &ctx,
-                            "ICMP Packet: SRC IP {:i}, DST IP {:i}",
-                            source,
-                            u32::from_be(unsafe { (*ipv4hdr).dst_addr })
-                        );
+                        log_new_connection(ctx, source, 0, 1, 5);
                         Ok(xdp_action::XDP_PASS)
                     } else {
                         Ok(xdp_action::XDP_DROP)
                     }
-                },
+                }
                 _ => Ok(xdp_action::XDP_DROP),
             }
         }
         _ => Ok(xdp_action::XDP_DROP),
-    };
+    }
 }

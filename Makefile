@@ -49,4 +49,4 @@ paru-uninstall: ## Uninstall nflux with paru
 	pacman -Rns nflux
 
 run: ## Run nflux
-	cargo xtask run --
+	cargo xtask run -- -c nflux.conf
