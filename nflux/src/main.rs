@@ -18,7 +18,7 @@ use bytes::BytesMut;
 use clap::Parser;
 use log::warn;
 use logger::setup_logger;
-use nflux_common::{ConnectionEvent, MAX_ALLOWED_PORTS};
+use nflux_common::{convert_protocol, ConnectionEvent, MAX_ALLOWED_PORTS};
 use std::net::Ipv4Addr;
 use std::str::FromStr;
 use std::{env, ptr};
@@ -30,7 +30,7 @@ async fn main() -> anyhow::Result<(), anyhow::Error> {
     // Parse command-line arguments
     let args = Args::parse();
 
-    // Load configuration file. Set the CONFIG_FILE_PATH env var. Example: CONFIG_FILE_PATH=./nflux.toml
+    // Load configuration file
     let config = Config::load_config(args.config_file.as_str());
 
     // Enable logging
@@ -47,9 +47,11 @@ async fn main() -> anyhow::Result<(), anyhow::Error> {
 
     // Load eBPF program
     let mut bpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/nflux")))?;
-    if let Err(e) = aya_log::EbpfLogger::init(&mut bpf) {
-        warn!("failed to initialize eBPF logger: {}", e);
-    }
+
+    // If you want to print logs from eBPF program, uncomment the following lines
+    // if let Err(e) = aya_log::EbpfLogger::init(&mut bpf) {
+    //     warn!("failed to initialize eBPF logger: {}", e);
+    // }
 
     // Attach XDP program
     // TODO: check if the interface you want to attach is valid (physical)
@@ -76,7 +78,7 @@ async fn main() -> anyhow::Result<(), anyhow::Error> {
     let cpus = online_cpus().map_err(|(_, error)| error)?;
 
     for cpu_id in cpus {
-        let mut buf = events.open(cpu_id, None)?;
+        let buf = events.open(cpu_id, None)?;
 
         task::spawn(process_events(buf, cpu_id));
     }
@@ -105,7 +107,7 @@ async fn process_events(
                     info!(
                         "CPU={} program=xdp protocol={} port={} ip={}",
                         cpu_id,
-                        event.protocol,
+                        convert_protocol(event.protocol),
                         event.dst_port,
                         Ipv4Addr::from(event.src_addr)
                     );
@@ -148,12 +150,10 @@ fn populate_allowed_ports_map(bpf: &mut Ebpf, config: &Config) -> anyhow::Result
     let mut allowed_ports: Array<_, u32> = Array::try_from(bpf.map_mut("ALLOWED_PORTS").unwrap())?;
     for (index, &port) in config.firewall.allowed_ports.iter().enumerate() {
         if index < MAX_ALLOWED_PORTS {
-            allowed_ports
-                .set(index as u32, port as u32, 0)
-                .context(format!(
-                    "Failed to set port {} in the allowed ports list",
-                    port
-                ))?;
+            allowed_ports.set(index as u32, port, 0).context(format!(
+                "Failed to set port {} in the allowed ports list",
+                port
+            ))?;
         } else {
             warn!(
                 "Skipping port {} because the maximum allowed ports limit was reached",

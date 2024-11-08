@@ -13,8 +13,8 @@ pub struct Args {
     #[arg(
         short = 'c',
         long = "config-file",
-        help = "Path to the configuration file nflux.toml",
-        default_value = "/etc/nflux/nflux.toml",
+        help = "Path to the configuration file nflux.conf",
+        default_value = "/etc/nflux/nflux.conf",
         required = false
     )]
     pub config_file: String,
