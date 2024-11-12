@@ -18,7 +18,7 @@ use network_types::{
     udp::UdpHdr,
 };
 
-use nflux_common::{ConnectionEvent, MAX_ALLOWED_IPV4, MAX_ALLOWED_PORTS};
+use nflux_common::{AppConfig, ConnectionEvent, APP_CONFIG_DEFAULTS};
 
 #[cfg(not(test))]
 #[panic_handler]
@@ -27,12 +27,7 @@ fn panic(_info: &core::panic::PanicInfo) -> ! {
 }
 
 #[map]
-static ALLOWED_PORTS: Array<u32> = Array::with_max_entries(MAX_ALLOWED_PORTS as u32, 0);
-#[map]
-static ALLOWED_IPV4: Array<u32> = Array::with_max_entries(MAX_ALLOWED_IPV4 as u32, 0);
-
-#[map]
-static ICMP_ENABLED: Array<u32> = Array::with_max_entries(1, 0);
+static APP_CONFIG: Array<AppConfig> = Array::with_max_entries(1, 0);
 
 #[map]
 static CONNECTION_EVENTS: PerfEventArray<ConnectionEvent> = PerfEventArray::new(0);
@@ -59,24 +54,28 @@ unsafe fn ptr_at<T>(ctx: &XdpContext, offset: usize) -> Result<*const T, ()> {
 }
 
 // Check if a port is allowed
-fn is_port_allowed(port: u16) -> bool {
-    for i in 0..MAX_ALLOWED_PORTS as u32 {
-        if let Some(allowed_port) = ALLOWED_PORTS.get(i) {
-            if port as u32 == *allowed_port {
-                return true;
-            }
+fn is_port_allowed(app_config: &AppConfig, port: u16) -> bool {
+    for &allowed_port in &app_config.allowed_ports {
+        if allowed_port == 0 {
+            // Stop if we hit an uninitialized entry (assuming 0 indicates unused entries)
+            break;
+        }
+        if port as u32 == allowed_port {
+            return true;
         }
     }
     false
 }
 
 // Check if an IP address is allowed
-fn is_ipv4_allowed(ip: u32) -> bool {
-    for i in 0..MAX_ALLOWED_IPV4 as u32 {
-        if let Some(&allowed_ip) = ALLOWED_IPV4.get(i) {
-            if ip == allowed_ip {
-                return true;
-            }
+fn is_ipv4_allowed(app_config: &AppConfig, ip: u32) -> bool {
+    for &allowed_ip in &app_config.allowed_ipv4 {
+        if allowed_ip == 0 {
+            // Stop if we hit an uninitialized entry (assuming 0 indicates unused entries)
+            break;
+        }
+        if ip == allowed_ip {
+            return true;
         }
     }
     false
@@ -115,6 +114,10 @@ fn should_log(ip: u32, port: u16, log_interval_secs: u64) -> bool {
     true
 }
 
+fn get_app_config() -> &'static AppConfig {
+    APP_CONFIG.get(0).unwrap_or(&APP_CONFIG_DEFAULTS)
+}
+
 fn log_new_connection(
     ctx: XdpContext,
     src_addr: u32,
@@ -135,6 +138,10 @@ fn log_new_connection(
 
 fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
     let ethhdr: *const EthHdr = unsafe { ptr_at(&ctx, 0)? };
+
+    // Get the app configuration
+    let app_config = get_app_config();
+
     match unsafe { (*ethhdr).ether_type } {
         EtherType::Ipv4 => {
             let ipv4hdr: *const Ipv4Hdr = unsafe { ptr_at(&ctx, EthHdr::LEN)? };
@@ -154,13 +161,13 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                         // Except, allowed ports and IP addresses
 
                         // Check ip port is allowed
-                        if is_port_allowed(dst_port) {
+                        if is_port_allowed(&app_config, dst_port) {
                             log_new_connection(ctx, source, dst_port, 6, 5);
                             return Ok(xdp_action::XDP_PASS);
                         }
 
                         // Check if the IP address is allowed
-                        if is_ipv4_allowed(source) {
+                        if is_ipv4_allowed(&app_config, source) {
                             log_new_connection(ctx, source, dst_port, 6, 5);
                             return Ok(xdp_action::XDP_PASS);
                         }
@@ -187,23 +194,25 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                     }
 
                     // Check if the IP address is blocked
-                    if is_ipv4_allowed(source) {
-                        log_new_connection(ctx, source, dst_port, 17, 5);
+                    if is_ipv4_allowed(&app_config, source) {
+                        log_new_connection(ctx, source, dst_port, 6, 5);
                         return Ok(xdp_action::XDP_PASS);
                     }
 
                     // Check allowed ports
-                    if is_port_allowed(dst_port) {
-                        log_new_connection(ctx, source, dst_port, 17, 5);
+                    // if is_port_allowed(dst_port) {
+                    //     log_new_connection(ctx, source, dst_port, 17, 5);
+                    //     return Ok(xdp_action::XDP_PASS);
+                    // }
+                    if is_port_allowed(&app_config, dst_port) {
+                        log_new_connection(ctx, source, dst_port, 6, 5);
                         return Ok(xdp_action::XDP_PASS);
                     }
 
                     Ok(xdp_action::XDP_DROP)
                 }
                 IpProto::Icmp => {
-                    // Retrieve the ICMP enable flag
-                    let enabled = ICMP_ENABLED.get(0).unwrap_or(&0);
-                    if *enabled == 1 {
+                    if app_config.allow_icmp == 1 {
                         log_new_connection(ctx, source, 0, 1, 5);
                         Ok(xdp_action::XDP_PASS)
                     } else {

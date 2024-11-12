@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+
+# Enable and start the service after installation
+systemctl enable nflux
+systemctl start nflux
+
+exit 0
