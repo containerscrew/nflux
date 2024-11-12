@@ -16,11 +16,11 @@ use aya::util::online_cpus;
 use aya::{include_bytes_aligned, Ebpf};
 use bytes::BytesMut;
 use clap::Parser;
-use log::warn;
 use logger::setup_logger;
-use nflux_common::{convert_protocol, ConnectionEvent, MAX_ALLOWED_PORTS};
+use nflux_common::{
+    convert_protocol, AppConfig, ConnectionEvent, MAX_ALLOWED_IPV4, MAX_ALLOWED_PORTS,
+};
 use std::net::Ipv4Addr;
-use std::str::FromStr;
 use std::{env, ptr};
 use tokio::task;
 use tracing::{error, info};
@@ -53,6 +53,18 @@ async fn main() -> anyhow::Result<(), anyhow::Error> {
     //     warn!("failed to initialize eBPF logger: {}", e);
     // }
 
+    let app_config = AppConfig {
+        allow_icmp: if config.firewall.allow_icmp { 1 } else { 0 },
+        allowed_ipv4: convert_ipv4_vec_to_array(&config.firewall.allowed_ipv4, MAX_ALLOWED_IPV4),
+        allowed_ports: convert_ports_vec_to_array(
+            &config.firewall.allowed_ports,
+            MAX_ALLOWED_PORTS,
+        ),
+    };
+
+    // Populate EBPF map with app config
+    load_app_config(&mut bpf, &app_config)?;
+
     // Attach XDP program
     // TODO: check if the interface you want to attach is valid (physical)
     // XDP program can only be attached to physical interfaces
@@ -68,11 +80,6 @@ async fn main() -> anyhow::Result<(), anyhow::Error> {
         config.nflux.interface_name
     );
     info!("Checking incoming packets...");
-
-    // Populate eBPF maps
-    populate_allowed_ipv4_map(&mut bpf, &config)?;
-    populate_allowed_ports_map(&mut bpf, &config)?;
-    populate_icmp_map(&mut bpf, config.firewall.allow_icmp)?;
 
     let mut events = AsyncPerfEventArray::try_from(bpf.take_map("CONNECTION_EVENTS").unwrap())?;
     let cpus = online_cpus().map_err(|(_, error)| error)?;
@@ -118,6 +125,32 @@ async fn process_events(
     }
 }
 
+// Helper function to convert Vec<String> to [u32; N]
+fn convert_ipv4_vec_to_array(vec: &Vec<String>, max_len: usize) -> [u32; MAX_ALLOWED_IPV4] {
+    let mut array = [0; MAX_ALLOWED_IPV4];
+    for (i, ip_str) in vec.iter().take(max_len).enumerate() {
+        if let Ok(ip) = ip_str.parse::<Ipv4Addr>() {
+            array[i] = u32::from(ip);
+        }
+    }
+    array
+}
+
+fn load_app_config(bpf: &mut Ebpf, app_config: &AppConfig) -> anyhow::Result<()> {
+    let mut app_config_map: Array<_, AppConfig> =
+        Array::try_from(bpf.map_mut("APP_CONFIG").unwrap())?;
+    app_config_map.set(0, app_config, 0)?;
+    Ok(())
+}
+
+fn convert_ports_vec_to_array(vec: &Vec<u32>, max_len: usize) -> [u32; MAX_ALLOWED_PORTS] {
+    let mut array = [0; MAX_ALLOWED_PORTS];
+    for (i, &port) in vec.iter().take(max_len).enumerate() {
+        array[i] = port;
+    }
+    array
+}
+
 fn parse_connection_event(buf: &BytesMut) -> anyhow::Result<ConnectionEvent> {
     if buf.len() >= std::mem::size_of::<ConnectionEvent>() {
         let ptr = buf.as_ptr() as *const ConnectionEvent;
@@ -129,45 +162,4 @@ fn parse_connection_event(buf: &BytesMut) -> anyhow::Result<ConnectionEvent> {
             "Buffer size is too small for ConnectionEvent"
         ))
     }
-}
-
-// Populate the eBPF array map for allowed IPv4 addresses
-fn populate_allowed_ipv4_map(bpf: &mut Ebpf, config: &Config) -> anyhow::Result<()> {
-    let mut allowed_ipv4: Array<_, u32> = Array::try_from(bpf.map_mut("ALLOWED_IPV4").unwrap())?;
-    for (index, ip_str) in config.firewall.allowed_ipv4.iter().enumerate() {
-        let ip: Ipv4Addr = Ipv4Addr::from_str(ip_str)
-            .with_context(|| format!("Invalid IP address: {}", ip_str))?;
-        allowed_ipv4
-            .set(index as u32, u32::from(ip), 0)
-            .with_context(|| format!("Failed to set IP address {} in eBPF map", ip_str))?;
-    }
-    info!("Allowed IPv4 addresses: {:?}", config.firewall.allowed_ipv4);
-    Ok(())
-}
-
-// Populate the eBPF array map for allowed ports
-fn populate_allowed_ports_map(bpf: &mut Ebpf, config: &Config) -> anyhow::Result<()> {
-    let mut allowed_ports: Array<_, u32> = Array::try_from(bpf.map_mut("ALLOWED_PORTS").unwrap())?;
-    for (index, &port) in config.firewall.allowed_ports.iter().enumerate() {
-        if index < MAX_ALLOWED_PORTS {
-            allowed_ports.set(index as u32, port, 0).context(format!(
-                "Failed to set port {} in the allowed ports list",
-                port
-            ))?;
-        } else {
-            warn!(
-                "Skipping port {} because the maximum allowed ports limit was reached",
-                port
-            );
-        }
-    }
-    info!("Allowed ports: {:?}", config.firewall.allowed_ports);
-    Ok(())
-}
-
-fn populate_icmp_map(bpf: &mut Ebpf, enabled: bool) -> anyhow::Result<()> {
-    let mut icmp_enabled: Array<_, u32> = Array::try_from(bpf.map_mut("ICMP_ENABLED").unwrap())?;
-    icmp_enabled.set(0, if enabled { 1 } else { 0 }, 0)?;
-    info!("ICMP enabled set to: {}", enabled);
-    Ok(())
 }
