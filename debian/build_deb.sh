@@ -13,7 +13,7 @@ cp debian/postrm deb-build/nflux/DEBIAN/
 cp debian/control deb-build/nflux/DEBIAN/
 cp debian/nflux.service deb-build/nflux/etc/systemd/system/
 cp debian/postrm deb-build/nflux/DEBIAN/
-cp nflux.conf deb-build/nflux/etc/nflux/nflux.conf
+cp nflux.toml deb-build/nflux/etc/nflux/nflux.toml
 
 # Build the Rust binary and place it in the package structure
 cargo xtask build --release

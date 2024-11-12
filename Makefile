@@ -35,9 +35,7 @@ remote-sync: ## Sync this repository to remote machine using rsync.
 
 install-dpkg: ## Install dpkg package
 	bash ./debian/build_deb.sh ;\
-	sudo dpkg -i nflux.deb ;\
-	sudo systemctl start nflux.service ;\
-	sudo systemctl status nflux.service
+	sudo dpkg -i nflux.deb
 
 paru-install: ## Install nflux with paru
 	paru -U .
@@ -48,4 +46,4 @@ paru-uninstall: ## Uninstall nflux with paru
 	pacman -Rns nflux
 
 run: ## Run nflux
-	cargo xtask run -- -c nflux.conf
+	cargo xtask run -- -c nflux.toml

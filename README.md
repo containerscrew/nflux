@@ -11,7 +11,7 @@
   - [Basic XDP firewall](#basic-xdp-firewall)
   - [Outgoing traffic monitoring](#outgoing-traffic-monitoring)
 - [Using `nflux`](#using-nflux)
-  - [nflux.conf](#nfluxconf)
+  - [nflux.toml](#nfluxtoml)
 - [Testing firewall](#testing-firewall)
 - [Debugging](#debugging)
 <!-- END OF TOC -->
@@ -72,26 +72,26 @@ LLVM_SYS_180_PREFIX=$(brew --prefix llvm) cargo install --no-default-features bp
 cargo install bpf-linker
 ```
 
-## nflux.conf
+## nflux.toml
 
-You can manage the firewall from the file [nflux.conf](./nflux.conf). The most important setting is the network interface.
+You can manage the firewall from the file [nflux.toml](./nflux.toml). The most important setting is the network interface.
 Set your network interface correctly.
 
 ```shell
 ip route # check default via
-ip link show # then copy the name of the interface and put it in the nflux.conf
-nvim nflux.conf # change the interface name
+ip link show # then copy the name of the interface and put it in the nflux.toml
+nvim nflux.toml # change the interface name
 ```
 
 > [!CAUTION]
 > nflux uses XDP for packet processing. Only works with physical interfaces. If you want to use it with a virtual interface, you need to use the `tc` mode which is not implemented yet.
 > For example, you want to monitor incoming traffic using a virtual interface like `tun0` (VPN), you need to use the `tc` mode.
 
-Now, copy the `nflux.conf` to `/etc/nflux/nflux.conf`:
+Now, copy the `nflux.toml` to `/etc/nflux/nflux.toml`:
 
 ```shell
 sudo mkdir -p /etc/nflux
-sudo cp nflux.conf /etc/nflux/nflux.conf
+sudo cp nflux.toml /etc/nflux/nflux.toml
 ```
 
 Install the binary in your bin path:
@@ -139,7 +139,7 @@ dig @ip -p 5053 mycompany.org A
 
 Now, since the exposed port of `nginx` for example is `8081`, let's run the firewall without any allowed port:
 
-For example, in `nflux.conf`:
+For example, in `nflux.toml`:
 
 ```toml
 [log]
