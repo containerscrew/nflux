@@ -2,7 +2,7 @@
 Description=Network monitoring and firewall using eBPF
 After=network-online.target nss-lookup.target
 Wants=network-online.target nss-lookup.target
-ConditionPathExists=|/etc/nflux/nflux.conf
+ConditionPathExists=|/etc/nflux/nflux.toml
 
 [Service]
 ExecStart=/usr/local/bin/nflux
