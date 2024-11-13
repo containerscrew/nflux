@@ -47,3 +47,6 @@ paru-uninstall: ## Uninstall nflux with paru
 
 run: ## Run nflux
 	cargo xtask run -- -c nflux.toml
+
+journal-logs: ## Show journal logs
+	sudo journalctl -u nflux.service -f
