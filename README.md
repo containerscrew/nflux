@@ -1,5 +1,6 @@
 > [!WARNING]
 > Ignore this README. It may change as I develop and adjust configurations.
+> The entire tool is under development, while I am learning Rust and eBPF.
 
 <p align="center">
     <h3 align="center">nflux</h3>
@@ -14,16 +15,14 @@
 - [Requirements](#requirements)
 - [Installation](#installation)
   - [Debian/Ubuntu installation](#debianubuntu-installation)
-    - [Edit `nflux.toml` if needed](#edit-nfluxtoml-if-needed)
-    - [Check logs](#check-logs)
+- [Configuration file](#configuration-file)
+- [Logging](#logging)
 - [Testing firewall](#testing-firewall)
 - [Debugging](#debugging)
 - [Contribution](#contribution)
 - [License](#license)
 <!-- END OF TOC -->
 
-> [!IMPORTANT]
-> By the moment this tool is under development
 
 # Intro
 
@@ -81,26 +80,24 @@ By the moment, I only have the setup for `dpkg` (Debian/Ubuntu).
 
 ## Debian/Ubuntu installation
 
-
 ```shell
 make install-dpkg
 ```
 
-### Edit `nflux.toml` if needed
+# Configuration file
 
-Edit the main configuration file if needed:
+Edit the main configuration [`nflux.toml`](./nflux.toml) file if needed:
 
 ```shell
 sudo nvim /etc/nflux/nflux.toml
 sudo systemctl restart nflux.service
 ```
 
-### Check logs
+# Logging
 
 ```shell
 make journal-logs
 ```
-
 
 # Testing firewall
 
