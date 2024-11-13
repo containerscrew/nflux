@@ -2,15 +2,19 @@
 Description=Network monitoring and firewall using eBPF
 After=network-online.target nss-lookup.target
 Wants=network-online.target nss-lookup.target
-ConditionPathExists=|/etc/nflux/nflux.toml
+ConditionPathExists=/etc/nflux/nflux.toml
 
 [Service]
 ExecStart=/usr/local/bin/nflux
 Restart=on-failure
 User=root
 Group=root
-StandardOutput=file:/tmp/nflux.log
-#StandardError=file:/tmp/nflux.log
+StandardOutput=journal
+StandardError=journal
+# Alternatively, if you want to log to a file, uncomment these:
+# StandardOutput=file:/tmp/nflux.log
+# StandardError=file:/tmp/nflux.log
+# EnvironmentFile=/etc/nflux/nflux.env
 
 [Install]
 WantedBy=multi-user.target

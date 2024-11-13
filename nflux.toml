@@ -1,5 +1,5 @@
 [log]
-log_level = "info" # trace, debug, info, warn or error. Defaults to info if not set
+log_level = "warn" # trace, debug, info, warn or error. Defaults to info if not set
 log_type = "text" # text or json. Defaults to text if not set
 
 [nflux]
@@ -11,11 +11,11 @@ interface_name = "wlp2s0"
 # This will allow both, udp and tcp connections
 
 # Specify IP addresses you want to allow. Will be able to access full ports tcp/udp
-allowed_ipv4 = []
+allowed_ipv4 = ["192.168.0.30"]
 # Specify ports you want to allow. Everyone will be able to access these ports. No ip filtering
-allowed_ports = [22]
+allowed_ports = []
 # Allow ICMP packets (ping)
-allow_icmp = true
+allow_icmp = false
 
 
 # TODO: Add more configurations
