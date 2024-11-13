@@ -78,6 +78,10 @@ cargo install bpf-linker
 
 By the moment, I only have the setup for `dpkg` (Debian/Ubuntu).
 
+```shell
+git clone https://github.com/containerscrew/nflux.git
+```
+
 ## Debian/Ubuntu installation
 
 ```shell
@@ -165,4 +169,4 @@ Any improvement is welcome! If you want to help me improve in Rust and eBPF, I'd
 
 # License
 
-**`nflow`** is distributed under the terms of the [AGPL3](./LICENSE) license.
+**`nflux`** is distributed under the terms of the [AGPL3](./LICENSE) license.
