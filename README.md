@@ -11,12 +11,15 @@
 **Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
 - [Intro](#intro)
 - [Features](#features)
-  - [Basic XDP firewall](#basic-xdp-firewall)
-  - [Outgoing traffic monitoring](#outgoing-traffic-monitoring)
-- [Using `nflux`](#using-nflux)
-  - [nflux.toml](#nfluxtoml)
+- [Requirements](#requirements)
+- [Installation](#installation)
+  - [Debian/Ubuntu installation](#debianubuntu-installation)
+    - [Edit `nflux.toml` if needed](#edit-nfluxtoml-if-needed)
+    - [Check logs](#check-logs)
 - [Testing firewall](#testing-firewall)
 - [Debugging](#debugging)
+- [Contribution](#contribution)
+- [License](#license)
 <!-- END OF TOC -->
 
 > [!IMPORTANT]
@@ -34,26 +37,18 @@ Powerful, right? Same for traffic control (TC).
 
 # Features
 
-## Basic XDP firewall
+Basic XDP firewall:
 
 * Block TCP SYN incoming packets
 * Allow incoming SYN-ACK incoming packets (for example, you are using your browser)
 * Block ICMP incoming packets
 * User can allow traffic for specific incoming ports
+* User can allow traffic for specific IP addresses
 
-## Outgoing traffic monitoring
 
-in progress
+# Requirements
 
-# Using `nflux`
-
-First of all, clone the repo:
-
-```shell
-git clone https://github.com/containerscrew/nflux.git
-```
-
-Since this project is under development just for fun and learning, you need to compile the project in your local:
+`nflux` is not available in any package manager yet. You need to build it from source.
 
 1. Install rust:
 ```bash
@@ -75,46 +70,37 @@ LLVM_SYS_180_PREFIX=$(brew --prefix llvm) cargo install --no-default-features bp
 cargo install bpf-linker
 ```
 
-## nflux.toml
-
-You can manage the firewall from the file [nflux.toml](./nflux.toml). The most important setting is the network interface.
-Set your network interface correctly.
-
-```shell
-ip route # check default via
-ip link show # then copy the name of the interface and put it in the nflux.toml
-nvim nflux.toml # change the interface name
-```
-
 > [!CAUTION]
 > nflux uses XDP for packet processing. Only works with physical interfaces. If you want to use it with a virtual interface, you need to use the `tc` mode which is not implemented yet.
 > For example, you want to monitor incoming traffic using a virtual interface like `tun0` (VPN), you need to use the `tc` mode.
 
-Now, copy the `nflux.toml` to `/etc/nflux/nflux.toml`:
+
+# Installation
+
+By the moment, I only have the setup for `dpkg` (Debian/Ubuntu).
+
+## Debian/Ubuntu installation
+
 
 ```shell
-sudo mkdir -p /etc/nflux
-sudo cp nflux.toml /etc/nflux/nflux.toml
+make install-dpkg
 ```
 
-Install the binary in your bin path:
+### Edit `nflux.toml` if needed
+
+Edit the main configuration file if needed:
 
 ```shell
-make install-binary
+sudo nvim /etc/nflux/nflux.toml
+sudo systemctl restart nflux.service
 ```
 
-Now, copy the custom `systemd service` to `/etc/systemd/system/nflux.service`:
+### Check logs
 
 ```shell
-make install-systemd-service
+make journal-logs
 ```
 
-Finally, start your `nflux` service:
-
-```shell
-sudo systemctl start nflux.service
-sudo systemctl status nflux.service
-```
 
 # Testing firewall
 
@@ -156,9 +142,13 @@ interface_name = "wlp2s0"
 # All incoming connections will be blocked by default
 # You can specify allowed IP addresses and ports
 # This will allow both, udp and tcp connections
-allowed_ipv4 = [] # Specify IP addresses you want to allow. Will be able to access full ports tcp/udp
-allowed_ports = [22, 5353] # Specify ports you want to allow. Everyone will be able to access these ports. No ip filtering
-allow_icmp = true
+
+# Specify IP addresses you want to allow. Will be able to access full ports tcp/udp
+allowed_ipv4 = ["192.168.0.30"]
+# Specify ports you want to allow. Everyone will be able to access these ports. No ip filtering
+allowed_ports = ["8080"]
+# Allow ICMP packets (ping)
+allow_icmp = false
 ```
 
 Try again `curl http://ip:8081` and you will see that the connection is blocked.
@@ -167,7 +157,6 @@ Change the `interface_name` to your physical interface name, also you can play c
 
 # Debugging
 
-```shell
 ```bash
 sudo bpftool prog list # show ebpf running programs
 ip link show dev wlo1 # xdp attached to your interface
