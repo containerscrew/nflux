@@ -74,7 +74,7 @@ async fn main() -> anyhow::Result<(), anyhow::Error> {
         .context("failed to attach the XDP program with default flags - try changing XdpFlags::default() to XdpFlags::SKB_MODE")?;
 
     // Some basic info
-    info!("starting nflux");
+    println!("\x1b[32mstarting nflux, a network traffic firewall and monitoring!\x1b[0m");
     info!(
         "Successfully attached XDP program to iface: {}",
         config.nflux.interface_name

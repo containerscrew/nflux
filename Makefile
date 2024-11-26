@@ -37,6 +37,9 @@ install-dpkg: ## Install dpkg package
 	bash ./debian/build_deb.sh ;\
 	sudo dpkg -i nflux.deb
 
+uninstall-dpkg: ## Uninstall dpkg package
+	sudo dpkg --purge nflux
+
 paru-install: ## Install nflux with paru
 	paru -U .
 	#ls /usr/local/bin/nflux              # Check if the binary is installed
@@ -45,7 +48,7 @@ paru-install: ## Install nflux with paru
 paru-uninstall: ## Uninstall nflux with paru
 	pacman -Rns nflux
 
-run: ## Run nflux
+local-run: ## Run nflux locally
 	cargo xtask run -- -c nflux.toml
 
 journal-logs: ## Show journal logs
