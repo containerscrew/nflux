@@ -1,5 +1,5 @@
 [log]
-log_level = "info" # trace, debug, info, warn or error. Defaults to info if not set
+log_level = "warn" # trace, debug, info, warn or error. Defaults to info if not set
 log_type = "text" # text or json. Defaults to text if not set
 
 [nflux]
