@@ -155,23 +155,20 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                         unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
                     let dst_port = u16::from_be(unsafe { (*tcphdr).dest });
 
+                    if is_port_allowed(&app_config, dst_port) {
+                        log_new_connection(ctx, source, dst_port, 6, 5);
+                        return Ok(xdp_action::XDP_PASS);
+                    }
+
+                    // Check if the IP address is allowed
+                    if is_ipv4_allowed(&app_config, source) {
+                        log_new_connection(ctx, source, dst_port, 6, 5);
+                        return Ok(xdp_action::XDP_PASS);
+                    }
+
                     // Deny incoming connections, except SYN-ACK packets
                     if unsafe { (*tcphdr).syn() == 1 && (*tcphdr).ack() == 0 } {
                         // Block unsolicited incoming SYN packets (deny incoming connections)
-                        // Except, allowed ports and IP addresses
-
-                        // Check ip port is allowed
-                        if is_port_allowed(&app_config, dst_port) {
-                            log_new_connection(ctx, source, dst_port, 6, 5);
-                            return Ok(xdp_action::XDP_PASS);
-                        }
-
-                        // Check if the IP address is allowed
-                        if is_ipv4_allowed(&app_config, source) {
-                            log_new_connection(ctx, source, dst_port, 6, 5);
-                            return Ok(xdp_action::XDP_PASS);
-                        }
-
                         return Ok(xdp_action::XDP_DROP);
                     } else if unsafe { (*tcphdr).ack() == 1 } {
                         // Permit ACK packets (responses to outgoing connections)
@@ -200,10 +197,6 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                     }
 
                     // Check allowed ports
-                    // if is_port_allowed(dst_port) {
-                    //     log_new_connection(ctx, source, dst_port, 17, 5);
-                    //     return Ok(xdp_action::XDP_PASS);
-                    // }
                     if is_port_allowed(&app_config, dst_port) {
                         log_new_connection(ctx, source, dst_port, 6, 5);
                         return Ok(xdp_action::XDP_PASS);

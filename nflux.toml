@@ -1,5 +1,5 @@
 [log]
-log_level = "warn" # trace, debug, info, warn or error. Defaults to info if not set
+log_level = "info" # trace, debug, info, warn or error. Defaults to info if not set
 log_type = "text" # text or json. Defaults to text if not set
 
 [nflux]
@@ -13,7 +13,7 @@ interface_name = "wlp2s0"
 # Specify IP addresses you want to allow. Will be able to access full ports tcp/udp
 allowed_ipv4 = ["192.168.0.30"]
 # Specify ports you want to allow. Everyone will be able to access these ports. No ip filtering
-allowed_ports = []
+allowed_ports = [22]
 # Allow ICMP packets (ping)
 allow_icmp = false
 
