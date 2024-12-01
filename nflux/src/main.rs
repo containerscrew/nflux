@@ -1,12 +1,7 @@
-mod cli;
 mod config;
 mod core;
 mod logger;
 mod utils;
-
-use crate::cli::Args;
-use crate::config::Config;
-use crate::core::set_mem_limit;
 use crate::utils::{is_root_user, wait_for_shutdown};
 use anyhow::Context;
 use aya::maps::perf::{AsyncPerfEventArrayBuffer, PerfBufferError};
@@ -15,8 +10,8 @@ use aya::programs::{Xdp, XdpFlags};
 use aya::util::online_cpus;
 use aya::{include_bytes_aligned, Ebpf};
 use bytes::BytesMut;
-use clap::Parser;
 use logger::setup_logger;
+use nflux::{set_mem_limit, Config};
 use nflux_common::{
     convert_protocol, AppConfig, ConnectionEvent, MAX_ALLOWED_IPV4, MAX_ALLOWED_PORTS,
 };
@@ -27,11 +22,8 @@ use tracing::{error, info};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<(), anyhow::Error> {
-    // Parse command-line arguments
-    let args = Args::parse();
-
     // Load configuration file
-    let config = Config::load_config(args.config_file.as_str());
+    let config = Config::load();
 
     // Enable logging
     setup_logger(&config.log.log_level, &config.log.log_type);
@@ -74,7 +66,7 @@ async fn main() -> anyhow::Result<(), anyhow::Error> {
         .context("failed to attach the XDP program with default flags - try changing XdpFlags::default() to XdpFlags::SKB_MODE")?;
 
     // Some basic info
-    println!("\x1b[32mstarting nflux, a network traffic firewall and monitoring!\x1b[0m");
+    info!("nflux started successfully!");
     info!(
         "Successfully attached XDP program to iface: {}",
         config.nflux.interface_name

@@ -1,34 +1,43 @@
 use serde::Deserialize;
+use std::env;
 use std::fs;
-use tracing::trace;
+
 #[derive(Deserialize)]
+#[allow(dead_code)]
 pub struct LoggingConfig {
-    pub(crate) log_level: String,
-    pub(crate) log_type: String,
+    pub log_level: String,
+    pub log_type: String,
 }
+
 #[derive(Deserialize)]
+#[allow(dead_code)]
 pub struct Nflux {
-    pub(crate) interface_name: String,
+    pub interface_name: String,
 }
 
 #[derive(Deserialize)]
+#[allow(dead_code)]
 pub struct FirewallConfig {
-    pub(crate) allowed_ipv4: Vec<String>,
-    pub(crate) allowed_ports: Vec<u32>,
-    pub(crate) allow_icmp: bool,
+    pub allowed_ipv4: Vec<String>,
+    pub allowed_ports: Vec<u32>,
+    pub allow_icmp: bool,
 }
 
 #[derive(Deserialize)]
+#[allow(dead_code)]
 pub struct Config {
-    pub(crate) log: LoggingConfig,
-    pub(crate) firewall: FirewallConfig,
-    pub(crate) nflux: Nflux,
+    pub log: LoggingConfig,
+    pub firewall: FirewallConfig,
+    pub nflux: Nflux,
 }
 
 impl Config {
-    // This function loads the configuration from the file
-    pub(crate) fn load_config(config_file: &str) -> Self {
-        let config_content = match fs::read_to_string(config_file) {
+    /// Load the configuration from a file, defaulting to `/etc/nflux/nflux.toml` if not specified
+    pub fn load() -> Self {
+        let config_file = env::var("NFLUX_CONFIG_FILE_PATH")
+            .unwrap_or_else(|_| "/etc/nflux/nflux.toml".to_string());
+
+        let config_content = match fs::read_to_string(&config_file) {
             Ok(content) => content,
             Err(e) => {
                 panic!("Failed to read configuration file {}: {}", config_file, e);
@@ -36,10 +45,7 @@ impl Config {
         };
 
         match toml::from_str(&config_content) {
-            Ok(config) => {
-                trace!("Configuration loaded successfully");
-                config
-            }
+            Ok(config) => config,
             Err(e) => {
                 panic!("Failed to parse configuration file {}: {}", config_file, e);
             }

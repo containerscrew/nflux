@@ -1,0 +1,25 @@
+name: Auto Merge Dependabot PRs
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  auto-merge:
+    name: Auto-merge dependabot PRs
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Auto-merge PR if it bumps the clap dependency
+        uses: pascalgn/automerge-action@v0.16.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
+        with:
+          MERGE_METHOD: "squash"
+          LOG: "TRACE"
