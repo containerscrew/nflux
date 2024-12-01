@@ -1,30 +1,18 @@
-[log]
+[firewall]
+# Applies for ipv4 and ipv6
+# Global means, if you put here an ip will be able to access every port, tcp and udp
+# enabled = true/false #TODO: Implement this
+icmp_enabled = true
+interface_name = "wlp2s0"
 log_level = "info" # trace, debug, info, warn or error. Defaults to info if not set
 log_type = "text" # text or json. Defaults to text if not set
 
-[nflux]
-interface_name = "wlp2s0"
+[firewall.ipv4_rules]
+# This is more finetuned, you can specify which ip can access which port
+"192.168.0.4" = { action = "deny", ports = [80], protocol = "tcp" }
+"192.168.0.11" = { action = "allow", ports = [53], protocol = "udp"}
+"192.168.0.50" = { action = "deny", ports = [22, 443], protocol = "tcp" }
+"192.168.0.100" = { action = "allow", ports = [80, 8080], protocol = "tcp"}
 
-[firewall]
-# All incoming connections will be blocked by default
-# You can specify allowed IP addresses and ports
-# This will allow both, udp and tcp connections
-defaut_action = "deny" # deny or allow
-
-# Specify IP addresses you want to allow. Will be able to access full ports tcp/udp
-allowed_ipv4 = ["192.168.0.30"]
-# Specify ports you want to allow. Everyone will be able to access these ports. No ip filtering
-allowed_ports = [22]
-# Allow ICMP packets (ping)
-allow_icmp = false
-
-
-# [firewall.rules]
-# "192.168.0.4" = { action = "deny", ports = [80] }
-# "192.168.0.11" = { action = "allow", ports = [53] }
-# "192.168.0.50" = { action = "deny", ports = [22, 443] }
-# "192.168.0.100" = { action = "allow", ports = [80, 8080] }
-
-# TODO: Add more configurations
-# User can decide which ports to block based in TCP/UDP ip->port mapping
-# For example, allow ip 192.168.0.22 to access 22/tcp but deny 53/udp. This is not implemented yet
+[firewall.ipv6_rules]
+"2001:0db8:85a3:0000:0000:8a2e:0370:7334" = { action = "deny", ports = [80], protocol = "tcp" }

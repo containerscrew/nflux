@@ -1,6 +1,10 @@
+use std::collections::HashMap;
+
 use libc::getuid;
 use tokio::signal;
 use tracing::{info, warn};
+
+use crate::config::FirewallRule;
 
 // Check if the current user ID is 0 (root)
 pub fn is_root_user() -> bool {
