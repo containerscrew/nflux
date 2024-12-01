@@ -1,5 +1,5 @@
 [log]
-log_level = "warn" # trace, debug, info, warn or error. Defaults to info if not set
+log_level = "info" # trace, debug, info, warn or error. Defaults to info if not set
 log_type = "text" # text or json. Defaults to text if not set
 
 [nflux]
@@ -9,6 +9,7 @@ interface_name = "wlp2s0"
 # All incoming connections will be blocked by default
 # You can specify allowed IP addresses and ports
 # This will allow both, udp and tcp connections
+defaut_action = "deny" # deny or allow
 
 # Specify IP addresses you want to allow. Will be able to access full ports tcp/udp
 allowed_ipv4 = ["192.168.0.30"]
@@ -17,6 +18,12 @@ allowed_ports = [22]
 # Allow ICMP packets (ping)
 allow_icmp = false
 
+
+# [firewall.rules]
+# "192.168.0.4" = { action = "deny", ports = [80] }
+# "192.168.0.11" = { action = "allow", ports = [53] }
+# "192.168.0.50" = { action = "deny", ports = [22, 443] }
+# "192.168.0.100" = { action = "allow", ports = [80, 8080] }
 
 # TODO: Add more configurations
 # User can decide which ports to block based in TCP/UDP ip->port mapping
