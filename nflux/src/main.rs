@@ -13,7 +13,8 @@ use bytes::BytesMut;
 use logger::setup_logger;
 use nflux::{set_mem_limit, Config};
 use nflux_common::{
-    convert_protocol, AppConfig, ConnectionEvent, MAX_ALLOWED_IPV4, MAX_ALLOWED_PORTS,
+    convert_protocol, AppConfig, ConnectionEvent, GlobalFirewall, MAX_ALLOWED_IPV4,
+    MAX_ALLOWED_PORTS,
 };
 use std::net::Ipv4Addr;
 use std::{env, ptr};
@@ -45,17 +46,19 @@ async fn main() -> anyhow::Result<(), anyhow::Error> {
     //     warn!("failed to initialize eBPF logger: {}", e);
     // }
 
-    let app_config = AppConfig {
-        allow_icmp: if config.firewall.allow_icmp { 1 } else { 0 },
-        allowed_ipv4: convert_ipv4_vec_to_array(&config.firewall.allowed_ipv4, MAX_ALLOWED_IPV4),
+    let global_firewall = GlobalFirewallRules {
+        allowed_ipv4: convert_ipv4_vec_to_array(
+            &config.firewall.global_rules.allowed_ipv4,
+            MAX_ALLOWED_IPV4,
+        ),
         allowed_ports: convert_ports_vec_to_array(
-            &config.firewall.allowed_ports,
+            &config.firewall.global_rules.allowed_ports,
             MAX_ALLOWED_PORTS,
         ),
     };
 
     // Populate EBPF map with app config
-    load_app_config(&mut bpf, &app_config)?;
+    populate_global_rules(&mut bpf, &app_config)?;
 
     // Attach XDP program
     // TODO: check if the interface you want to attach is valid (physical)
@@ -128,10 +131,10 @@ fn convert_ipv4_vec_to_array(vec: &Vec<String>, max_len: usize) -> [u32; MAX_ALL
     array
 }
 
-fn load_app_config(bpf: &mut Ebpf, app_config: &AppConfig) -> anyhow::Result<()> {
-    let mut app_config_map: Array<_, AppConfig> =
-        Array::try_from(bpf.map_mut("APP_CONFIG").unwrap())?;
-    app_config_map.set(0, app_config, 0)?;
+fn populate_global_rules(bpf: &mut Ebpf, global_rules: &GlobalFirewallRules) -> anyhow::Result<()> {
+    let mut global_rules_map: Array<_, GlobalFirewallRules> =
+        Array::try_from(bpf.map_mut("GLOBAL_FIREWALL_RULES").unwrap())?;
+    global_rules_map.set(0, global_rules, 0)?;
     Ok(())
 }
 

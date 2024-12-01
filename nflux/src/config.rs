@@ -1,34 +1,39 @@
 use serde::Deserialize;
+use std::collections::HashMap;
 use std::env;
 use std::fs;
-
-#[derive(Deserialize)]
-#[allow(dead_code)]
-pub struct LoggingConfig {
+#[derive(Deserialize, Debug)]
+pub struct FirewallGlobalConfig {
+    pub icmp_enabled: bool,
+    pub interface_name: String,
     pub log_level: String,
     pub log_type: String,
 }
 
-#[derive(Deserialize)]
-#[allow(dead_code)]
-pub struct Nflux {
-    pub interface_name: String,
+#[derive(Deserialize, Debug)]
+pub struct FirewallIpv4Rules {
+    pub action: String,
+    pub ports: Vec<u32>,
+    pub protocol: String,
 }
 
-#[derive(Deserialize)]
-#[allow(dead_code)]
+#[derive(Deserialize, Debug)]
+pub struct FirewallIpv6Rules {
+    pub action: String,
+    pub ports: Vec<u32>,
+    pub protocol: String,
+}
+
+#[derive(Deserialize, Debug)]
 pub struct FirewallConfig {
-    pub allowed_ipv4: Vec<String>,
-    pub allowed_ports: Vec<u32>,
-    pub allow_icmp: bool,
+    pub firewall: FirewallGlobalConfig,
+    pub ipv4_rules: HashMap<String, FirewallIpv4Rules>,
+    pub ipv6_rules: HashMap<String, FirewallIpv6Rules>,
 }
 
-#[derive(Deserialize)]
-#[allow(dead_code)]
+#[derive(Deserialize, Debug)]
 pub struct Config {
-    pub log: LoggingConfig,
     pub firewall: FirewallConfig,
-    pub nflux: Nflux,
 }
 
 impl Config {

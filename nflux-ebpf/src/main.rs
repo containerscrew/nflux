@@ -18,7 +18,7 @@ use network_types::{
     udp::UdpHdr,
 };
 
-use nflux_common::{AppConfig, ConnectionEvent, APP_CONFIG_DEFAULTS};
+use nflux_common::{ConnectionEvent, GlobalFirewallRules};
 
 #[cfg(not(test))]
 #[panic_handler]
@@ -27,7 +27,7 @@ fn panic(_info: &core::panic::PanicInfo) -> ! {
 }
 
 #[map]
-static APP_CONFIG: Array<AppConfig> = Array::with_max_entries(1, 0);
+static GLOBAL_FIREWALL_RULES: Array<GlobalFirewallRules> = Array::with_max_entries(1, 0);
 
 #[map]
 static CONNECTION_EVENTS: PerfEventArray<ConnectionEvent> = PerfEventArray::new(0);
@@ -54,8 +54,8 @@ unsafe fn ptr_at<T>(ctx: &XdpContext, offset: usize) -> Result<*const T, ()> {
 }
 
 // Check if a port is allowed
-fn is_port_allowed(app_config: &AppConfig, port: u16) -> bool {
-    for &allowed_port in &app_config.allowed_ports {
+fn is_port_allowed(global_firewall_rules: &GlobalFirewallRules, port: u16) -> bool {
+    for &allowed_port in &global_firewall_rules.allowed_ports {
         if allowed_port == 0 {
             // Stop if we hit an uninitialized entry (assuming 0 indicates unused entries)
             break;
@@ -68,7 +68,7 @@ fn is_port_allowed(app_config: &AppConfig, port: u16) -> bool {
 }
 
 // Check if an IP address is allowed
-fn is_ipv4_allowed(app_config: &AppConfig, ip: u32) -> bool {
+fn is_ipv4_allowed(app_config: &GlobalFirewallRules, ip: u32) -> bool {
     for &allowed_ip in &app_config.allowed_ipv4 {
         if allowed_ip == 0 {
             // Stop if we hit an uninitialized entry (assuming 0 indicates unused entries)
@@ -114,8 +114,8 @@ fn should_log(ip: u32, port: u16, log_interval_secs: u64) -> bool {
     true
 }
 
-fn get_app_config() -> &'static AppConfig {
-    APP_CONFIG.get(0).unwrap_or(&APP_CONFIG_DEFAULTS)
+fn get_global_firewall_rules() -> &'static GlobalFirewallRules {
+    GLOBAL_FIREWALL_RULES.get(0).unwrap()
 }
 
 fn log_new_connection(
@@ -139,8 +139,8 @@ fn log_new_connection(
 fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
     let ethhdr: *const EthHdr = unsafe { ptr_at(&ctx, 0)? };
 
-    // Get the app configuration
-    let app_config = get_app_config();
+    // Get global firewall rules
+    let global_firewall_rules = get_global_firewall_rules();
 
     match unsafe { (*ethhdr).ether_type } {
         EtherType::Ipv4 => {
@@ -155,26 +155,26 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                         unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
                     let dst_port = u16::from_be(unsafe { (*tcphdr).dest });
 
-                    if is_port_allowed(&app_config, dst_port) {
-                        log_new_connection(ctx, source, dst_port, 6, 5);
-                        return Ok(xdp_action::XDP_PASS);
-                    }
+                    // if is_port_allowed(&global_firewall_rules, dst_port) {
+                    //     log_new_connection(ctx, source, dst_port, 6, 5);
+                    //     return Ok(xdp_action::XDP_PASS);
+                    // }
 
-                    // Check if the IP address is allowed
-                    if is_ipv4_allowed(&app_config, source) {
-                        log_new_connection(ctx, source, dst_port, 6, 5);
-                        return Ok(xdp_action::XDP_PASS);
-                    }
+                    // // Check if the IP address is allowed
+                    // if is_ipv4_allowed(&global_firewall_rules, source) {
+                    //     log_new_connection(ctx, source, dst_port, 6, 5);
+                    //     return Ok(xdp_action::XDP_PASS);
+                    // }
 
-                    // Deny incoming connections, except SYN-ACK packets
-                    if unsafe { (*tcphdr).syn() == 1 && (*tcphdr).ack() == 0 } {
-                        // Block unsolicited incoming SYN packets (deny incoming connections)
-                        return Ok(xdp_action::XDP_DROP);
-                    } else if unsafe { (*tcphdr).ack() == 1 } {
-                        // Permit ACK packets (responses to outgoing connections)
-                        log_new_connection(ctx, source, dst_port, 6, 5);
-                        return Ok(xdp_action::XDP_PASS);
-                    }
+                    // // Deny incoming connections, except SYN-ACK packets
+                    // if unsafe { (*tcphdr).syn() == 1 && (*tcphdr).ack() == 0 } {
+                    //     // Block unsolicited incoming SYN packets (deny incoming connections)
+                    //     return Ok(xdp_action::XDP_DROP);
+                    // } else if unsafe { (*tcphdr).ack() == 1 } {
+                    //     // Permit ACK packets (responses to outgoing connections)
+                    //     log_new_connection(ctx, source, dst_port, 6, 5);
+                    //     return Ok(xdp_action::XDP_PASS);
+                    // }
 
                     Ok(xdp_action::XDP_DROP)
                 }
@@ -186,32 +186,32 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                     let src_port = u16::from_be(unsafe { (*udphdr).source });
 
                     // If the source port (DNS) is 53, allow the packet. Internet connection
-                    if src_port == 53 {
-                        return Ok(xdp_action::XDP_PASS);
-                    }
+                    // if src_port == 53 {
+                    //     return Ok(xdp_action::XDP_PASS);
+                    // }
 
-                    // Check if the IP address is blocked
-                    if is_ipv4_allowed(&app_config, source) {
-                        log_new_connection(ctx, source, dst_port, 6, 5);
-                        return Ok(xdp_action::XDP_PASS);
-                    }
+                    // // Check if the IP address is blocked
+                    // if is_ipv4_allowed(&global_firewall_rules, source) {
+                    //     log_new_connection(ctx, source, dst_port, 6, 5);
+                    //     return Ok(xdp_action::XDP_PASS);
+                    // }
 
-                    // Check allowed ports
-                    if is_port_allowed(&app_config, dst_port) {
-                        log_new_connection(ctx, source, dst_port, 6, 5);
-                        return Ok(xdp_action::XDP_PASS);
-                    }
+                    // // Check allowed ports
+                    // if is_port_allowed(&global_firewall_rules, dst_port) {
+                    //     log_new_connection(ctx, source, dst_port, 6, 5);
+                    //     return Ok(xdp_action::XDP_PASS);
+                    // }
 
                     Ok(xdp_action::XDP_DROP)
                 }
-                IpProto::Icmp => {
-                    if app_config.allow_icmp == 1 {
-                        log_new_connection(ctx, source, 0, 1, 5);
-                        Ok(xdp_action::XDP_PASS)
-                    } else {
-                        Ok(xdp_action::XDP_DROP)
-                    }
-                }
+                // IpProto::Icmp => {
+                //     if global_firewall_rules.allow_icmp == 1 {
+                //         log_new_connection(ctx, source, 0, 1, 5);
+                //         Ok(xdp_action::XDP_PASS)
+                //     } else {
+                //         Ok(xdp_action::XDP_DROP)
+                //     }
+                // }
                 _ => Ok(xdp_action::XDP_DROP),
             }
         }
