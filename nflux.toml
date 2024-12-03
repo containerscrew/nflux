@@ -1,23 +1,35 @@
 [firewall]
-# Applies for ipv4 and ipv6
-# Global means, if you put here an ip will be able to access every port, tcp and udp
-# enabled = true/false #TODO: Implement this
-icmp_enabled = true
-interface_name = "wlp2s0"
-log_level = "info" # trace, debug, info, warn or error. Defaults to info if not set
-log_type = "text" # text or json. Defaults to text if not set
+# TODO: Add support for multiple interfaces
+interface_names = ["wlp2s0", "eth0"]
+log_level = "info" # trace, debug, info, warn, or error. Defaults to info if not set
+log_type = "text"  # text or json. Defaults to text if not set
+# TODO
+# default_action = "deny" # global default action if no specific rule matches
 
-[firewall.ipv4_rules]
-# This is more finetuned, you can specify which ip can access which port
-"192.168.0.4" = { action = "deny", ports = [80], protocol = "tcp" }
-"192.168.0.11" = { action = "allow", ports = [53], protocol = "udp"}
-"192.168.0.50" = { action = "deny", ports = [22, 443], protocol = "tcp" }
-"192.168.0.100" = { action = "allow", ports = [80, 8080], protocol = "tcp"}
+[ip_rules]
+# Fine-tuned rules for IP-based filtering
+"192.168.0.0/24" = { priority = 1, action = "deny", ports = [22], protocol = "tcp" }
+"192.168.0.170/32" = { priority = 1, action = "allow", ports = [22], protocol = "tcp", log = true, description = "Block SSH for single IP" }
+# "192.168.0.170/24" = { priority = 2, action = "deny", ports = [22], protocol = "tcp", log = false, description = "Deny SSH from entire subnet" }
+# "2001:0db8:85a3:0000:0000:8a2e:0370:7334" = { action = "deny", ports = [80], protocol = "tcp" }
 
-[firewall.ipv6_rules]
-"2001:0db8:85a3:0000:0000:8a2e:0370:7334" = { action = "deny", ports = [80], protocol = "tcp" }
+[icmp_rules]
+# Rules for ICMP traffic
+"192.168.0.1/24" = { action = "deny", protocol = "icmp" }
+"192.168.0.88/24" = { action = "allow", protocol = "icmp" }
+"192.168.0.22/24" = { action = "deny", protocol = "icmp" }
 
-[firewall.icmp_rules]
-"192.168.0.1" = { action = "deny" }
-"192.168.0.88" = { action = "allow" }
-"192.168.0.22" = { action = "deny" }
+[mac_rules]
+# Rules for MAC address filtering
+"00:0a:95:9d:68:16" = { action = "allow" }
+"00:0a:95:9d:68:17" = { action = "deny" }
+
+[logging]
+log_denied_packets = true
+log_allowed_packets = false
+log_format = "json"
+log_file = "/var/log/firewall.log"
+
+[failsafe]
+# Failsafe rule for unmatched traffic
+action = "log"

@@ -5,10 +5,7 @@ mod utils;
 
 // Dependencies
 pub use config::Action;
-pub use config::{
-    Config, FirewallConfig, FirewallGlobalConfig, FirewallIpv4Rules, FirewallIpv6Rules, IcmpRules,
-    Protocol,
-};
+pub use config::{FirewallConfig, FirewallGlobalConfig, IcmpRules, Protocol};
 pub use core::set_mem_limit;
 
 /// RXH version.

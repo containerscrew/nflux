@@ -2,86 +2,80 @@ mod config;
 mod core;
 mod logger;
 mod utils;
+
 use crate::utils::{is_root_user, wait_for_shutdown};
 use anyhow::Context;
+use aya::maps::lpm_trie::Key;
 use aya::maps::perf::{AsyncPerfEventArrayBuffer, PerfBufferError};
-use aya::maps::{AsyncPerfEventArray, MapData};
+use aya::maps::{AsyncPerfEventArray, LpmTrie, Map, MapData};
 use aya::programs::{Xdp, XdpFlags};
 use aya::util::online_cpus;
 use aya::{include_bytes_aligned, Ebpf};
 use bytes::BytesMut;
+use config::{Action, FirewallConfig, Protocol, Rules};
 use logger::setup_logger;
-use nflux::{set_mem_limit, Action, Config, FirewallIpv4Rules, Protocol};
-use nflux_common::{
-    convert_protocol, ConnectionEvent, Ipv4Rule, MAX_ALLOWED_IPV4, MAX_ALLOWED_PORTS,
-};
+use nflux::set_mem_limit;
+use nflux_common::{convert_protocol, ConnectionEvent, IpRule, LpmKeyIpv4, LpmKeyIpv6};
 use std::collections::HashMap;
-use std::net::Ipv4Addr;
-use std::{env, ptr};
+use std::net::{Ipv4Addr, Ipv6Addr};
+use std::ptr;
 use tokio::task;
-use tracing::{error, info};
+use tracing::{error, info, warn};
 
 #[tokio::main]
-async fn main() -> anyhow::Result<(), anyhow::Error> {
+async fn main() -> anyhow::Result<()> {
     // Load configuration file
-    let config = Config::load();
+    let config = FirewallConfig::load().context("Failed to load firewall configuration")?;
 
     // Enable logging
-    setup_logger(
-        &config.config.firewall.log_level,
-        &config.config.firewall.log_type,
-    );
+    setup_logger(&config.firewall.log_level, &config.firewall.log_type);
 
-    // Check if user is root.
+    // Ensure the program is run as root
     if !is_root_user() {
         error!("This program must be run as root.");
         std::process::exit(1);
     }
 
-    // Mem limit
+    // Set memory limit
     set_mem_limit();
 
     // Load eBPF program
     let mut bpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/nflux")))?;
 
-    // If you want to print logs from eBPF program, uncomment the following lines
-    // if let Err(e) = aya_log::EbpfLogger::init(&mut bpf) {
-    //     warn!("failed to initialize eBPF logger: {}", e);
-    // }
-
-    // Populate EBPF map with app config
-    // populate_global_rules(&mut bpf, &app_config)?;
-    populate_ipv4_rules(&mut bpf, &config.config.ipv4_rules)
-        .context("Failed to populate IPv4 rules")?;
+    // Populate eBPF maps with configuration data
+    populate_ipv4_rules(&mut bpf, &config.ip_rules)?;
+    // populate_ipv6_rules(&mut bpf, &config.ip_rules)?;
 
     // Attach XDP program
-    // TODO: check if the interface you want to attach is valid (physical)
-    // XDP program can only be attached to physical interfaces
     let program: &mut Xdp = bpf.program_mut("nflux").unwrap().try_into()?;
     program.load()?;
-    program.attach(&config.config.firewall.interface_name.as_str(), XdpFlags::default())
-        .context("failed to attach the XDP program with default flags - try changing XdpFlags::default() to XdpFlags::SKB_MODE")?;
+    program
+        .attach(&config.firewall.interface_names[0], XdpFlags::default())
+        .context(
+            "Failed to attach XDP program. Ensure the interface is physical and not virtual.",
+        )?;
 
-    // Some basic info
+    // Log startup info
     info!("nflux started successfully!");
     info!(
-        "Successfully attached XDP program to iface: {}",
-        config.config.firewall.interface_name
+        "XDP program attached to interface: {:?}",
+        config.firewall.interface_names[0]
     );
-    info!("Checking incoming packets...");
 
-    let mut events = AsyncPerfEventArray::try_from(bpf.take_map("CONNECTION_EVENTS").unwrap())?;
+    // Start processing events from the eBPF program
+    let mut events = AsyncPerfEventArray::try_from(
+        bpf.take_map("CONNECTION_EVENTS")
+            .context("Failed to find CONNECTION_EVENTS map")?,
+    )?;
     let cpus = online_cpus().map_err(|(_, error)| error)?;
 
     for cpu_id in cpus {
         let buf = events.open(cpu_id, None)?;
-
         task::spawn(process_events(buf, cpu_id));
     }
 
     // Wait for shutdown signal
     wait_for_shutdown().await?;
-
     Ok(())
 }
 
@@ -105,7 +99,7 @@ async fn process_events(
                         cpu_id,
                         convert_protocol(event.protocol),
                         event.dst_port,
-                        Ipv4Addr::from(event.src_addr)
+                        Ipv4Addr::from(event.src_addr),
                     );
                 }
                 Err(e) => error!("Failed to parse event on CPU {}: {}", cpu_id, e),
@@ -114,73 +108,9 @@ async fn process_events(
     }
 }
 
-// Helper function to convert Vec<String> to [u32; N]
-fn convert_ipv4_vec_to_array(vec: &Vec<String>, max_len: usize) -> [u32; MAX_ALLOWED_IPV4] {
-    let mut array = [0; MAX_ALLOWED_IPV4];
-    for (i, ip_str) in vec.iter().take(max_len).enumerate() {
-        if let Ok(ip) = ip_str.parse::<Ipv4Addr>() {
-            array[i] = u32::from(ip);
-        }
-    }
-    array
-}
-
-// fn populate_global_rules(bpf: &mut Ebpf, global_rules: &GlobalFirewallRules) -> anyhow::Result<()> {
-//     let mut global_rules_map: Array<_, GlobalFirewallRules> =
-//         Array::try_from(bpf.map_mut("GLOBAL_FIREWALL_RULES").unwrap())?;
-//     global_rules_map.set(0, global_rules, 0)?;
-//     Ok(())
-// }
-
-fn populate_ipv4_rules(
-    bpf: &mut Ebpf,
-    ipv4_rules: &HashMap<String, FirewallIpv4Rules>, // This comes from the `Config`
-) -> anyhow::Result<()> {
-    let mut map: aya::maps::HashMap<_, u32, Ipv4Rule> = aya::maps::HashMap::try_from(
-        bpf.map_mut("IPV4_RULES")
-            .context("IPV4_RULES map not found")?,
-    )?;
-
-    for (ip_str, rule) in ipv4_rules {
-        // Parse IP string into u32
-        let ip: u32 = ip_str.parse::<Ipv4Addr>()?.into();
-
-        // Prepare ports array
-        let mut ports = [0u16; 16];
-        for (i, &port) in rule.ports.iter().enumerate().take(16) {
-            ports[i] = port as u16;
-        }
-
-        // Create Ipv4Rule struct
-        let ipv4_rule = Ipv4Rule {
-            action: if rule.action == Action::Allow { 1 } else { 0 },
-            ports,
-            protocol: if rule.protocol == Protocol::Tcp {
-                6
-            } else {
-                17
-            },
-        };
-
-        // Insert into the map
-        map.insert(ip, ipv4_rule, 0)?;
-    }
-
-    Ok(())
-}
-
-fn convert_ports_vec_to_array(vec: &Vec<u32>, max_len: usize) -> [u32; MAX_ALLOWED_PORTS] {
-    let mut array = [0; MAX_ALLOWED_PORTS];
-    for (i, &port) in vec.iter().take(max_len).enumerate() {
-        array[i] = port;
-    }
-    array
-}
-
 fn parse_connection_event(buf: &BytesMut) -> anyhow::Result<ConnectionEvent> {
     if buf.len() >= std::mem::size_of::<ConnectionEvent>() {
         let ptr = buf.as_ptr() as *const ConnectionEvent;
-        // Safety: we've confirmed the buffer is large enough
         let event = unsafe { ptr::read_unaligned(ptr) };
         Ok(event)
     } else {
@@ -189,3 +119,94 @@ fn parse_connection_event(buf: &BytesMut) -> anyhow::Result<ConnectionEvent> {
         ))
     }
 }
+
+fn populate_ipv4_rules(bpf: &mut Ebpf, ip_rules: &HashMap<String, Rules>) -> anyhow::Result<()> {
+    let mut ipv4_map: LpmTrie<&mut MapData, LpmKeyIpv4, IpRule> = LpmTrie::try_from(
+        bpf.map_mut("IPV4_RULES")
+            .context("Failed to find IPV4_RULES map")?,
+    )?;
+
+    // Sort rules by priority
+    let mut sorted_rules: Vec<_> = ip_rules.iter().collect();
+    sorted_rules.sort_by_key(|(_, rule)| rule.priority);
+
+    for (cidr, rule) in sorted_rules {
+        println!("Loading rule: CIDR={}, {:?}", cidr, rule);
+        let (ip, prefix_len) = parse_cidr_v4(cidr)?;
+        let ip_rule = prepare_ip_rule(rule)?;
+
+        let key = Key::new(
+            prefix_len,
+            LpmKeyIpv4 {
+                prefix_len,
+                ip: ip.into(),
+            },
+        );
+        ipv4_map
+            .insert(&key, &ip_rule, 0)
+            .context("Failed to insert IPv4 rule")?;
+    }
+
+    Ok(())
+}
+
+fn prepare_ip_rule(rule: &Rules) -> anyhow::Result<IpRule> {
+    let mut ports = [0u16; 16];
+    for (i, &port) in rule.ports.iter().enumerate().take(16) {
+        ports[i] = port as u16;
+    }
+
+    Ok(IpRule {
+        action: match rule.action {
+            Action::Allow => 1,
+            Action::Deny => 0,
+            _ => {
+                warn!("Unsupported action: {:?}", rule.action);
+                return Err(anyhow::anyhow!("Unsupported action"));
+            }
+        },
+        ports,
+        protocol: match rule.protocol {
+            Protocol::Tcp => 6,
+            Protocol::Udp => 17,
+            Protocol::Icmp => 1,
+        },
+        priority: rule.priority,
+    })
+}
+
+// fn populate_ipv6_rules(bpf: &mut Ebpf, ip_rules: &HashMap<String, Rules>) -> anyhow::Result<()> {
+//     let mut ipv6_map: LpmTrie<&mut MapData, LpmKeyIpv6, IpRule> = LpmTrie::try_from(
+//         bpf.map_mut("IPV6_RULES").context("Failed to find IPV4_RULES map")?,
+//     )?;
+
+//     for (cidr, rule) in ip_rules {
+//         let (ip, prefix_len) = parse_cidr_v6(cidr)?;
+//         let ip_rule = prepare_ip_rule(rule)?;
+
+//         let key = Key::new(prefix_len, LpmKeyIpv6 { prefix_len, ip: ip.into() });
+//         ipv6_map.insert(&key, &ip_rule, 0).context("Failed to insert IPv6 rule")?;
+//     }
+
+//     Ok(())
+// }
+
+fn parse_cidr_v4(cidr: &str) -> anyhow::Result<(Ipv4Addr, u32)> {
+    let parts: Vec<&str> = cidr.split('/').collect();
+    if parts.len() != 2 {
+        return Err(anyhow::anyhow!("Invalid CIDR format: {}", cidr));
+    }
+    let ip = parts[0].parse::<Ipv4Addr>()?;
+    let prefix_len = parts[1].parse::<u32>()?;
+    Ok((ip, prefix_len))
+}
+
+// fn parse_cidr_v6(cidr: &str) -> anyhow::Result<(Ipv6Addr, u32)> {
+//     let parts: Vec<&str> = cidr.split('/').collect();
+//     if parts.len() != 2 {
+//         return Err(anyhow::anyhow!("Invalid CIDR format: {}", cidr));
+//     }
+//     let ip = parts[0].parse::<Ipv6Addr>()?;
+//     let prefix_len = parts[1].parse::<u32>()?;
+//     Ok((ip, prefix_len))
+// }
