@@ -13,19 +13,34 @@ pub struct ConnectionEvent {
     pub protocol: u8, // 6 for TCP, 17 for UDP
 }
 
+// #[repr(C)]
+// #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+// pub struct GlobalFirewallRules {
+//     pub icmp_enabled: u8,
+//     pub allowed_ipv4: [u32; MAX_ALLOWED_IPV4],
+//     pub allowed_ports: [u32; MAX_ALLOWED_PORTS],
+// }
+
+// #[cfg(feature = "user")]
+// pub mod user {
+//     use super::*;
+
+//     unsafe impl aya::Pod for GlobalFirewallRules {}
+// }
+
 #[repr(C)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct GlobalFirewallRules {
-    pub icmp_enabled: u8,
-    pub allowed_ipv4: [u32; MAX_ALLOWED_IPV4],
-    pub allowed_ports: [u32; MAX_ALLOWED_PORTS],
+#[derive(Clone, Copy, Debug)]
+pub struct Ipv4Rule {
+    pub action: u8,       // 0 = deny, 1 = allow
+    pub ports: [u16; 16], // Up to 16 ports
+    pub protocol: u8,     // 6 = TCP, 17 = UDP
 }
 
 #[cfg(feature = "user")]
 pub mod user {
     use super::*;
 
-    unsafe impl aya::Pod for GlobalFirewallRules {}
+    unsafe impl aya::Pod for Ipv4Rule {}
 }
 
 // Define the default configuration if the user does not provide one

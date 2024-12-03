@@ -2,6 +2,22 @@ use serde::Deserialize;
 use std::collections::HashMap;
 use std::env;
 use std::fs;
+
+// Enum to restrict `action` values
+#[derive(Debug, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")] // Allows "deny" and "allow" as lowercase in TOML
+pub enum Action {
+    Allow,
+    Deny,
+}
+
+#[derive(Debug, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")] // Allows "deny" and "allow" as lowercase in TOML
+pub enum Protocol {
+    Tcp,
+    Udp,
+}
+
 #[derive(Deserialize, Debug)]
 pub struct FirewallGlobalConfig {
     pub icmp_enabled: bool,
@@ -12,16 +28,21 @@ pub struct FirewallGlobalConfig {
 
 #[derive(Deserialize, Debug)]
 pub struct FirewallIpv4Rules {
-    pub action: String,
+    pub action: Action,
     pub ports: Vec<u32>,
-    pub protocol: String,
+    pub protocol: Protocol,
 }
 
 #[derive(Deserialize, Debug)]
 pub struct FirewallIpv6Rules {
-    pub action: String,
+    pub action: Action,
     pub ports: Vec<u32>,
-    pub protocol: String,
+    pub protocol: Protocol,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct IcmpRules {
+    pub action: Action,
 }
 
 #[derive(Deserialize, Debug)]
@@ -29,11 +50,12 @@ pub struct FirewallConfig {
     pub firewall: FirewallGlobalConfig,
     pub ipv4_rules: HashMap<String, FirewallIpv4Rules>,
     pub ipv6_rules: HashMap<String, FirewallIpv6Rules>,
+    pub icmp_rules: HashMap<String, IcmpRules>,
 }
 
 #[derive(Deserialize, Debug)]
 pub struct Config {
-    pub firewall: FirewallConfig,
+    pub config: FirewallConfig,
 }
 
 impl Config {
