@@ -6,7 +6,7 @@ use aya_ebpf::helpers::bpf_ktime_get_ns;
 use aya_ebpf::{
     bindings::xdp_action,
     macros::{map, xdp},
-    maps::{Array, LruHashMap, PerfEventArray},
+    maps::{LruHashMap, PerfEventArray},
     programs::XdpContext,
 };
 
@@ -18,7 +18,7 @@ use network_types::{
     udp::UdpHdr,
 };
 
-use nflux_common::{ConnectionEvent, GlobalFirewallRules};
+use nflux_common::{ConnectionEvent, Ipv4Rule};
 
 #[cfg(not(test))]
 #[panic_handler]
@@ -26,8 +26,11 @@ fn panic(_info: &core::panic::PanicInfo) -> ! {
     loop {}
 }
 
+// #[map]
+// static GLOBAL_FIREWALL_RULES: Array<GlobalFirewallRules> = Array::with_max_entries(1, 0);
+
 #[map]
-static GLOBAL_FIREWALL_RULES: Array<GlobalFirewallRules> = Array::with_max_entries(1, 0);
+static IPV4_RULES: LruHashMap<u32, Ipv4Rule> = LruHashMap::with_max_entries(1024, 0);
 
 #[map]
 static CONNECTION_EVENTS: PerfEventArray<ConnectionEvent> = PerfEventArray::new(0);

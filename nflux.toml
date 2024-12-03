@@ -16,3 +16,8 @@ log_type = "text" # text or json. Defaults to text if not set
 
 [firewall.ipv6_rules]
 "2001:0db8:85a3:0000:0000:8a2e:0370:7334" = { action = "deny", ports = [80], protocol = "tcp" }
+
+[firewall.icmp_rules]
+"192.168.0.1" = { action = "deny" }
+"192.168.0.88" = { action = "allow" }
+"192.168.0.22" = { action = "deny" }
