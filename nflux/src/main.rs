@@ -7,21 +7,21 @@ mod utils;
 use anyhow::Context;
 use aya::maps::lpm_trie::Key;
 use aya::maps::perf::{AsyncPerfEventArrayBuffer, PerfBufferError};
-use aya::maps::{AsyncPerfEventArray, LpmTrie, Map, MapData};
+use aya::maps::{AsyncPerfEventArray, LpmTrie, MapData};
 use aya::programs::{Xdp, XdpFlags};
 use aya::util::online_cpus;
 use aya::{include_bytes_aligned, Ebpf};
 use bytes::BytesMut;
 use config::{Action, Nflux, Protocol, Rules};
 use logger::setup_logger;
-use nflux_common::{convert_protocol, ConnectionEvent, IpRule, LpmKeyIpv4, LpmKeyIpv6};
+use nflux_common::{convert_protocol, ConnectionEvent, IpRule, LpmKeyIpv4};
 use utils::{is_root_user, wait_for_shutdown};
 use core::set_mem_limit;
 use std::collections::HashMap;
 use std::net::Ipv4Addr;
 use std::ptr;
 use tokio::task;
-use tracing::{error, info, warn};
+use tracing::{error, info};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -161,24 +161,17 @@ fn prepare_ip_rule(rule: &Rules) -> anyhow::Result<IpRule> {
         action: match rule.action {
             Action::Allow => 1,
             Action::Deny => 0,
-            _ => {
-                warn!("Unsupported action: {:?}", rule.action);
-                return Err(anyhow::anyhow!("Unsupported action"));
-            }
         },
         ports,
         protocol: match rule.protocol {
             Protocol::Tcp => 6,
             Protocol::Udp => 17,
             Protocol::Icmp => 1,
-            _ => {
-                warn!("Unsupported protocol: {:?}", rule.protocol);
-                return Err(anyhow::anyhow!("Unsupported protocol"));
-            }
         },
         priority: rule.priority,
     })
 }
+
 
 // fn populate_ipv6_rules(bpf: &mut Ebpf, ip_rules: &HashMap<String, Rules>) -> anyhow::Result<()> {
 //     let mut ipv6_map: LpmTrie<&mut MapData, LpmKeyIpv6, IpRule> = LpmTrie::try_from(
