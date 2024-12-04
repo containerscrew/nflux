@@ -24,5 +24,3 @@ log_type = "text"  # text or json. Defaults to text if not set
 # # Rules for MAC address filtering
 # "00:0a:95:9d:68:16" = { action = "allow" }
 # "00:0a:95:9d:68:17" = { action = "deny" }
-
-
