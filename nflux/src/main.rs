@@ -3,7 +3,7 @@ mod core;
 mod logger;
 mod utils;
 
-use crate::utils::{is_root_user, wait_for_shutdown};
+
 use anyhow::Context;
 use aya::maps::lpm_trie::Key;
 use aya::maps::perf::{AsyncPerfEventArrayBuffer, PerfBufferError};
@@ -12,12 +12,13 @@ use aya::programs::{Xdp, XdpFlags};
 use aya::util::online_cpus;
 use aya::{include_bytes_aligned, Ebpf};
 use bytes::BytesMut;
-use config::{Action, FirewallConfig, Protocol, Rules};
+use config::{Action, Nflux, Protocol, Rules};
 use logger::setup_logger;
-use nflux::set_mem_limit;
 use nflux_common::{convert_protocol, ConnectionEvent, IpRule, LpmKeyIpv4, LpmKeyIpv6};
+use utils::{is_root_user, wait_for_shutdown};
+use core::set_mem_limit;
 use std::collections::HashMap;
-use std::net::{Ipv4Addr, Ipv6Addr};
+use std::net::Ipv4Addr;
 use std::ptr;
 use tokio::task;
 use tracing::{error, info, warn};
@@ -25,10 +26,10 @@ use tracing::{error, info, warn};
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     // Load configuration file
-    let config = FirewallConfig::load().context("Failed to load firewall configuration")?;
+    let config = Nflux::load_config().context("Failed to load nflux configuration")?;
 
     // Enable logging
-    setup_logger(&config.firewall.log_level, &config.firewall.log_type);
+    setup_logger(&config.logging.log_level, &config.logging.log_type);
 
     // Ensure the program is run as root
     if !is_root_user() {
@@ -50,7 +51,7 @@ async fn main() -> anyhow::Result<()> {
     let program: &mut Xdp = bpf.program_mut("nflux").unwrap().try_into()?;
     program.load()?;
     program
-        .attach(&config.firewall.interface_names[0], XdpFlags::default())
+        .attach(&config.nflux.interface_names[0], XdpFlags::default())
         .context(
             "Failed to attach XDP program. Ensure the interface is physical and not virtual.",
         )?;
@@ -59,7 +60,7 @@ async fn main() -> anyhow::Result<()> {
     info!("nflux started successfully!");
     info!(
         "XDP program attached to interface: {:?}",
-        config.firewall.interface_names[0]
+        config.nflux.interface_names[0]
     );
 
     // Start processing events from the eBPF program
@@ -170,6 +171,10 @@ fn prepare_ip_rule(rule: &Rules) -> anyhow::Result<IpRule> {
             Protocol::Tcp => 6,
             Protocol::Udp => 17,
             Protocol::Icmp => 1,
+            _ => {
+                warn!("Unsupported protocol: {:?}", rule.protocol);
+                return Err(anyhow::anyhow!("Unsupported protocol"));
+            }
         },
         priority: rule.priority,
     })
