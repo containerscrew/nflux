@@ -131,7 +131,6 @@ fn populate_ipv4_rules(bpf: &mut Ebpf, ip_rules: &HashMap<String, Rules>) -> any
     sorted_rules.sort_by_key(|(_, rule)| rule.priority);
 
     for (cidr, rule) in sorted_rules {
-        println!("Loading rule: CIDR={}, {:?}", cidr, rule);
         let (ip, prefix_len) = parse_cidr_v4(cidr)?;
         let ip_rule = prepare_ip_rule(rule)?;
 
@@ -142,6 +141,7 @@ fn populate_ipv4_rules(bpf: &mut Ebpf, ip_rules: &HashMap<String, Rules>) -> any
                 ip: ip.into(),
             },
         );
+
         ipv4_map
             .insert(&key, &ip_rule, 0)
             .context("Failed to insert IPv4 rule")?;

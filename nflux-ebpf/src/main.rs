@@ -74,50 +74,48 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
             let source_ip = u32::from_be(unsafe { (*ipv4hdr).src_addr });
             let proto = unsafe { (*ipv4hdr).proto };
 
-            let key = Key::new(
-                32,
-                LpmKeyIpv4 {
-                    prefix_len: 32,
-                    ip: source_ip,
-                },
-            );
+            for prefix_len in (1..=32).rev() {
+                let key = Key::new(
+                    prefix_len,
+                    LpmKeyIpv4 {
+                        prefix_len,
+                        ip: source_ip & (u32::MAX << (32 - prefix_len)),
+                    },
+                );
 
-            if let Some(rule) = IPV4_RULES.get(&key) {
-                match proto {
-                    IpProto::Tcp => {
-                        let tcphdr: *const TcpHdr =
-                            unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
-                        let dst_port = u16::from_be(unsafe { (*tcphdr).dest });
+                if let Some(rule) = IPV4_RULES.get(&key) {
+                    match proto {
+                        IpProto::Tcp => {
+                            let tcphdr: *const TcpHdr =
+                                unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
+                            let dst_port = u16::from_be(unsafe { (*tcphdr).dest });
 
-                        if rule.ports.contains(&dst_port) {
-                            if rule.action == 1 {
+                            if rule.ports.contains(&dst_port) && rule.action == 1 {
                                 log_new_connection(ctx, source_ip, dst_port, 6);
                                 return Ok(xdp_action::XDP_PASS);
                             }
+                            return Ok(xdp_action::XDP_DROP);
                         }
-                        return Ok(xdp_action::XDP_DROP);
-                    }
-                    IpProto::Udp => {
-                        let udphdr: *const UdpHdr =
-                            unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
-                        let dst_port = u16::from_be(unsafe { (*udphdr).dest });
+                        IpProto::Udp => {
+                            let udphdr: *const UdpHdr =
+                                unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
+                            let dst_port = u16::from_be(unsafe { (*udphdr).dest });
 
-                        if rule.ports.contains(&dst_port) {
-                            if rule.action == 1 {
+                            if rule.ports.contains(&dst_port) && rule.action == 1 {
                                 log_new_connection(ctx, source_ip, dst_port, 17);
                                 return Ok(xdp_action::XDP_PASS);
                             }
+                            return Ok(xdp_action::XDP_DROP);
                         }
-                        return Ok(xdp_action::XDP_DROP);
-                    }
-                    IpProto::Icmp => {
-                        if rule.action == 1 {
-                            log_new_connection(ctx, source_ip, 0, 1);
-                            return Ok(xdp_action::XDP_PASS);
+                        IpProto::Icmp => {
+                            if rule.action == 1 {
+                                log_new_connection(ctx, source_ip, 0, 1);
+                                return Ok(xdp_action::XDP_PASS);
+                            }
+                            return Ok(xdp_action::XDP_DROP);
                         }
-                        return Ok(xdp_action::XDP_DROP);
+                        _ => return Ok(xdp_action::XDP_DROP),
                     }
-                    _ => return Ok(xdp_action::XDP_DROP),
                 }
             }
 
