@@ -9,7 +9,7 @@ log_type = "text"  # text or json. Defaults to text if not set
 
 [ip_rules]
 # Fine-tuned rules for IP-based filtering
-"192.168.0.0/24" = { priority = 1, action = "allow", ports = [22], log = false, protocol = "tcp", description  = ""}
+"192.168.0.0/24" = { priority = 1, action = "allow", ports = [22], log = false, protocol = "tcp", description  = "Allow SSH from entire local subnet" }
 "192.168.0.172/32" = { priority = 2, action = "deny", ports = [53], protocol = "udp", log = false, description = "Block UDP port" }
 # "192.168.0.170/24" = { priority = 2, action = "deny", ports = [22], protocol = "tcp", log = false, description = "Deny SSH from entire subnet" }
 # "2001:0db8:85a3:0000:0000:8a2e:0370:7334" = { action = "deny", ports = [80], protocol = "tcp" }
