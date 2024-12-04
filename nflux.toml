@@ -1,10 +1,11 @@
-[firewall]
-# TODO: Add support for multiple interfaces
+[nflux]
+# Global configuration for nflux
 interface_names = ["wlp2s0", "eth0"]
+
+[logging]
 log_level = "info" # trace, debug, info, warn, or error. Defaults to info if not set
 log_type = "text"  # text or json. Defaults to text if not set
-# TODO
-# default_action = "deny" # global default action if no specific rule matches
+# log_file = "/var/log/firewall.log"
 
 [ip_rules]
 # Fine-tuned rules for IP-based filtering
@@ -13,19 +14,15 @@ log_type = "text"  # text or json. Defaults to text if not set
 # "192.168.0.170/24" = { priority = 2, action = "deny", ports = [22], protocol = "tcp", log = false, description = "Deny SSH from entire subnet" }
 # "2001:0db8:85a3:0000:0000:8a2e:0370:7334" = { action = "deny", ports = [80], protocol = "tcp" }
 
-[icmp_rules]
-# Rules for ICMP traffic
-"192.168.0.1/24" = { action = "deny", protocol = "icmp" }
-"192.168.0.88/24" = { action = "allow", protocol = "icmp" }
-"192.168.0.22/24" = { action = "deny", protocol = "icmp" }
+# [icmp_rules]
+# # Rules for ICMP traffic
+# "192.168.0.1/24" = { action = "deny", protocol = "icmp" }
+# "192.168.0.88/24" = { action = "allow", protocol = "icmp" }
+# "192.168.0.22/24" = { action = "deny", protocol = "icmp" }
 
-[mac_rules]
-# Rules for MAC address filtering
-"00:0a:95:9d:68:16" = { action = "allow" }
-"00:0a:95:9d:68:17" = { action = "deny" }
+# [mac_rules]
+# # Rules for MAC address filtering
+# "00:0a:95:9d:68:16" = { action = "allow" }
+# "00:0a:95:9d:68:17" = { action = "deny" }
 
-[logging]
-log_denied_packets = true
-log_allowed_packets = false
-log_format = "json"
-log_file = "/var/log/firewall.log"
+

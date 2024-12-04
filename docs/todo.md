@@ -8,3 +8,4 @@
 - [2] Prometheus metrics for XDP program.
 - [3] Implement in how much time a log_connection_event will be sended to Perf Ring Buffer.
 - [3] Allow the user to change the config in the runtime.
+- [4] Implement default values in nflux.toml (config.rs)
