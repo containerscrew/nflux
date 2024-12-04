@@ -4,8 +4,7 @@ mod logger;
 mod utils;
 
 // Dependencies
-pub use config::Action;
-pub use config::{FirewallConfig, FirewallGlobalConfig, IcmpRules, Protocol};
+pub use config::{FirewallConfig, IcmpRules, Protocol, Rules};
 pub use core::set_mem_limit;
 
 /// RXH version.
