@@ -12,19 +12,27 @@ pub enum Action {
     Allow,
 }
 
-/// Enum for `protocol`
+// Enum for `protocol`
 #[derive(Debug, Deserialize, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum Protocol {
     Tcp,
     Udp,
-    Icmp,
+}
+
+// Enum for `is enabled`
+#[derive(Debug, Deserialize, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub enum IsEnabled {
+    True,
+    False,
 }
 
 // General firewall configuration
 #[derive(Debug, Deserialize)]
 pub struct NfluxConfig {
     pub interface_names: Vec<String>,
+    pub icmp_ping: IsEnabled,
 }
 
 // Logging config
@@ -34,10 +42,10 @@ pub struct LoggingConfig {
     pub log_type: String,
 }
 
-/// Generic rule for both IPv4 and IPv6
+// Generic rule for both IPv4 and IPv6
 #[derive(Debug, Deserialize)]
 #[allow(dead_code)]
-pub struct Rules {
+pub struct IpRules {
     pub priority: u32,
     pub action: Action,
     pub ports: Vec<u16>,
@@ -52,7 +60,7 @@ pub struct Rules {
 pub struct Nflux {
     pub nflux: NfluxConfig,
     pub logging: LoggingConfig,
-    pub ip_rules: HashMap<String, Rules>,
+    pub ip_rules: HashMap<String, IpRules>,
 }
 
 impl Nflux {
@@ -122,10 +130,12 @@ mod tests {
         let config_content = r#"
         [nflux]
         interface_names = ["eth0", "wlan0"]
+        icmp_ping = "true"
 
         [logging]
         log_level = "debug"
         log_type = "json"
+
 
         [ip_rules]
         "192.168.0.1" = { priority = 1, action = "allow", ports = [22], protocol = "tcp", log = true, description = "SSH rule" }
@@ -137,6 +147,7 @@ mod tests {
 
         // Assertions
         assert_eq!(config.nflux.interface_names, vec!["eth0", "wlan0"]);
+        assert_eq!(config.nflux.icmp_ping, IsEnabled::True);
         assert_eq!(config.logging.log_level, "debug");
         assert_eq!(config.logging.log_type, "json");
 
@@ -168,10 +179,15 @@ mod tests {
         let config_content = r#"
         [nflux]
         interface_names = ["eth0", "wlan0"]
+        icmp_ping = "true"
 
         [logging]
         log_level = "debug"
         log_type = "json"
+
+        [icmp_rules]
+        # Rules for ICMP traffic
+        "192.168.0.0/24" = { action = "deny", protocol = "icmp" }
 
         [ip_rules]
         "192.168.0.1" = { priority = 1, action = "allow", ports = [22], protocol = "tcp", log = true, description = "SSH rule" }
@@ -188,20 +204,4 @@ mod tests {
             "Expected duplicate priorities to cause an error"
         );
     }
-
-    // #[test]
-    // fn test_load_invalid_config_format() {
-    //     let invalid_config_content = "invalid: [toml";
-
-    //     setup_temp_config(invalid_config_content);
-
-    //     let result = Nflux::load_config();
-
-    //     // Assert that loading fails due to parse error
-    //     assert!(result.is_err());
-    //     assert!(result
-    //         .unwrap_err()
-    //         .to_string()
-    //         .contains("Failed to parse configuration file"));
-    // }
 }

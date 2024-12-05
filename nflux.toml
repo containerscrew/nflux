@@ -1,6 +1,9 @@
 [nflux]
 # Global configuration for nflux
 interface_names = ["wlp2s0", "eth0"]
+# Control ICMP ping packets for each IP I think is not necessary by the moment
+# Lets decide if ICMP packets will be allowed or denied globally
+icmp_ping = "false"
 
 [logging]
 log_level = "info" # trace, debug, info, warn, or error. Defaults to info if not set
@@ -14,12 +17,6 @@ log_type = "text"  # text or json. Defaults to text if not set
 
 # todo: ipv6 support
 # "2001:0db8:85a3:0000:0000:8a2e:0370:7334" = { action = "deny", ports = [80], protocol = "tcp" }
-
-# [icmp_rules]
-# # Rules for ICMP traffic
-# "192.168.0.1/24" = { action = "deny", protocol = "icmp" }
-# "192.168.0.88/24" = { action = "allow", protocol = "icmp" }
-# "192.168.0.22/24" = { action = "deny", protocol = "icmp" }
 
 # [mac_rules]
 # # Rules for MAC address filtering

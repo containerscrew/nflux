@@ -2,6 +2,7 @@ mod config;
 mod core;
 mod logger;
 mod utils;
+mod ebpf_mapping;
 
 use anyhow::Context;
 use aya::maps::lpm_trie::Key;
@@ -11,7 +12,7 @@ use aya::programs::{Xdp, XdpFlags};
 use aya::util::online_cpus;
 use aya::{include_bytes_aligned, Ebpf};
 use bytes::BytesMut;
-use config::{Action, Nflux, Protocol, Rules};
+use config::{Action, Nflux, Protocol, IpRules};
 use core::set_mem_limit;
 use logger::setup_logger;
 use nflux_common::{convert_protocol, ConnectionEvent, IpRule, LpmKeyIpv4};
@@ -21,6 +22,7 @@ use std::ptr;
 use tokio::task;
 use tracing::{error, info};
 use utils::{is_root_user, wait_for_shutdown};
+use crate::ebpf_mapping::populate_icmp_rule;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -44,6 +46,7 @@ async fn main() -> anyhow::Result<()> {
 
     // Populate eBPF maps with configuration data
     populate_ipv4_rules(&mut bpf, &config.ip_rules)?;
+    populate_icmp_rule(&mut bpf, config.nflux.icmp_ping)?;
     // populate_ipv6_rules(&mut bpf, &config.ip_rules)?;
 
     // Attach XDP program
@@ -120,7 +123,7 @@ fn parse_connection_event(buf: &BytesMut) -> anyhow::Result<ConnectionEvent> {
     }
 }
 
-fn populate_ipv4_rules(bpf: &mut Ebpf, ip_rules: &HashMap<String, Rules>) -> anyhow::Result<()> {
+fn populate_ipv4_rules(bpf: &mut Ebpf, ip_rules: &HashMap<String, IpRules>) -> anyhow::Result<()> {
     let mut ipv4_map: LpmTrie<&mut MapData, LpmKeyIpv4, IpRule> = LpmTrie::try_from(
         bpf.map_mut("IPV4_RULES")
             .context("Failed to find IPV4_RULES map")?,
@@ -150,7 +153,7 @@ fn populate_ipv4_rules(bpf: &mut Ebpf, ip_rules: &HashMap<String, Rules>) -> any
     Ok(())
 }
 
-fn prepare_ip_rule(rule: &Rules) -> anyhow::Result<IpRule> {
+fn prepare_ip_rule(rule: &IpRules) -> anyhow::Result<IpRule> {
     let mut ports = [0u16; 16];
     for (i, &port) in rule.ports.iter().enumerate().take(16) {
         ports[i] = port as u16;
@@ -165,7 +168,6 @@ fn prepare_ip_rule(rule: &Rules) -> anyhow::Result<IpRule> {
         protocol: match rule.protocol {
             Protocol::Tcp => 6,
             Protocol::Udp => 17,
-            Protocol::Icmp => 1,
         },
         priority: rule.priority,
     })
