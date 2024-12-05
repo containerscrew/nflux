@@ -3,7 +3,7 @@
 #![allow(nonstandard_style, dead_code)]
 
 use aya_ebpf::maps::lpm_trie::Key;
-use aya_ebpf::maps::LpmTrie;
+use aya_ebpf::maps::{Array, LpmTrie};
 use aya_ebpf::{
     bindings::xdp_action,
     macros::{map, xdp},
@@ -34,6 +34,9 @@ static IPV6_RULES: LpmTrie<LpmKeyIpv6, IpRule> = LpmTrie::with_max_entries(1024,
 
 #[map]
 static CONNECTION_EVENTS: PerfEventArray<ConnectionEvent> = PerfEventArray::new(0);
+
+#[map]
+static ICMP_RULE: Array<u32> = Array::with_max_entries(1, 0);
 
 #[xdp]
 pub fn nflux(ctx: XdpContext) -> u32 {
@@ -136,10 +139,15 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                             return Ok(xdp_action::XDP_PASS);
                         }
                         IpProto::Icmp => {
-                            if rule.action == 1 {
-                                log_new_connection(ctx, source_ip, 0, 1);
-                                return Ok(xdp_action::XDP_PASS);
+                            // Read from EBPF map
+                            if let Some(&icmp_ping) = ICMP_RULE.get(0) {
+                                if icmp_ping == 1 {
+                                    // Allow ICMP packets if enabled
+                                    log_new_connection(ctx, source_ip, 0, 1);
+                                    return Ok(xdp_action::XDP_PASS);
+                                }
                             }
+                            // Block ICMP packets by default
                             return Ok(xdp_action::XDP_DROP);
                         }
                         _ => return Ok(xdp_action::XDP_DROP),
