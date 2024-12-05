@@ -11,9 +11,10 @@ use aya_ebpf::{
     programs::XdpContext,
 };
 use core::mem;
+use network_types::ip::IpProto;
 use network_types::{
     eth::{EthHdr, EtherType},
-    ip::{IpProto, Ipv4Hdr},
+    ip::Ipv4Hdr,
     tcp::TcpHdr,
     udp::UdpHdr,
 };
@@ -89,11 +90,36 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                             let tcphdr: *const TcpHdr =
                                 unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
                             let dst_port = u16::from_be(unsafe { (*tcphdr).dest });
+                            let syn = unsafe { (*tcphdr).syn() };
+                            let ack = unsafe { (*tcphdr).ack() };
 
-                            if rule.ports.contains(&dst_port) && rule.action == 1 {
-                                log_new_connection(ctx, source_ip, dst_port, 6);
+                            if syn == 1 && ack == 0 {
+                                // SYN packet: Apply rules for incoming or outgoing connections
+                                if rule.ports.contains(&dst_port) {
+                                    if rule.action == 1 {
+                                        log_new_connection(ctx, source_ip, dst_port, 6);
+                                        return Ok(xdp_action::XDP_PASS);
+                                    } else {
+                                        log_new_connection(ctx, source_ip, dst_port, 6);
+                                        return Ok(xdp_action::XDP_DROP);
+                                    }
+                                }
+                            } else if syn == 1 && ack == 1 {
+                                // SYN-ACK packets: Allow for outgoing connection responses
+                                return Ok(xdp_action::XDP_PASS);
+                            } else if ack == 1 {
+                                // ACK packets: Allow for established connections
                                 return Ok(xdp_action::XDP_PASS);
                             }
+
+                            // For other TCP packets, apply rules
+                            if rule.ports.contains(&dst_port) {
+                                if rule.action == 1 {
+                                    log_new_connection(ctx, source_ip, dst_port, 6);
+                                    return Ok(xdp_action::XDP_PASS);
+                                }
+                            }
+                            log_new_connection(ctx, source_ip, dst_port, 6);
                             return Ok(xdp_action::XDP_DROP);
                         }
                         IpProto::Udp => {
@@ -105,7 +131,9 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                                 log_new_connection(ctx, source_ip, dst_port, 17);
                                 return Ok(xdp_action::XDP_PASS);
                             }
-                            return Ok(xdp_action::XDP_DROP);
+                            // By the moment, allow every UDP packet
+                            // Necessary to allow DNS UDP packets (internet browsing, for example)
+                            return Ok(xdp_action::XDP_PASS);
                         }
                         IpProto::Icmp => {
                             if rule.action == 1 {
