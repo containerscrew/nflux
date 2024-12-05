@@ -10,9 +10,7 @@ log_type = "text"  # text or json. Defaults to text if not set
 [ip_rules]
 # The /32 CIDR block is used to represent a single IP address rather than a range
 "192.168.0.174/32" = { priority = 1, action = "allow", ports = [22], protocol = "tcp", log = false, description = "Allow SSH for specific IP" }
-"192.168.0.0/24" = { priority = 2, action = "deny", ports = [22], protocol = "tcp", log = false, description = "Deny SSH for entire subnet" }
-
-
+"192.168.0.0/24" = { priority = 2, action = "deny", ports = [8081], protocol = "tcp", log = false, description = "Deny SSH for entire subnet" }
 
 # todo: ipv6 support
 # "2001:0db8:85a3:0000:0000:8a2e:0370:7334" = { action = "deny", ports = [80], protocol = "tcp" }

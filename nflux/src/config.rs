@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use serde::Deserialize;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::env;
 use std::fs;
 
@@ -74,14 +74,29 @@ impl Nflux {
 
     // A separate validation function to ensure correctness
     pub fn validate(&self) -> Result<()> {
+        let mut priorities: HashSet<u32> = HashSet::new();
+
         for (ip, rule) in &self.ip_rules {
+            // Ensure priority is greater than 0
             if rule.priority == 0 {
-                anyhow::bail!("Priority must be greater than 0");
+                anyhow::bail!("Priority must be greater than 0 for rule: {}", ip);
             }
+
+            // Ensure port numbers are within the valid range
             if !rule.ports.iter().all(|&port| (1..=65535).contains(&port)) {
                 anyhow::bail!("Invalid port number in rule for IP: {}", ip);
             }
+
+            // Check for duplicate priorities
+            if !priorities.insert(rule.priority) {
+                anyhow::bail!(
+                    "Duplicate priority found: {} in rule for IP: {}",
+                    rule.priority,
+                    ip
+                );
+            }
         }
+
         Ok(())
     }
 }
@@ -146,6 +161,32 @@ mod tests {
             .unwrap_err()
             .to_string()
             .contains("Failed to read configuration file"));
+    }
+
+    #[test]
+    fn test_duplicate_priority() {
+        let config_content = r#"
+        [nflux]
+        interface_names = ["eth0", "wlan0"]
+
+        [logging]
+        log_level = "debug"
+        log_type = "json"
+
+        [ip_rules]
+        "192.168.0.1" = { priority = 1, action = "allow", ports = [22], protocol = "tcp", log = true, description = "SSH rule" }
+        "192.168.0.4" = { priority = 1, action = "allow", ports = [80], protocol = "tcp", log = true, description = "Nginx rule" }
+        "#;
+
+        let _temp_dir = setup_temp_config(config_content);
+
+        let config = Nflux::load_config();
+
+        // Check that the configuration loading fails due to duplicate priorities
+        assert!(
+            config.is_err(),
+            "Expected duplicate priorities to cause an error"
+        );
     }
 
     // #[test]
