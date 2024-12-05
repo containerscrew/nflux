@@ -1,0 +1,37 @@
+services:
+  # Simulate TCP service
+  nginx:
+    image: docker.io/nginx:latest
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    networks:
+      - nginx_network
+  # Simulate UDP service
+  bind:
+    image: docker.io/ubuntu/bind9:latest
+    container_name: bind_dns
+    restart: unless-stopped
+    environment:
+      - TZ=UTC
+      - BIND9_USER=bind
+    ports:
+      - "5053:53/tcp"
+      - "5053:53/udp"
+    volumes:
+      - ./bind/configuration/named.conf:/etc/bind/named.conf:rw
+      - bind_cache:/var/cache/bind:rw
+      - ./bind/configuration/db.mycompany.org:/etc/bind/db.mycompany.org:rw
+    networks:
+      - bind_network
+
+networks:
+  bind_network:
+    driver: bridge
+  nginx_network:
+    driver: bridge
+
+volumes:
+  bind_cache:
+      driver: local
