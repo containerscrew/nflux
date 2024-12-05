@@ -3,7 +3,7 @@
 interface_names = ["wlp2s0", "eth0"]
 # Control ICMP ping packets for each IP I think is not necessary by the moment
 # Lets decide if ICMP packets will be allowed or denied globally
-icmp_ping = "false"
+icmp_ping = "true"
 
 [logging]
 log_level = "info" # trace, debug, info, warn, or error. Defaults to info if not set

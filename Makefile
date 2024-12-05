@@ -24,6 +24,9 @@ generate-changelog: ## Generate changelog
 init-gitmoji: ## Init gitmoji (sudo npm i -g gitmoji-cli)
 	gitmoji --init
 
+compose-build: ## Run docker-compose build
+	docker-compose -f docker/compose.yml build
+
 compose-up: ## Run docker-compose up
 	docker-compose -f docker/compose.yml up -d --force-recreate
 
