@@ -1,25 +1,25 @@
-name: Auto Merge Dependabot PRs
+name: Dependabot auto-merge
 
-on:
-  pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
+on: pull_request
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
-  auto-merge:
-    name: Auto-merge dependabot PRs
+  dependabot:
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]'
+    if: github.event.pull_request.user.login == 'dependabot[bot]' && github.repository == 'containerscrew/nflux'
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Auto-merge PR if it bumps the clap dependency
-        uses: pascalgn/automerge-action@v0.16.4
-        env:
-          GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
+      - name: Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d
         with:
-          MERGE_METHOD: "squash"
-          LOG: "TRACE"
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Enable auto-merge for Dependabot PRs
+#        if: contains(steps.metadata.outputs.dependency-names, 'my-dependency') && steps.metadata.outputs.update-type == 'version-update:semver-patch'
+        run: gh pr merge --auto --merge "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
