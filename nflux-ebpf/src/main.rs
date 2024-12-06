@@ -11,7 +11,7 @@ use aya_ebpf::{
     programs::XdpContext,
 };
 use core::mem;
-use network_types::ip::IpProto;
+use network_types::ip::{IpProto, Ipv6Hdr};
 use network_types::{
     eth::{EthHdr, EtherType},
     ip::Ipv4Hdr,
@@ -97,7 +97,6 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                             let ack = unsafe { (*tcphdr).ack() };
 
                             if syn == 1 && ack == 0 {
-                                // SYN packet: Apply rules for incoming or outgoing connections
                                 if rule.ports.contains(&dst_port) {
                                     if rule.action == 1 {
                                         log_new_connection(ctx, source_ip, dst_port, 6);
@@ -108,14 +107,11 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                                     }
                                 }
                             } else if syn == 1 && ack == 1 {
-                                // SYN-ACK packets: Allow for outgoing connection responses
                                 return Ok(xdp_action::XDP_PASS);
                             } else if ack == 1 {
-                                // ACK packets: Allow for established connections
                                 return Ok(xdp_action::XDP_PASS);
                             }
 
-                            // For other TCP packets, apply rules
                             if rule.ports.contains(&dst_port) {
                                 if rule.action == 1 {
                                     log_new_connection(ctx, source_ip, dst_port, 6);
@@ -134,27 +130,94 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                                 log_new_connection(ctx, source_ip, dst_port, 17);
                                 return Ok(xdp_action::XDP_PASS);
                             }
-                            // By the moment, allow every UDP packet
-                            // Necessary to allow DNS UDP packets (internet browsing, for example)
                             return Ok(xdp_action::XDP_PASS);
                         }
                         IpProto::Icmp => {
-                            // Read from EBPF map
                             if let Some(&icmp_ping) = ICMP_RULE.get(0) {
                                 if icmp_ping == 1 {
-                                    // Allow ICMP packets if enabled
                                     log_new_connection(ctx, source_ip, 0, 1);
                                     return Ok(xdp_action::XDP_PASS);
                                 }
                             }
-                            // Block ICMP packets by default
                             return Ok(xdp_action::XDP_DROP);
                         }
                         _ => return Ok(xdp_action::XDP_DROP),
                     }
                 }
             }
+            Ok(xdp_action::XDP_DROP)
+        }
+        EtherType::Ipv6 => {
+            let ipv6hdr: *const Ipv6Hdr = unsafe { ptr_at(&ctx, EthHdr::LEN)? };
+            let proto = unsafe { (*ipv6hdr).next_hdr };
+            let source_ip = unsafe { (*ipv6hdr).src_addr.in6_u.u6_addr8 };
 
+            for prefix_len in (1..=128).rev() {
+                let key = Key::new(
+                    prefix_len,
+                    LpmKeyIpv6 {
+                        prefix_len,
+                        ip: source_ip,
+                    },
+                );
+
+                if let Some(rule) = IPV6_RULES.get(&key) {
+                    match proto {
+                        IpProto::Tcp => {
+                            let tcphdr: *const TcpHdr =
+                                unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv6Hdr::LEN)? };
+                            let dst_port = u16::from_be(unsafe { (*tcphdr).dest });
+                            let syn = unsafe { (*tcphdr).syn() };
+                            let ack = unsafe { (*tcphdr).ack() };
+
+                            if syn == 1 && ack == 0 {
+                                if rule.ports.contains(&dst_port) {
+                                    if rule.action == 1 {
+                                        log_new_connection(ctx, 0, dst_port, 6);
+                                        return Ok(xdp_action::XDP_PASS);
+                                    } else {
+                                        log_new_connection(ctx, 0, dst_port, 6);
+                                        return Ok(xdp_action::XDP_DROP);
+                                    }
+                                }
+                            } else if syn == 1 && ack == 1 {
+                                return Ok(xdp_action::XDP_PASS);
+                            } else if ack == 1 {
+                                return Ok(xdp_action::XDP_PASS);
+                            }
+
+                            if rule.ports.contains(&dst_port) {
+                                if rule.action == 1 {
+                                    log_new_connection(ctx, 0, dst_port, 6);
+                                    return Ok(xdp_action::XDP_PASS);
+                                }
+                            }
+                            return Ok(xdp_action::XDP_DROP);
+                        }
+                        IpProto::Udp => {
+                            let udphdr: *const UdpHdr =
+                                unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv6Hdr::LEN)? };
+                            let dst_port = u16::from_be(unsafe { (*udphdr).dest });
+
+                            if rule.ports.contains(&dst_port) && rule.action == 1 {
+                                log_new_connection(ctx, 0, dst_port, 17);
+                                return Ok(xdp_action::XDP_PASS);
+                            }
+                            return Ok(xdp_action::XDP_PASS);
+                        }
+                        IpProto::Icmp => {
+                            if let Some(&icmp_ping) = ICMP_RULE.get(0) {
+                                if icmp_ping == 1 {
+                                    log_new_connection(ctx, 0, 0, 1);
+                                    return Ok(xdp_action::XDP_PASS);
+                                }
+                            }
+                            return Ok(xdp_action::XDP_DROP);
+                        }
+                        _ => return Ok(xdp_action::XDP_DROP),
+                    }
+                }
+            }
             Ok(xdp_action::XDP_DROP)
         }
         _ => Ok(xdp_action::XDP_DROP),
