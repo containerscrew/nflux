@@ -12,8 +12,6 @@ RUN cargo xtask build --release
 
 FROM gcr.io/distroless/cc-debian12
 
-ENV NFLUX_CONFIG_FILE_PATH=/nflux.toml
-
 COPY --from=build-env /app/target/release/nflux /
 
 CMD ["./nflux"]
