@@ -12,13 +12,14 @@ log_type = "text"  # text or json. Defaults to text if not set
 
 [ip_rules]
 # The /32 CIDR block is used to represent a single IP address rather than a range
-"192.168.0.174/32" = { priority = 1, action = "allow", ports = [22], protocol = "tcp", log = false, description = "Allow SSH for specific IP" }
-"192.168.0.0/24" = { priority = 2, action = "deny", ports = [8081], protocol = "tcp", log = false, description = "Deny SSH for entire subnet" }
+"192.168.0.0/24" = { priority = 1, action = "allow", ports = [22], protocol = "tcp", log = false, description = "Allow SSH for entire local net" }
 
-# todo: ipv6 support
-# "2001:0db8:85a3:0000:0000:8a2e:0370:7334" = { action = "deny", ports = [80], protocol = "tcp" }
+# curl -6 -v http://\[::ffff:192.168.0.26\]:80
+"fe80::5bc2:662b:ac2f:7e8b/128" = { priority = 2, action = "allow", ports = [80], protocol = "tcp", log = false, description = "Deny HTTP for specific IPv6 address" }
 
-# [mac_rules]
-# # Rules for MAC address filtering
-# "00:0a:95:9d:68:16" = { action = "allow" }
-# "00:0a:95:9d:68:17" = { action = "deny" }
+#[mac_rules]
+# todo: MAC address filtering
+# This is not implemented. Not necessary by the moment
+# Rules for MAC address filtering
+#"00:0a:95:9d:68:16" = { action = "allow" }
+#"00:0a:95:9d:68:17" = { action = "deny" }

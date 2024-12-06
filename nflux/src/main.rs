@@ -15,9 +15,9 @@ use bytes::BytesMut;
 use config::{Action, Nflux, Protocol, IpRules};
 use core::set_mem_limit;
 use logger::setup_logger;
-use nflux_common::{convert_protocol, ConnectionEvent, IpRule, LpmKeyIpv4};
+use nflux_common::{convert_protocol, ConnectionEvent, IpRule, LpmKeyIpv4, LpmKeyIpv6};
 use std::collections::HashMap;
-use std::net::Ipv4Addr;
+use std::net::{Ipv4Addr, Ipv6Addr};
 use std::ptr;
 use tokio::task;
 use tracing::{error, info};
@@ -45,9 +45,8 @@ async fn main() -> anyhow::Result<()> {
     let mut bpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/nflux")))?;
 
     // Populate eBPF maps with configuration data
-    populate_ipv4_rules(&mut bpf, &config.ip_rules)?;
+    populate_ip_rules(&mut bpf, &config.ip_rules)?;
     populate_icmp_rule(&mut bpf, config.nflux.icmp_ping)?;
-    // populate_ipv6_rules(&mut bpf, &config.ip_rules)?;
 
     // Attach XDP program
     let program: &mut Xdp = bpf.program_mut("nflux").unwrap().try_into()?;
@@ -123,36 +122,6 @@ fn parse_connection_event(buf: &BytesMut) -> anyhow::Result<ConnectionEvent> {
     }
 }
 
-fn populate_ipv4_rules(bpf: &mut Ebpf, ip_rules: &HashMap<String, IpRules>) -> anyhow::Result<()> {
-    let mut ipv4_map: LpmTrie<&mut MapData, LpmKeyIpv4, IpRule> = LpmTrie::try_from(
-        bpf.map_mut("IPV4_RULES")
-            .context("Failed to find IPV4_RULES map")?,
-    )?;
-
-    // Sort rules by priority
-    let mut sorted_rules: Vec<_> = ip_rules.iter().collect();
-    sorted_rules.sort_by_key(|(_, rule)| rule.priority);
-
-    for (cidr, rule) in sorted_rules {
-        let (ip, prefix_len) = parse_cidr_v4(cidr)?;
-        let ip_rule = prepare_ip_rule(rule)?;
-
-        let key = Key::new(
-            prefix_len,
-            LpmKeyIpv4 {
-                prefix_len,
-                ip: ip.into(),
-            },
-        );
-
-        ipv4_map
-            .insert(&key, &ip_rule, 0)
-            .context("Failed to insert IPv4 rule")?;
-    }
-
-    Ok(())
-}
-
 fn prepare_ip_rule(rule: &IpRules) -> anyhow::Result<IpRule> {
     let mut ports = [0u16; 16];
     for (i, &port) in rule.ports.iter().enumerate().take(16) {
@@ -173,22 +142,6 @@ fn prepare_ip_rule(rule: &IpRules) -> anyhow::Result<IpRule> {
     })
 }
 
-// fn populate_ipv6_rules(bpf: &mut Ebpf, ip_rules: &HashMap<String, Rules>) -> anyhow::Result<()> {
-//     let mut ipv6_map: LpmTrie<&mut MapData, LpmKeyIpv6, IpRule> = LpmTrie::try_from(
-//         bpf.map_mut("IPV6_RULES").context("Failed to find IPV4_RULES map")?,
-//     )?;
-
-//     for (cidr, rule) in ip_rules {
-//         let (ip, prefix_len) = parse_cidr_v6(cidr)?;
-//         let ip_rule = prepare_ip_rule(rule)?;
-
-//         let key = Key::new(prefix_len, LpmKeyIpv6 { prefix_len, ip: ip.into() });
-//         ipv6_map.insert(&key, &ip_rule, 0).context("Failed to insert IPv6 rule")?;
-//     }
-
-//     Ok(())
-// }
-
 fn parse_cidr_v4(cidr: &str) -> anyhow::Result<(Ipv4Addr, u32)> {
     let parts: Vec<&str> = cidr.split('/').collect();
     if parts.len() != 2 {
@@ -199,12 +152,74 @@ fn parse_cidr_v4(cidr: &str) -> anyhow::Result<(Ipv4Addr, u32)> {
     Ok((ip, prefix_len))
 }
 
-// fn parse_cidr_v6(cidr: &str) -> anyhow::Result<(Ipv6Addr, u32)> {
-//     let parts: Vec<&str> = cidr.split('/').collect();
-//     if parts.len() != 2 {
-//         return Err(anyhow::anyhow!("Invalid CIDR format: {}", cidr));
-//     }
-//     let ip = parts[0].parse::<Ipv6Addr>()?;
-//     let prefix_len = parts[1].parse::<u32>()?;
-//     Ok((ip, prefix_len))
-// }
+fn parse_cidr_v6(cidr: &str) -> anyhow::Result<(Ipv6Addr, u32)> {
+    let parts: Vec<&str> = cidr.split('/').collect();
+    if parts.len() != 2 {
+        return Err(anyhow::anyhow!("Invalid CIDR format: {}", cidr));
+    }
+    let ip = parts[0].parse::<Ipv6Addr>()?;
+    let prefix_len = parts[1].parse::<u32>()?;
+    Ok((ip, prefix_len))
+}
+
+fn populate_ip_rules(bpf: &mut Ebpf, ip_rules: &HashMap<String, IpRules>) -> anyhow::Result<()> {
+    {
+        // Populate IPv4 rules
+        let mut ipv4_map: LpmTrie<&mut MapData, LpmKeyIpv4, IpRule> = LpmTrie::try_from(
+            bpf.map_mut("IPV4_RULES")
+                .context("Failed to find IPV4_RULES map")?,
+        )?;
+
+        // Sort rules by priority
+        let mut sorted_rules: Vec<_> = ip_rules.iter().collect();
+        sorted_rules.sort_by_key(|(_, rule)| rule.priority);
+
+        for (cidr, rule) in &sorted_rules {
+            if let Ok((ip, prefix_len)) = parse_cidr_v4(cidr) {
+                // Handle IPv4 rules
+                let ip_rule = prepare_ip_rule(rule)?;
+                let key = Key::new(
+                    prefix_len,
+                    LpmKeyIpv4 {
+                        prefix_len,
+                        ip: ip.into(),
+                    },
+                );
+                ipv4_map
+                    .insert(&key, &ip_rule, 0)
+                    .context("Failed to insert IPv4 rule")?;
+            }
+        }
+    }
+
+    {
+        // Populate IPv6 rules
+        let mut ipv6_map: LpmTrie<&mut MapData, LpmKeyIpv6, IpRule> = LpmTrie::try_from(
+            bpf.map_mut("IPV6_RULES")
+                .context("Failed to find IPV6_RULES map")?,
+        )?;
+
+        // Sort rules by priority
+        let mut sorted_rules: Vec<_> = ip_rules.iter().collect();
+        sorted_rules.sort_by_key(|(_, rule)| rule.priority);
+
+        for (cidr, rule) in &sorted_rules {
+            if let Ok((ip, prefix_len)) = parse_cidr_v6(cidr) {
+                // Handle IPv6 rules
+                let ip_rule = prepare_ip_rule(rule)?;
+                let key = Key::new(
+                    prefix_len,
+                    LpmKeyIpv6 {
+                        prefix_len,
+                        ip: ip.octets(),
+                    },
+                );
+                ipv6_map
+                    .insert(&key, &ip_rule, 0)
+                    .context("Failed to insert IPv6 rule")?;
+            }
+        }
+    }
+
+    Ok(())
+}
