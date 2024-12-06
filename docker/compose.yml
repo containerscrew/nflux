@@ -9,5 +9,7 @@ services:
       # Insecure, by the moment give all capabilities
       - ALL
     container_name: nflux
+    environment:
+      - NFLUX_CONFIG_FILE_PATH=/nflux.toml
     volumes:
       - ${PWD}/nflux.toml:/nflux.toml
