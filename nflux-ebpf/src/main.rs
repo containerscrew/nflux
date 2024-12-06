@@ -59,11 +59,12 @@ unsafe fn ptr_at<T>(ctx: &XdpContext, offset: usize) -> Result<*const T, ()> {
     Ok((start + offset) as *const T)
 }
 
-fn log_new_connection(ctx: XdpContext, src_addr: u32, dst_port: u16, protocol: u8) {
+fn log_new_connection(ctx: XdpContext, src_addr: u32, dst_port: u16, protocol: u8, action: u8) {
     let event = ConnectionEvent {
         src_addr,
         dst_port,
         protocol,
+        action,
     };
 
     CONNECTION_EVENTS.output(&ctx, &event, 0);
@@ -90,35 +91,46 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                 if let Some(rule) = IPV4_RULES.get(&key) {
                     match proto {
                         IpProto::Tcp => {
-                            let tcphdr: *const TcpHdr =
-                                unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
+                            let tcphdr: *const TcpHdr = unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
                             let dst_port = u16::from_be(unsafe { (*tcphdr).dest });
                             let syn = unsafe { (*tcphdr).syn() };
                             let ack = unsafe { (*tcphdr).ack() };
 
+                            // Check if the port is in the allowed list for the rule
+                            if !rule.ports.contains(&dst_port) {
+                                log_new_connection(ctx, source_ip, dst_port, 6, 0);
+                                return Ok(xdp_action::XDP_DROP);
+                            }
+
+                            // Handle SYN (new connection attempts)
                             if syn == 1 && ack == 0 {
-                                if rule.ports.contains(&dst_port) {
-                                    if rule.action == 1 {
-                                        log_new_connection(ctx, source_ip, dst_port, 6);
-                                        return Ok(xdp_action::XDP_PASS);
-                                    } else {
-                                        log_new_connection(ctx, source_ip, dst_port, 6);
-                                        return Ok(xdp_action::XDP_DROP);
-                                    }
+                                if rule.action == 1 {
+                                    // Log only connection establishment attempts
+                                    log_new_connection(ctx, source_ip, dst_port, 6, rule.action);
+                                    return Ok(xdp_action::XDP_PASS);
+                                } else {
+                                    log_new_connection(ctx, source_ip, dst_port, 6, 0);
+                                    return Ok(xdp_action::XDP_DROP);
                                 }
-                            } else if syn == 1 && ack == 1 {
-                                return Ok(xdp_action::XDP_PASS);
-                            } else if ack == 1 {
+                            }
+
+                            // Handle SYN-ACK (response to outgoing connection attempts)
+                            if syn == 1 && ack == 1 {
                                 return Ok(xdp_action::XDP_PASS);
                             }
 
-                            if rule.ports.contains(&dst_port) {
-                                if rule.action == 1 {
-                                    log_new_connection(ctx, source_ip, dst_port, 6);
-                                    return Ok(xdp_action::XDP_PASS);
-                                }
+                            // Handle ACK (established connections)
+                            if ack == 1 {
+                                return Ok(xdp_action::XDP_PASS);
                             }
-                            log_new_connection(ctx, source_ip, dst_port, 6);
+
+                            // For other TCP packets, apply the rule's action
+                            if rule.action == 1 {
+                                log_new_connection(ctx, source_ip, dst_port, 6, 1);
+                                return Ok(xdp_action::XDP_PASS);
+                            }
+
+                            log_new_connection(ctx, source_ip, dst_port, 6, 0);
                             return Ok(xdp_action::XDP_DROP);
                         }
                         IpProto::Udp => {
@@ -127,7 +139,7 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                             let dst_port = u16::from_be(unsafe { (*udphdr).dest });
 
                             if rule.ports.contains(&dst_port) && rule.action == 1 {
-                                log_new_connection(ctx, source_ip, dst_port, 17);
+                                log_new_connection(ctx, source_ip, dst_port, 17, 0);
                                 return Ok(xdp_action::XDP_PASS);
                             }
                             return Ok(xdp_action::XDP_PASS);
@@ -135,7 +147,7 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                         IpProto::Icmp => {
                             if let Some(&icmp_ping) = ICMP_RULE.get(0) {
                                 if icmp_ping == 1 {
-                                    log_new_connection(ctx, source_ip, 0, 1);
+                                    log_new_connection(ctx, source_ip, 0, 1, 1);
                                     return Ok(xdp_action::XDP_PASS);
                                 }
                             }
@@ -170,28 +182,42 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                             let syn = unsafe { (*tcphdr).syn() };
                             let ack = unsafe { (*tcphdr).ack() };
 
+                            // Check if the port is in the allowed list for the rule
+                            if !rule.ports.contains(&dst_port) {
+                                log_new_connection(ctx, 0, dst_port, 6, 0);
+                                return Ok(xdp_action::XDP_DROP);
+                            }
+
+                            // Handle SYN (new connection attempts)
                             if syn == 1 && ack == 0 {
-                                if rule.ports.contains(&dst_port) {
-                                    if rule.action == 1 {
-                                        log_new_connection(ctx, 0, dst_port, 6);
-                                        return Ok(xdp_action::XDP_PASS);
-                                    } else {
-                                        log_new_connection(ctx, 0, dst_port, 6);
-                                        return Ok(xdp_action::XDP_DROP);
-                                    }
+                                if rule.action == 1 {
+                                    log_new_connection(ctx, 0, dst_port, 6, 1);
+                                    return Ok(xdp_action::XDP_PASS);
+                                } else {
+                                    log_new_connection(ctx, 0, dst_port, 6, 0);
+                                    return Ok(xdp_action::XDP_DROP);
                                 }
-                            } else if syn == 1 && ack == 1 {
-                                return Ok(xdp_action::XDP_PASS);
-                            } else if ack == 1 {
+                            }
+
+                            // Handle SYN-ACK (response to outgoing connection attempts)
+                            if syn == 1 && ack == 1 {
+                                log_new_connection(ctx, 0, dst_port, 6, 1);
                                 return Ok(xdp_action::XDP_PASS);
                             }
 
-                            if rule.ports.contains(&dst_port) {
-                                if rule.action == 1 {
-                                    log_new_connection(ctx, 0, dst_port, 6);
-                                    return Ok(xdp_action::XDP_PASS);
-                                }
+                            // Handle ACK (established connections)
+                            if ack == 1 {
+                                log_new_connection(ctx, 0, dst_port, 6, 1);
+                                return Ok(xdp_action::XDP_PASS);
                             }
+
+                            // For other TCP packets, apply the rule's action
+                            if rule.action == 1 {
+                                log_new_connection(ctx, 0, dst_port, 6, 1);
+                                return Ok(xdp_action::XDP_PASS);
+                            }
+
+                            log_new_connection(ctx, 0, dst_port, 6, 0);
                             return Ok(xdp_action::XDP_DROP);
                         }
                         IpProto::Udp => {
@@ -200,15 +226,15 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                             let dst_port = u16::from_be(unsafe { (*udphdr).dest });
 
                             if rule.ports.contains(&dst_port) && rule.action == 1 {
-                                log_new_connection(ctx, 0, dst_port, 17);
+                                log_new_connection(ctx, 0, dst_port, 17, 1);
                                 return Ok(xdp_action::XDP_PASS);
                             }
-                            return Ok(xdp_action::XDP_PASS);
+                            return Ok(xdp_action::XDP_DROP);
                         }
                         IpProto::Icmp => {
                             if let Some(&icmp_ping) = ICMP_RULE.get(0) {
                                 if icmp_ping == 1 {
-                                    log_new_connection(ctx, 0, 0, 1);
+                                    log_new_connection(ctx, 0, 0, 1, 1);
                                     return Ok(xdp_action::XDP_PASS);
                                 }
                             }

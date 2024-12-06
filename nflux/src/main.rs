@@ -97,11 +97,12 @@ async fn process_events(
             match parse_connection_event(buf) {
                 Ok(event) => {
                     info!(
-                        "CPU={} program=xdp protocol={} port={} ip={}",
+                        "CPU={} program=xdp protocol={} port={} ip={} action={}",
                         cpu_id,
                         convert_protocol(event.protocol),
                         event.dst_port,
                         Ipv4Addr::from(event.src_addr),
+                        if event.action == 1 { "allow" } else { "deny" }
                     );
                 }
                 Err(e) => error!("Failed to parse event on CPU {}: {}", cpu_id, e),
