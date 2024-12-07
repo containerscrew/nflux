@@ -15,7 +15,7 @@ use bytes::BytesMut;
 use config::{Action, Nflux, Protocol, IpRules};
 use core::set_mem_limit;
 use logger::setup_logger;
-use nflux_common::{convert_protocol, ConnectionEvent, IpRule, LpmKeyIpv4, LpmKeyIpv6};
+use nflux_common::{convert_protocol, ConnectionEvent, EgressEvent, IpRule, LpmKeyIpv4, LpmKeyIpv6};
 use std::collections::HashMap;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::ptr;
@@ -82,20 +82,56 @@ async fn main() -> anyhow::Result<()> {
     )?;
 
     let mut egress_events = AsyncPerfEventArray::try_from(
-        bpf.take_map("EGRESS_EVENTS")
-            .context("Failed to find EGRESS_EVENTS map")?,
+        bpf.take_map("EGRESS_EVENT")
+            .context("Failed to find EGRESS_EVENT map")?,
     )?;
 
     let cpus = online_cpus().map_err(|(_, error)| error)?;
 
     for cpu_id in cpus {
-        let buf = events.open(cpu_id, None)?;
-        task::spawn(process_events(buf, cpu_id));
+        // Spawn task for connection events
+        {
+            let buf = events.open(cpu_id, None)?;
+            task::spawn(process_events(buf, cpu_id));
+        }
+
+        // Spawn task for egress events
+        {
+            let buf = egress_events.open(cpu_id, None)?;
+            task::spawn(process_egress_events(buf, cpu_id));
+        }
     }
+
 
     // Wait for shutdown signal
     wait_for_shutdown().await?;
     Ok(())
+}
+
+async fn process_egress_events(
+    mut buf: AsyncPerfEventArrayBuffer<MapData>,
+    cpu_id: u32,
+) -> Result<(), PerfBufferError> {
+    let mut buffers = vec![BytesMut::with_capacity(1024); 10];
+
+    loop {
+        // Wait for events
+        let events = buf.read_events(&mut buffers).await?;
+
+        // Process each event in the buffer
+        for i in 0..events.read {
+            let buf = &buffers[i];
+            match parse_egress_event(buf) {
+                Ok(event) => {
+                    info!(
+                        "direction=outgoing ip={}",
+                        Ipv4Addr::from(event.dst_ip)
+                    );
+                }
+                Err(e) => error!("Failed to parse egress event on CPU {}: {}", cpu_id, e),
+            }
+        }
+    }
 }
 
 async fn process_events(
@@ -124,6 +160,18 @@ async fn process_events(
                 Err(e) => error!("Failed to parse event on CPU {}: {}", cpu_id, e),
             }
         }
+    }
+}
+
+fn parse_egress_event(buf: &BytesMut) -> anyhow::Result<EgressEvent> {
+    if buf.len() >= std::mem::size_of::<EgressEvent>() {
+        let ptr = buf.as_ptr() as *const EgressEvent;
+        let event = unsafe { ptr::read_unaligned(ptr) };
+        Ok(event)
+    } else {
+        Err(anyhow::anyhow!(
+            "Buffer size is too small for EgressEvent"
+        ))
     }
 }
 
