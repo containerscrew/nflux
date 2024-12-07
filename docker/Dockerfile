@@ -8,6 +8,7 @@ RUN set -eux ;\
     cargo install bpf-linker ;\
     rustup install stable && rustup toolchain install nightly --component rust-src
 
+# cargo xtask build --release
 RUN cargo xtask build --release
 
 FROM gcr.io/distroless/cc-debian12
