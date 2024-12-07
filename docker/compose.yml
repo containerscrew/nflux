@@ -6,6 +6,10 @@ services:
     restart: unless-stopped
     network_mode: host
     cap_add:
+      # Required caps:
+      #  - CAP_NET_ADMIN
+      #  - CAP_BPF
+      #  - CAP_PERFMON
       # Insecure, by the moment give all capabilities
       - ALL
     container_name: nflux
