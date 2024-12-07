@@ -2,6 +2,7 @@
 **Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
 - [Local development](#local-development)
   - [Requirements](#requirements)
+- [Running nflux](#running-nflux)
 - [Debugging](#debugging)
 <!-- END OF TOC -->
 # Local development
@@ -28,6 +29,12 @@ LLVM_SYS_180_PREFIX=$(brew --prefix llvm) cargo install --no-default-features bp
 3. **MANDATORY:**
 ```bash
 cargo install bpf-linker
+```
+
+# Running nflux
+
+```bash
+make local-run
 ```
 
 # Debugging
