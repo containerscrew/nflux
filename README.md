@@ -60,7 +60,7 @@ make compose-build
 Before running the container, you need to edit the configuration file [`nflux.toml`](./nflux.toml). The most important configuration is the `interface` name.
 
 ```bash
-ip link show # get the name of your PHISICAL interface
+ip link show # get the name of your PHYSICAL interface
 # Once is changes in the conf file, lets run nflux
 make compose-up
 ```
