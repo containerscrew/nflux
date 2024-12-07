@@ -15,6 +15,7 @@
 - [Nflux architecture](#nflux-architecture)
 - [Features](#features)
 - [Installation](#installation)
+- [Local development](#local-development)
 - [Contribution](#contribution)
 - [License](#license)
 <!-- END OF TOC -->
@@ -60,6 +61,10 @@ make compose-up
 ```
 
 > By default, nflux will allow SSH (22) connections from any IP. Avoid blocking your SSH connection if testing in remote servers (VPS).
+
+# Local development
+
+For local development, I don't use containers since the build process is slow. Visit this custom page for [`local development`](./docs/local_dev.md).
 
 # Contribution
 
