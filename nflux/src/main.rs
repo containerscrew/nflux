@@ -23,6 +23,7 @@ use tokio::task;
 use tracing::{error, info};
 use utils::{is_root_user, wait_for_shutdown};
 use crate::ebpf_mapping::populate_icmp_rule;
+use crate::utils::lookup_address;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {

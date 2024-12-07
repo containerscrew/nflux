@@ -2,6 +2,8 @@
 #![no_main]
 #![allow(nonstandard_style, dead_code)]
 
+mod egress;
+
 use aya_ebpf::maps::lpm_trie::Key;
 use aya_ebpf::maps::{Array, LpmTrie, LruHashMap};
 use aya_ebpf::{
@@ -22,6 +24,7 @@ use network_types::{
     udp::UdpHdr,
 };
 use nflux_common::{ConnectionEvent, EgressEvent, IpRule, LpmKeyIpv4, LpmKeyIpv6};
+use crate::egress::try_tc_egress;
 
 #[map]
 static IPV4_RULES: LpmTrie<LpmKeyIpv4, IpRule> = LpmTrie::with_max_entries(1024, 0);
@@ -34,12 +37,6 @@ static CONNECTION_EVENTS: PerfEventArray<ConnectionEvent> = PerfEventArray::new(
 
 #[map]
 static ICMP_RULE: Array<u32> = Array::with_max_entries(1, 0);
-
-#[map]
-static EGRESS_EVENT: PerfEventArray<EgressEvent> = PerfEventArray::new(0);
-
-#[map]
-static ACTIVE_CONNECTIONS: LruHashMap<u32, u32> = LruHashMap::with_max_entries(1024, 0);
 
 #[xdp]
 pub fn nflux(ctx: XdpContext) -> u32 {
@@ -77,30 +74,6 @@ fn log_new_connection(ctx: XdpContext, src_addr: u32, dst_port: u16, protocol: u
 
     CONNECTION_EVENTS.output(&ctx, &event, 0);
 }
-
-fn try_tc_egress(ctx: TcContext) -> Result<i32, ()> {
-    let ethhdr: EthHdr = ctx.load(0).map_err(|_| ())?;
-    match ethhdr.ether_type {
-        EtherType::Ipv4 => unsafe {
-            let ipv4hdr: Ipv4Hdr = ctx.load(EthHdr::LEN).map_err(|_| ())?;
-            let destination = u32::from_be(ipv4hdr.dst_addr);
-
-            // Check if this destination is already active
-            if ACTIVE_CONNECTIONS.get(&destination).is_none() {
-                // Log only new connections
-                let event = EgressEvent { dst_ip: destination };
-                EGRESS_EVENT.output(&ctx, &event, 0);
-
-                // Mark connection as active
-                ACTIVE_CONNECTIONS.insert(&destination, &1, 0).map_err(|_| ())?;
-            }
-        }
-        _ => return Ok(TC_ACT_PIPE),
-    }
-
-    Ok(TC_ACT_PIPE)
-}
-
 
 fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
     let ethhdr: *const EthHdr = unsafe { ptr_at(&ctx, 0)? };
