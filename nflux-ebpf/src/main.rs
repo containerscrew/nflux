@@ -11,6 +11,9 @@ use aya_ebpf::{
     programs::XdpContext,
 };
 use core::mem;
+use aya_ebpf::bindings::{TC_ACT_PIPE, TC_ACT_SHOT};
+use aya_ebpf::macros::classifier;
+use aya_ebpf::programs::TcContext;
 use network_types::ip::{IpProto, Ipv6Hdr};
 use network_types::{
     eth::{EthHdr, EtherType},
@@ -18,13 +21,7 @@ use network_types::{
     tcp::TcpHdr,
     udp::UdpHdr,
 };
-use nflux_common::{ConnectionEvent, IpRule, LpmKeyIpv4, LpmKeyIpv6};
-
-#[cfg(not(test))]
-#[panic_handler]
-fn panic(_info: &core::panic::PanicInfo) -> ! {
-    loop {}
-}
+use nflux_common::{ConnectionEvent, EgressEvent, IpRule, LpmKeyIpv4, LpmKeyIpv6};
 
 #[map]
 static IPV4_RULES: LpmTrie<LpmKeyIpv4, IpRule> = LpmTrie::with_max_entries(1024, 0);
@@ -38,12 +35,20 @@ static CONNECTION_EVENTS: PerfEventArray<ConnectionEvent> = PerfEventArray::new(
 #[map]
 static ICMP_RULE: Array<u32> = Array::with_max_entries(1, 0);
 
+#[map]
+static EGRESS_EVENT: PerfEventArray<EgressEvent> = PerfEventArray::new(0);
+
 #[xdp]
 pub fn nflux(ctx: XdpContext) -> u32 {
     match start_nflux(ctx) {
         Ok(ret) => ret,
         Err(_) => xdp_action::XDP_ABORTED,
     }
+}
+
+#[classifier]
+pub fn tc_egress(ctx: TcContext) -> i32 {
+    try_tc_egress(ctx).unwrap_or_else(|_| TC_ACT_SHOT)
 }
 
 #[inline(always)]
@@ -68,6 +73,23 @@ fn log_new_connection(ctx: XdpContext, src_addr: u32, dst_port: u16, protocol: u
     };
 
     CONNECTION_EVENTS.output(&ctx, &event, 0);
+}
+
+fn try_tc_egress(ctx: TcContext) -> Result<i32, ()> {
+    let ethhdr: EthHdr = ctx.load(0).map_err(|_| ())?;
+    match ethhdr.ether_type {
+        EtherType::Ipv4 => {}
+        _ => return Ok(TC_ACT_PIPE),
+    }
+
+    let ipv4hdr: Ipv4Hdr = ctx.load(EthHdr::LEN).map_err(|_| ())?;
+    let destination = u32::from_be(ipv4hdr.dst_addr);
+
+    let event = EgressEvent { dst_ip: destination };
+
+    EGRESS_EVENT.output(&ctx, &event, 0);
+
+    Ok(TC_ACT_PIPE)
 }
 
 fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
@@ -248,4 +270,10 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
         }
         _ => Ok(xdp_action::XDP_DROP),
     }
+}
+
+#[cfg(not(test))]
+#[panic_handler]
+fn panic(_info: &core::panic::PanicInfo) -> ! {
+    loop {}
 }

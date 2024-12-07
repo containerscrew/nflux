@@ -16,6 +16,12 @@ pub struct ConnectionEvent {
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct EgressEvent {
+    pub dst_ip: u32,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct IpRule {
     pub action: u8,       // 0 = deny, 1 = allow
     pub ports: [u16; 16], // Up to 16 ports

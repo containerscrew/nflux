@@ -8,7 +8,7 @@ use anyhow::Context;
 use aya::maps::lpm_trie::Key;
 use aya::maps::perf::{AsyncPerfEventArrayBuffer, PerfBufferError};
 use aya::maps::{AsyncPerfEventArray, LpmTrie, MapData};
-use aya::programs::{Xdp, XdpFlags};
+use aya::programs::{tc, SchedClassifier, TcAttachType, Xdp, XdpFlags};
 use aya::util::online_cpus;
 use aya::{include_bytes_aligned, Ebpf};
 use bytes::BytesMut;
@@ -56,19 +56,36 @@ async fn main() -> anyhow::Result<()> {
         .context(
             "Failed to attach XDP program. Ensure the interface is physical and not virtual.",
         )?;
-
-    // Log startup info
-    info!("nflux started successfully!");
     info!(
         "XDP program attached to interface: {:?}",
         config.nflux.interface_names[0]
     );
+
+    // Attach TC program
+    let _ = tc::qdisc_add_clsact(&config.nflux.interface_names[0]);
+    let program: &mut SchedClassifier =
+        bpf.program_mut("tc_egress").unwrap().try_into()?;
+    program.load()?;
+    program.attach(&config.nflux.interface_names[0], TcAttachType::Egress)?;
+    info!(
+        "TC egress program attached to interface: {:?}",
+        config.nflux.interface_names[0]
+    );
+
+    // Log startup info
+    info!("nflux started successfully!");
 
     // Start processing events from the eBPF program
     let mut events = AsyncPerfEventArray::try_from(
         bpf.take_map("CONNECTION_EVENTS")
             .context("Failed to find CONNECTION_EVENTS map")?,
     )?;
+
+    let mut egress_events = AsyncPerfEventArray::try_from(
+        bpf.take_map("EGRESS_EVENTS")
+            .context("Failed to find EGRESS_EVENTS map")?,
+    )?;
+
     let cpus = online_cpus().map_err(|(_, error)| error)?;
 
     for cpu_id in cpus {
@@ -97,8 +114,7 @@ async fn process_events(
             match parse_connection_event(buf) {
                 Ok(event) => {
                     info!(
-                        "CPU={} program=xdp protocol={} port={} ip={} action={}",
-                        cpu_id,
+                        "direction=incoming protocol={} port={} ip={} action={}",
                         convert_protocol(event.protocol),
                         event.dst_port,
                         Ipv4Addr::from(event.src_addr),
