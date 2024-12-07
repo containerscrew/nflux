@@ -1,8 +1,8 @@
 > [!WARNING]
 > Ignore this README. It may change as I develop and adjust configurations.
 > The entire tool is under development, while I am learning Rust and eBPF.
-> I am not a Rust developer, so I am learning as I go. I am open to any suggestions or improvements.
-> Code is not optimized, and I am not following best practices. I am learning and improving as I go.
+> I am not a Rust senior developer, so I am learning as I go. I am open to any suggestions or improvements.
+> Code is not optimized. I will try to split functionalities into different files. Also, some code comments are missing.
 
 <p align="center">
     <h3 align="center">nflux</h3>
