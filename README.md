@@ -15,6 +15,7 @@
 - [Nflux architecture](#nflux-architecture)
 - [Features](#features)
 - [Installation](#installation)
+  - [Requirements](#requirements)
 - [Local development](#local-development)
 - [Contribution](#contribution)
 - [License](#license)
@@ -44,6 +45,10 @@ Basic XDP firewall:
 * Filter outgoing packets.
 
 # Installation
+
+## Requirements
+
+* Docker
 
 By the moment, the quickest way to install **`nflux`** is using containers. Let's see how to run `nflux` with `docker-compose`.
 
