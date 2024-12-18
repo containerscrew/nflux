@@ -92,7 +92,7 @@ impl Nflux {
 
             // Ensure port numbers are within the valid range
             if !rule.ports.iter().all(|&port| (1..=65535).contains(&port)) {
-                anyhow::bail!("Invalid port number in rule for IP: {}", ip);
+                anyhow::bail!("Invalid port number in rule for IP: {}. Allowed ports: 1-65535", ip);
             }
 
             // Check for duplicate priorities
