@@ -31,7 +31,7 @@ pub enum IsEnabled {
 // General firewall configuration
 #[derive(Debug, Deserialize)]
 pub struct NfluxConfig {
-    pub interface_names: Vec<String>,
+    pub interface_name: String,
     pub icmp_ping: IsEnabled,
 }
 
