@@ -52,24 +52,24 @@ async fn main() -> anyhow::Result<()> {
     let program: &mut Xdp = bpf.program_mut("nflux").unwrap().try_into()?;
     program.load()?;
     program
-        .attach(&config.nflux.interface_names[0], XdpFlags::default())
+        .attach(&config.nflux.interface_name, XdpFlags::default())
         .context(
             "Failed to attach XDP program. Ensure the interface is physical and not virtual.",
         )?;
     info!(
         "XDP program attached to interface: {:?}",
-        config.nflux.interface_names[0]
+        config.nflux.interface_name
     );
 
     // Attach TC program
-    let _ = tc::qdisc_add_clsact(&config.nflux.interface_names[0]);
+    let _ = tc::qdisc_add_clsact(&config.nflux.interface_name);
     let program: &mut SchedClassifier =
         bpf.program_mut("tc_egress").unwrap().try_into()?;
     program.load()?;
-    program.attach(&config.nflux.interface_names[0], TcAttachType::Egress)?;
+    program.attach(&config.nflux.interface_name, TcAttachType::Egress)?;
     info!(
         "TC egress program attached to interface: {:?}",
-        config.nflux.interface_names[0]
+        config.nflux.interface_name
     );
 
     // Log startup info
