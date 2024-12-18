@@ -15,3 +15,9 @@ pub static CONNECTION_EVENTS: PerfEventArray<ConnectionEvent> = PerfEventArray::
 
 #[map]
 pub static CONNECTION_TRACKER: LruHashMap<u64, u64> = LruHashMap::with_max_entries(1024, 0);
+
+#[map]
+static ACTIVE_CONNECTIONS: LruHashMap<u32, u32> = LruHashMap::with_max_entries(4096, 0);
+
+#[map]
+static EGRESS_EVENT: PerfEventArray<EgressEvent> = PerfEventArray::new(0);

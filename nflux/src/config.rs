@@ -146,7 +146,7 @@ mod tests {
         let config = Nflux::load_config().unwrap();
 
         // Assertions
-        assert_eq!(config.nflux.interface_names, vec!["eth0", "wlan0"]);
+        assert_eq!(config.nflux.interface_name, "wlan0");
         assert_eq!(config.nflux.icmp_ping, IsEnabled::True);
         assert_eq!(config.logging.log_level, "debug");
         assert_eq!(config.logging.log_type, "json");
