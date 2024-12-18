@@ -1,5 +1,5 @@
 use aya_ebpf::{macros::map, maps::{Array, LpmTrie, LruHashMap, PerfEventArray}};
-use nflux_common::{ConnectionEvent, IpRule, LpmKeyIpv4, LpmKeyIpv6};
+use nflux_common::{ConnectionEvent, EgressEvent, IpRule, LpmKeyIpv4, LpmKeyIpv6};
 
 #[map]
 pub static IPV4_RULES: LpmTrie<LpmKeyIpv4, IpRule> = LpmTrie::with_max_entries(1024, 0);
@@ -17,7 +17,7 @@ pub static CONNECTION_EVENTS: PerfEventArray<ConnectionEvent> = PerfEventArray::
 pub static CONNECTION_TRACKER: LruHashMap<u64, u64> = LruHashMap::with_max_entries(1024, 0);
 
 #[map]
-static ACTIVE_CONNECTIONS: LruHashMap<u32, u32> = LruHashMap::with_max_entries(4096, 0);
+pub static ACTIVE_CONNECTIONS: LruHashMap<u32, u32> = LruHashMap::with_max_entries(4096, 0);
 
 #[map]
-static EGRESS_EVENT: PerfEventArray<EgressEvent> = PerfEventArray::new(0);
+pub static EGRESS_EVENT: PerfEventArray<EgressEvent> = PerfEventArray::new(0);

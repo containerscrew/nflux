@@ -6,6 +6,8 @@ use network_types::eth::{EthHdr, EtherType};
 use network_types::ip::Ipv4Hdr;
 use nflux_common::EgressEvent;
 
+use crate::maps::{ACTIVE_CONNECTIONS, EGRESS_EVENT};
+
 
 pub fn try_tc_egress(ctx: TcContext) -> Result<i32, ()> {
     let ethhdr: EthHdr = ctx.load(0).map_err(|_| ())?;
