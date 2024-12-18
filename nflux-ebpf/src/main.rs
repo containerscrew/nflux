@@ -12,7 +12,7 @@ use aya_ebpf::{
     macros::xdp,
     programs::XdpContext,
 };
-use maps::{CONNECTION_EVENTS, CONNECTION_TRACKER, ICMP_RULE, IPV4_RULES};
+use maps::{ACTIVE_CONNECTIONS, CONNECTION_EVENTS, CONNECTION_TRACKER, ICMP_RULE, IPV4_RULES};
 use core::mem;
 use aya_ebpf::bindings::TC_ACT_SHOT;
 use aya_ebpf::macros::classifier;
@@ -97,13 +97,6 @@ fn process_ipv4(ctx: &XdpContext) -> Result<u32, ()> {
 
                     let connection_key = ((source_ip as u64) << 32) | (dst_port as u64);
 
-                    // Check if the incoming connection is part of an active egress connection
-                    if let Some(source_ip) = unsafe { ACTIVE_CONNECTIONS.get(&source_ip) } {
-                        info!(&ctx, "active connection: {:i}", source_ip);
-                        log_new_connection(ctx, source_ip, dst_port, IpProto::Tcp as u8, 1);
-                        return Ok(XDP_PASS); // Allow response to active connection
-                    }
-
                     if rule.ports.contains(&dst_port) && rule.action == 1 {
                         // Allow new connection initiation if permitted by rules
                         if let Some(_) = unsafe { CONNECTION_TRACKER.get(&connection_key) } {
@@ -114,6 +107,13 @@ fn process_ipv4(ctx: &XdpContext) -> Result<u32, ()> {
                             log_new_connection(ctx, source_ip, dst_port, IpProto::Tcp as u8, 1);
                             return Ok(XDP_PASS);
                         }
+                    }
+
+                    // Check if the incoming connection is part of an active egress connection
+                    if let Some(&source_ip) = unsafe { ACTIVE_CONNECTIONS.get(&source_ip) } {
+                        //info!(&ctx, "active connection: {:i}", source_ip);
+                        //log_new_connection(ctx, source_ip, dst_port, IpProto::Tcp as u8, 1);
+                        return Ok(XDP_PASS); // Allow response to active connection
                     }
 
                     // Drop packets that are not part of any known connection

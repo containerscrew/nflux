@@ -47,9 +47,9 @@ async fn main() -> anyhow::Result<()> {
 
     // Necessary to debug something in the ebpf code
     // By the moment
-    if let Err(e) = EbpfLogger::init(&mut bpf) {
-        warn!("failed to initialize eBPF logger: {}", e);
-    }
+    // if let Err(e) = EbpfLogger::init(&mut bpf) {
+    //     warn!("failed to initialize eBPF logger: {}", e);
+    // }
 
     // Populate eBPF maps with configuration data
     populate_ip_rules(&mut bpf, &config.ip_rules)?;
