@@ -7,7 +7,7 @@ use network_types::ip::Ipv4Hdr;
 use nflux_common::EgressEvent;
 
 #[map]
-static ACTIVE_CONNECTIONS: LruHashMap<u32, u32> = LruHashMap::with_max_entries(1024, 0);
+static ACTIVE_CONNECTIONS: LruHashMap<u32, u32> = LruHashMap::with_max_entries(4096, 0);
 
 #[map]
 static EGRESS_EVENT: PerfEventArray<EgressEvent> = PerfEventArray::new(0);
@@ -26,7 +26,9 @@ pub fn try_tc_egress(ctx: TcContext) -> Result<i32, ()> {
                 EGRESS_EVENT.output(&ctx, &event, 0);
 
                 // Mark connection as active
-                ACTIVE_CONNECTIONS.insert(&destination, &1, 0).map_err(|_| ())?;
+                if ACTIVE_CONNECTIONS.insert(&destination, &1, 0).is_err() {
+                    return Err(());
+                }
             }
         }
         _ => return Ok(TC_ACT_PIPE),

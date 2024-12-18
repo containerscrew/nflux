@@ -17,7 +17,7 @@ pub async fn wait_for_shutdown() -> anyhow::Result<()> {
     Ok(())
 }
 
-pub fn lookup_address(ip: u32) -> String {
+pub fn _lookup_address(ip: u32) -> String {
     // Convert the u32 IP address to Ipv4Addr
     let ip = Ipv4Addr::from(ip);
 

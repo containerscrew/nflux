@@ -11,6 +11,7 @@ use aya::maps::{AsyncPerfEventArray, LpmTrie, MapData};
 use aya::programs::{tc, SchedClassifier, TcAttachType, Xdp, XdpFlags};
 use aya::util::online_cpus;
 use aya::{include_bytes_aligned, Ebpf};
+use aya_log::EbpfLogger;
 use bytes::BytesMut;
 use config::{Action, Nflux, Protocol, IpRules};
 use core::set_mem_limit;
@@ -20,7 +21,7 @@ use std::collections::HashMap;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::ptr;
 use tokio::task;
-use tracing::{error, info};
+use tracing::{error, info, warn};
 use utils::{is_root_user, wait_for_shutdown};
 use crate::ebpf_mapping::populate_icmp_rule;
 
@@ -43,6 +44,12 @@ async fn main() -> anyhow::Result<()> {
 
     // Load eBPF program
     let mut bpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/nflux")))?;
+
+    // Necessary to debug something in the ebpf code
+    // By the moment
+    if let Err(e) = EbpfLogger::init(&mut bpf) {
+        warn!("failed to initialize eBPF logger: {}", e);
+    }
 
     // Populate eBPF maps with configuration data
     populate_ip_rules(&mut bpf, &config.ip_rules)?;
