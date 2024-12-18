@@ -6,11 +6,6 @@ use network_types::eth::{EthHdr, EtherType};
 use network_types::ip::Ipv4Hdr;
 use nflux_common::EgressEvent;
 
-#[map]
-static ACTIVE_CONNECTIONS: LruHashMap<u32, u32> = LruHashMap::with_max_entries(4096, 0);
-
-#[map]
-static EGRESS_EVENT: PerfEventArray<EgressEvent> = PerfEventArray::new(0);
 
 pub fn try_tc_egress(ctx: TcContext) -> Result<i32, ()> {
     let ethhdr: EthHdr = ctx.load(0).map_err(|_| ())?;
