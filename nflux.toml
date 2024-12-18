@@ -7,8 +7,7 @@ icmp_ping = "true"
 
 [logging]
 log_level = "info" # trace, debug, info, warn, or error. Defaults to info if not set
-log_type = "text"  # text or json. Defaults to text if not set
-# log_file = "/var/log/firewall.log"
+log_type = "json"  # text or json. Defaults to text if not set
 
 [ip_rules]
 # The /32 CIDR block is used to represent a single IP address rather than a range
