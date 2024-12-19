@@ -129,7 +129,7 @@ mod tests {
     fn test_load_valid_config() {
         let config_content = r#"
         [nflux]
-        interface_names = ["eth0", "wlan0"]
+        interface_name = "wlan0"
         icmp_ping = "true"
 
         [logging]
@@ -178,7 +178,7 @@ mod tests {
     fn test_duplicate_priority() {
         let config_content = r#"
         [nflux]
-        interface_names = ["eth0", "wlan0"]
+        interface_name = "wlan0"
         icmp_ping = "true"
 
         [logging]

@@ -78,6 +78,7 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
     }
 }
 
+#[inline]
 fn process_ipv4(ctx: &XdpContext) -> Result<u32, ()> {
     let ipv4hdr: *const Ipv4Hdr = unsafe { ptr_at(ctx, EthHdr::LEN)? };
     let source_ip = u32::from_be(unsafe { (*ipv4hdr).src_addr });
