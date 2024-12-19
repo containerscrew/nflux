@@ -30,6 +30,9 @@ compose-build: ## Run docker-compose build
 compose-up: ## Run docker-compose up
 	docker-compose -f docker/compose.yml up -d --force-recreate
 
+compose-up-build: ## Run docker-compose and build
+	docker compose -f docker/compose.yml up --build -d
+
 compose-down: ## Run docker-compose down
 	docker-compose -f docker/compose.yml down
 
