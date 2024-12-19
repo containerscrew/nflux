@@ -6,12 +6,7 @@ services:
     restart: unless-stopped
     network_mode: host
     cap_add:
-      # Required caps:
-      #  - CAP_NET_ADMIN
-      #  - CAP_BPF
-      #  - CAP_PERFMON
-      # Insecure, by the moment give all capabilities
-      - ALL
+       - ALL
     container_name: nflux
     environment:
       - NFLUX_CONFIG_FILE_PATH=/nflux.toml

@@ -65,6 +65,10 @@ ip link show # get the name of your PHYSICAL interface
 make compose-up
 ```
 
+> [!WARNING]
+> In Fedora, where selinux is enforced by default, I'm having some problems.
+> Quick fix (not secure): `sudo setenforce 0`
+
 > By default, nflux will allow SSH (22) connections from any IP. Avoid blocking your SSH connection if testing in remote servers (VPS).
 
 # Local development
