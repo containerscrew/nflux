@@ -70,6 +70,10 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
 
     match unsafe { (*ethhdr).ether_type } {
         EtherType::Ipv4 => process_ipv4(&ctx),
+        EtherType::Arp => {
+            //let header: ArpHdr = ctx.load(EthHdr::LEN).map_err(|_| ())?;
+            return Ok(XDP_PASS);
+        },
         _ => Ok(XDP_DROP),
     }
 }
@@ -94,29 +98,59 @@ fn process_ipv4(ctx: &XdpContext) -> Result<u32, ()> {
                 IpProto::Tcp => {
                     let tcphdr: *const TcpHdr = unsafe { ptr_at(ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
                     let dst_port = u16::from_be(unsafe { (*tcphdr).dest });
+                    let syn = unsafe { (*tcphdr).syn() };
+                    let ack = unsafe { (*tcphdr).ack() };
+                    let fin = unsafe { (*tcphdr).fin() };
+                    let rst = unsafe { (*tcphdr).rst() };
 
                     let connection_key = ((source_ip as u64) << 32) | (dst_port as u64);
 
-                    if rule.ports.contains(&dst_port) && rule.action == 1 {
-                        // Allow new connection initiation if permitted by rules
+                    // Handle ACK packets (responses to outgoing connections)
+                    if ack == 1 {
+                        // Allow if part of an active egress connection
+                        if let Some(_) = unsafe { ACTIVE_CONNECTIONS.get(&source_ip) } {
+                            return Ok(XDP_PASS);
+                        }
+                        // Allow if part of an active incoming connection
                         if let Some(_) = unsafe { CONNECTION_TRACKER.get(&connection_key) } {
                             return Ok(XDP_PASS);
-                        } else {
+                        }
+                        log_new_connection(ctx, source_ip, dst_port, IpProto::Tcp as u8, 0);
+                        return Ok(XDP_DROP);
+                    }
+
+                    // Handle SYN-ACK packets (handshake response from server)
+                    if syn == 1 && ack == 1 {
+                        // Allow if part of an active egress connection
+                        if let Some(_) = unsafe { ACTIVE_CONNECTIONS.get(&source_ip) } {
+                            let timestamp = unsafe { bpf_ktime_get_ns() };
+                            let _ = CONNECTION_TRACKER.insert(&connection_key, &timestamp, 0);
+                            return Ok(XDP_PASS);
+                        }
+                        log_new_connection(ctx, source_ip, dst_port, IpProto::Tcp as u8, 0);
+                        return Ok(XDP_DROP);
+                    }
+
+                    // Handle new connection attempts (SYN packets)
+                    if syn == 1 && ack == 0 {
+                        if rule.ports.contains(&dst_port) && rule.action == 1 {
                             let timestamp = unsafe { bpf_ktime_get_ns() };
                             let _ = CONNECTION_TRACKER.insert(&connection_key, &timestamp, 0);
                             log_new_connection(ctx, source_ip, dst_port, IpProto::Tcp as u8, 1);
                             return Ok(XDP_PASS);
+                        } else {
+                            log_new_connection(ctx, source_ip, dst_port, IpProto::Tcp as u8, 0);
+                            return Ok(XDP_DROP);
                         }
                     }
 
-                    // Check if the incoming connection is part of an active egress connection
-                    if let Some(&source_ip) = unsafe { ACTIVE_CONNECTIONS.get(&source_ip) } {
-                        //info!(&ctx, "active connection: {:i}", source_ip);
-                        //log_new_connection(ctx, source_ip, dst_port, IpProto::Tcp as u8, 1);
-                        return Ok(XDP_PASS); // Allow response to active connection
+                    // Handle connection closure packets (FIN or RST)
+                    if fin == 1 || rst == 1 {
+                        let _ = CONNECTION_TRACKER.remove(&connection_key);
+                        return Ok(XDP_PASS);
                     }
 
-                    // Drop packets that are not part of any known connection
+                    // Default action: drop packets not matching any known or allowed connections
                     log_new_connection(ctx, source_ip, dst_port, IpProto::Tcp as u8, 0);
                     return Ok(XDP_DROP);
                 }

@@ -14,7 +14,7 @@ pub static ICMP_RULE: Array<u32> = Array::with_max_entries(1, 0);
 pub static CONNECTION_EVENTS: PerfEventArray<ConnectionEvent> = PerfEventArray::new(0);
 
 #[map]
-pub static CONNECTION_TRACKER: LruHashMap<u64, u64> = LruHashMap::with_max_entries(1024, 0);
+pub static CONNECTION_TRACKER: LruHashMap<u64, u64> = LruHashMap::with_max_entries(4096, 0);
 
 #[map]
 pub static ACTIVE_CONNECTIONS: LruHashMap<u32, u32> = LruHashMap::with_max_entries(4096, 0);
