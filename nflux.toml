@@ -4,7 +4,7 @@ interface_name = "wlp2s0"
 icmp_ping = "true"
 
 [egress]
-enabled = "true" 
+enabled = "true"
 interface_name = "proton0"
 
 

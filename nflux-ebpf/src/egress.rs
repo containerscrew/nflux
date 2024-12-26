@@ -28,7 +28,7 @@ fn ptr_at<T>(ctx: &TcContext, offset: usize) -> Result<*const T, ()> {
 
 pub fn try_tc_egress(ctx: TcContext) -> Result<i32, ()> {
     let ethhdr: EthHdr = ctx.load(0).map_err(|_| ())?;
-    
+
     match ethhdr.ether_type {
         EtherType::Ipv4 => unsafe {
             info!(&ctx, "is an ipv4 packet!");
@@ -39,7 +39,7 @@ pub fn try_tc_egress(ctx: TcContext) -> Result<i32, ()> {
                 IpProto::Tcp => {
                     let tcphdr: *const TcpHdr = ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)?;
                     let dst_port = u16::from_be((*tcphdr).dest);
-                    
+
                     // Check if this destination is already active
                     if ACTIVE_CONNECTIONS.get(&destination).is_none() {
                         // Log only new connections
