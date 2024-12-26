@@ -18,6 +18,7 @@ pub struct ConnectionEvent {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct EgressEvent {
     pub dst_ip: u32,
+    pub dst_port: u16,
 }
 
 #[repr(C)]

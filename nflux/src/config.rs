@@ -27,12 +27,17 @@ pub enum IsEnabled {
     True,
     False,
 }
-
-// General firewall configuration
 #[derive(Debug, Deserialize)]
-pub struct NfluxConfig {
+pub struct Ingress {
+    pub enabled: IsEnabled,
     pub interface_name: String,
     pub icmp_ping: IsEnabled,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Egress {
+    pub enabled: IsEnabled,
+    pub interface_name: String,
 }
 
 // Logging config
@@ -50,7 +55,6 @@ pub struct IpRules {
     pub action: Action,
     pub ports: Vec<u16>,
     pub protocol: Protocol,
-    pub log: bool,
     pub description: String,
 }
 
@@ -58,7 +62,8 @@ pub struct IpRules {
 #[derive(Debug, Deserialize)]
 #[allow(dead_code)]
 pub struct Nflux {
-    pub nflux: NfluxConfig,
+    pub ingress: Ingress,
+    pub egress: Egress,
     pub logging: LoggingConfig,
     pub ip_rules: HashMap<String, IpRules>,
 }
@@ -146,8 +151,8 @@ mod tests {
         let config = Nflux::load_config().unwrap();
 
         // Assertions
-        assert_eq!(config.nflux.interface_name, "wlan0");
-        assert_eq!(config.nflux.icmp_ping, IsEnabled::True);
+        assert_eq!(config.ingress.interface_name, "wlan0");
+        assert_eq!(config.ingress.icmp_ping, IsEnabled::True);
         assert_eq!(config.logging.log_level, "debug");
         assert_eq!(config.logging.log_type, "json");
 
@@ -156,7 +161,6 @@ mod tests {
         assert_eq!(rule.action, Action::Allow);
         assert_eq!(rule.ports, vec![22]);
         assert_eq!(rule.protocol, Protocol::Tcp);
-        assert_eq!(rule.log, true);
         assert_eq!(rule.description, "SSH rule");
     }
 
