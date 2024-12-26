@@ -13,7 +13,8 @@ use aya::util::online_cpus;
 use aya::{include_bytes_aligned, Ebpf};
 use aya_log::EbpfLogger;
 use bytes::BytesMut;
-use config::{Action, Nflux, Protocol, IpRules};
+use config::{Action, IpRules, IsEnabled, Nflux, Protocol};
+use log::warn;
 use core::set_mem_limit;
 use logger::setup_logger;
 use nflux_common::{convert_protocol, ConnectionEvent, EgressEvent, IpRule, LpmKeyIpv4, LpmKeyIpv6};
@@ -21,7 +22,7 @@ use std::collections::HashMap;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::ptr;
 use tokio::task;
-use tracing::{error, info, warn};
+use tracing::{error, info};
 use utils::{is_root_user, wait_for_shutdown};
 use crate::ebpf_mapping::populate_icmp_rule;
 
@@ -47,37 +48,89 @@ async fn main() -> anyhow::Result<()> {
 
     // Necessary to debug something in the ebpf code
     // By the moment
-    // if let Err(e) = EbpfLogger::init(&mut bpf) {
-    //     warn!("failed to initialize eBPF logger: {}", e);
-    // }
-
-    // Populate eBPF maps with configuration data
-    populate_ip_rules(&mut bpf, &config.ip_rules)?;
-    populate_icmp_rule(&mut bpf, config.nflux.icmp_ping)?;
+    if let Err(e) = EbpfLogger::init(&mut bpf) {
+        warn!("failed to initialize eBPF logger: {}", e);
+    }
 
     // Attach XDP program
-    let program: &mut Xdp = bpf.program_mut("nflux").unwrap().try_into()?;
-    program.load()?;
-    program
-        .attach(&config.nflux.interface_name, XdpFlags::default())
-        .context(
-            "Failed to attach XDP program. Ensure the interface is physical and not virtual.",
-        )?;
-    info!(
-        "XDP program attached to interface: {:?}",
-        config.nflux.interface_name
-    );
+    match config.ingress.enabled {
+        IsEnabled::True => {
+            // Populate eBPF maps with configuration data
+            populate_ip_rules(&mut bpf, &config.ip_rules)?;
+            populate_icmp_rule(&mut bpf, config.ingress.icmp_ping)?;
+
+            let program: &mut Xdp = bpf.program_mut("nflux").unwrap().try_into()?;
+            program.load()?;
+            program
+                .attach(&config.ingress.interface_name, XdpFlags::default())
+                .context(
+                    "Failed to attach XDP program. Ensure the interface is physical and not virtual.",
+                )?;
+            info!(
+                "XDP program attached to interface: {:?}",
+                config.ingress.interface_name
+            );
+        }
+        IsEnabled::False => {
+            // If not enabled, just log
+            info!("Firewall not enabled")
+        }
+    }
 
     // Attach TC program
-    let _ = tc::qdisc_add_clsact(&config.nflux.interface_name);
-    let program: &mut SchedClassifier =
-        bpf.program_mut("tc_egress").unwrap().try_into()?;
-    program.load()?;
-    program.attach(&config.nflux.interface_name, TcAttachType::Egress)?;
-    info!(
-        "TC egress program attached to interface: {:?}",
-        config.nflux.interface_name
-    );
+    match config.egress.enabled {
+    IsEnabled::True => {
+        // Add clsact qdisc
+        if let Err(e) = tc::qdisc_add_clsact(&config.egress.interface_name) {
+            warn!(
+                "Failed to add clsact qdisc to interface {:?}: {:?}",
+                config.egress.interface_name, e
+            );
+        }
+
+        // Get the tc_egress program
+        let program = match bpf.program_mut("tc_egress") {
+            Some(p) => p,
+            None => {
+                error!("Failed to find the tc_egress program in BPF object");
+                return Err(anyhow::anyhow!("tc_egress program not found"));
+            }
+        };
+
+        // Try converting the program into a SchedClassifier
+        let program: &mut SchedClassifier = match program.try_into() {
+            Ok(p) => p,
+            Err(e) => {
+                error!("Failed to convert tc_egress program to SchedClassifier: {:?}", e);
+                return Err(e.into());
+            }
+        };
+
+        // Load the program
+        if let Err(e) = program.load() {
+            error!("Failed to load tc_egress program: {:?}", e);
+            return Err(e.into());
+        }
+
+        // Attach the program
+        if let Err(e) = program.attach(&config.egress.interface_name, TcAttachType::Egress) {
+            error!(
+                "Failed to attach tc_egress program to interface {:?}: {:?}",
+                config.egress.interface_name, e
+            );
+            return Err(e.into());
+        }
+
+        info!(
+            "TC egress program successfully attached to interface: {:?}",
+            config.egress.interface_name
+        );
+    }
+    IsEnabled::False => {
+        info!("Egress not enabled");
+    }
+}
+
 
     // Log startup info
     info!("nflux started successfully!");
@@ -131,8 +184,9 @@ async fn process_egress_events(
             match parse_egress_event(buf) {
                 Ok(event) => {
                     info!(
-                        "direction=outgoing ip={}",
-                        Ipv4Addr::from(event.dst_ip)
+                        "direction=outgoing ip={}, port={}",
+                        Ipv4Addr::from(event.dst_ip),
+                        event.dst_port
                     );
                 }
                 Err(e) => error!("Failed to parse egress event on CPU {}: {}", cpu_id, e),

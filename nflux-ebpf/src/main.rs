@@ -3,6 +3,7 @@
 #![allow(nonstandard_style, dead_code)]
 
 mod egress;
+mod egress_vpn;
 mod maps;
 
 use aya_ebpf::bindings::xdp_action::{XDP_ABORTED, XDP_DROP, XDP_PASS};
@@ -12,11 +13,11 @@ use aya_ebpf::{
     macros::xdp,
     programs::XdpContext,
 };
+use egress_vpn::try_tc_egress_vpn;
 use maps::{ACTIVE_CONNECTIONS, CONNECTION_EVENTS, CONNECTION_TRACKER, ICMP_RULE, IPV4_RULES};
 use core::mem;
 use aya_ebpf::bindings::TC_ACT_SHOT;
 use aya_ebpf::macros::classifier;
-use aya_log_ebpf::info;
 use aya_ebpf::programs::TcContext;
 use network_types::ip::IpProto;
 use network_types::{
@@ -26,7 +27,6 @@ use network_types::{
     udp::UdpHdr,
 };
 use nflux_common::{ConnectionEvent, LpmKeyIpv4};
-use crate::egress::try_tc_egress;
 
 #[xdp]
 pub fn nflux(ctx: XdpContext) -> u32 {
@@ -38,7 +38,7 @@ pub fn nflux(ctx: XdpContext) -> u32 {
 
 #[classifier]
 pub fn tc_egress(ctx: TcContext) -> i32 {
-    try_tc_egress(ctx).unwrap_or_else(|_| TC_ACT_SHOT)
+    try_tc_egress_vpn(ctx).unwrap_or_else(|_| TC_ACT_SHOT)
 }
 
 #[inline(always)]
