@@ -1,22 +1,23 @@
+[logging]
+log_level = "info" # trace, debug, info, warn, or error (default: info)
+log_type = "text"  # text or json (default: text)
+
 [firewall]
-enabled = "true"
-interfaces = ["wlp2s0"]
-icmp_ping = "false"
+enabled = "true" # Decide if the firewall is enabled or not
+interfaces = ["enp0s20f0u4"] # Interfaces to protect (can be only physical interfaces)
+icmp_ping = "true" # Allow or deny ICMP ping requests
 
 [firewall_rules]
 # The /32 CIDR block is used to represent a single IP address rather than a range
-"192.168.0.0/24" = { priority = 1, action = "allow", ports = [22, 8000, 80], protocol = "tcp", description = "Allow some web servers" }
+"192.168.0.0/24" = { priority = 1, action = "allow", ports = [22], protocol = "tcp", description = "Allow some web servers" }
+"192.168.0.76/32" = { priority = 2, action = "deny", ports = [8080], protocol = "tcp", description = "Deny a specific IP address" }
+
 
 [egress]
-enabled = "true"
-interfaces = ["wlp2s0", "proton0"]
+enabled = "false"
+interfaces = ["enp0s20f0u4", "protonvpn"]
 
 #[egress_rules]
-
-[logging]
-log_level = "info" # trace, debug, info, warn, or error. Defaults to info if not set
-log_type = "json"  # text or json. Defaults to text if not set
-
 
 # curl -6 -v http://\[::ffff:192.168.0.26\]:80
 #"fe80::5bc2:662b:ac2f:7e8b/128" = { priority = 3, action = "allow", ports = [80], protocol = "tcp", log = false, description = "Deny HTTP for specific IPv6 address" }
