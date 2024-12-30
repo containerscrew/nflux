@@ -13,7 +13,7 @@ use aya::util::online_cpus;
 use aya::{include_bytes_aligned, Ebpf};
 use aya_log::EbpfLogger;
 use bytes::BytesMut;
-use config::{Action, IpRules, IsEnabled, Nflux, Protocol};
+use config::{Action, FirewallRules, IsEnabled, Nflux, Protocol};
 use log::warn;
 use core::set_mem_limit;
 use logger::setup_logger;
@@ -23,7 +23,7 @@ use std::net::{Ipv4Addr, Ipv6Addr};
 use std::ptr;
 use tokio::task;
 use tracing::{error, info};
-use utils::{is_root_user, wait_for_shutdown};
+use utils::{is_root_user, lookup_address, wait_for_shutdown};
 use crate::ebpf_mapping::populate_icmp_rule;
 
 #[tokio::main]
@@ -53,23 +53,27 @@ async fn main() -> anyhow::Result<()> {
     }
 
     // Attach XDP program
-    match config.ingress.enabled {
+    match config.firewall.enabled {
         IsEnabled::True => {
             // Populate eBPF maps with configuration data
-            populate_ip_rules(&mut bpf, &config.ip_rules)?;
-            populate_icmp_rule(&mut bpf, config.ingress.icmp_ping)?;
+            populate_ip_rules(&mut bpf, &config.firewall_rules)?;
+            populate_icmp_rule(&mut bpf, config.firewall.icmp_ping)?;
 
+            // Load the XDP program
             let program: &mut Xdp = bpf.program_mut("nflux").unwrap().try_into()?;
             program.load()?;
-            program
-                .attach(&config.ingress.interface_name, XdpFlags::default())
-                .context(
-                    "Failed to attach XDP program. Ensure the interface is physical and not virtual.",
-                )?;
-            info!(
-                "XDP program attached to interface: {:?}",
-                config.ingress.interface_name
-            );
+
+            // Attach the XDP program to multiple interfaces
+            for interface in &config.firewall.interfaces {
+                if let Err(e) = program.attach(interface, XdpFlags::default()) {
+                    error!(
+                        "Failed to attach XDP program to interface {}: {}. Ensure it is a physical interface.",
+                        interface, e
+                    );
+                } else {
+                    info!("XDP program attached to interface: {}", interface);
+                }
+            }
         }
         IsEnabled::False => {
             // If not enabled, just log
@@ -77,60 +81,60 @@ async fn main() -> anyhow::Result<()> {
         }
     }
 
+
     // Attach TC program
-    match config.egress.enabled {
-    IsEnabled::True => {
-        // Add clsact qdisc
-        if let Err(e) = tc::qdisc_add_clsact(&config.egress.interface_name) {
-            warn!(
-                "Failed to add clsact qdisc to interface {:?}: {:?}",
-                config.egress.interface_name, e
-            );
-        }
+    // match config.egress.enabled {
+    //     IsEnabled::True => {
+    //         // Add clsact qdisc
+    //         if let Err(e) = tc::qdisc_add_clsact(&config.egress.interface_name) {
+    //             warn!(
+    //                 "Failed to add clsact qdisc to interface {:?}: {:?}",
+    //                 config.egress.interface_name, e
+    //             );
+    //         }
 
-        // Get the tc_egress program
-        let program = match bpf.program_mut("tc_egress") {
-            Some(p) => p,
-            None => {
-                error!("Failed to find the tc_egress program in BPF object");
-                return Err(anyhow::anyhow!("tc_egress program not found"));
-            }
-        };
+    //         // Get the tc_egress program
+    //         let program = match bpf.program_mut("tc_egress") {
+    //             Some(p) => p,
+    //             None => {
+    //                 error!("Failed to find the tc_egress program in BPF object");
+    //                 return Err(anyhow::anyhow!("tc_egress program not found"));
+    //             }
+    //         };
 
-        // Try converting the program into a SchedClassifier
-        let program: &mut SchedClassifier = match program.try_into() {
-            Ok(p) => p,
-            Err(e) => {
-                error!("Failed to convert tc_egress program to SchedClassifier: {:?}", e);
-                return Err(e.into());
-            }
-        };
+    //         // Try converting the program into a SchedClassifier
+    //         let program: &mut SchedClassifier = match program.try_into() {
+    //             Ok(p) => p,
+    //             Err(e) => {
+    //                 error!("Failed to convert tc_egress program to SchedClassifier: {:?}", e);
+    //                 return Err(e.into());
+    //             }
+    //         };
 
-        // Load the program
-        if let Err(e) = program.load() {
-            error!("Failed to load tc_egress program: {:?}", e);
-            return Err(e.into());
-        }
+    //         // Load the program
+    //         if let Err(e) = program.load() {
+    //             error!("Failed to load tc_egress program: {:?}", e);
+    //             return Err(e.into());
+    //         }
 
-        // Attach the program
-        if let Err(e) = program.attach(&config.egress.interface_name, TcAttachType::Egress) {
-            error!(
-                "Failed to attach tc_egress program to interface {:?}: {:?}",
-                config.egress.interface_name, e
-            );
-            return Err(e.into());
-        }
+    //         // Attach the program
+    //         if let Err(e) = program.attach(&config.egress.interface_name, TcAttachType::Egress) {
+    //             error!(
+    //                 "Failed to attach tc_egress program to interface {:?}: {:?}",
+    //                 config.egress.interface_name, e
+    //             );
+    //             return Err(e.into());
+    //         }
 
-        info!(
-            "TC egress program successfully attached to interface: {:?}",
-            config.egress.interface_name
-        );
-    }
-    IsEnabled::False => {
-        info!("Egress not enabled");
-    }
-}
-
+    //         info!(
+    //             "TC egress program successfully attached to interface: {:?}",
+    //             config.egress.interface_name
+    //         );
+    //     }
+    //     IsEnabled::False => {
+    //         info!("Egress not enabled");
+    //     }
+    // }
 
     // Log startup info
     info!("nflux started successfully!");
@@ -141,10 +145,10 @@ async fn main() -> anyhow::Result<()> {
             .context("Failed to find CONNECTION_EVENTS map")?,
     )?;
 
-    let mut egress_events = AsyncPerfEventArray::try_from(
-        bpf.take_map("EGRESS_EVENT")
-            .context("Failed to find EGRESS_EVENT map")?,
-    )?;
+    // let mut egress_events = AsyncPerfEventArray::try_from(
+    //     bpf.take_map("EGRESS_EVENT")
+    //         .context("Failed to find EGRESS_EVENT map")?,
+    // )?;
 
     let cpus = online_cpus().map_err(|(_, error)| error)?;
 
@@ -155,13 +159,12 @@ async fn main() -> anyhow::Result<()> {
             task::spawn(process_events(buf, cpu_id));
         }
 
-        // Spawn task for egress events
-        {
-            let buf = egress_events.open(cpu_id, None)?;
-            task::spawn(process_egress_events(buf, cpu_id));
-        }
+        // // Spawn task for egress events
+        // {
+        //     let buf = egress_events.open(cpu_id, None)?;
+        //     task::spawn(process_egress_events(buf, cpu_id));
+        // }
     }
-
 
     // Wait for shutdown signal
     wait_for_shutdown().await?;
@@ -184,9 +187,10 @@ async fn process_egress_events(
             match parse_egress_event(buf) {
                 Ok(event) => {
                     info!(
-                        "direction=outgoing ip={}, port={}",
+                        "direction=outgoing ip={}, port={}, fqdn={}",
                         Ipv4Addr::from(event.dst_ip),
-                        event.dst_port
+                        event.dst_port,
+                        lookup_address(event.dst_ip),
                     );
                 }
                 Err(e) => error!("Failed to parse egress event on CPU {}: {}", cpu_id, e),
@@ -248,7 +252,7 @@ fn parse_connection_event(buf: &BytesMut) -> anyhow::Result<ConnectionEvent> {
     }
 }
 
-fn prepare_ip_rule(rule: &IpRules) -> anyhow::Result<IpRule> {
+fn prepare_ip_rule(rule: &FirewallRules) -> anyhow::Result<IpRule> {
     let mut ports = [0u16; 16];
     for (i, &port) in rule.ports.iter().enumerate().take(16) {
         ports[i] = port as u16;
@@ -288,7 +292,7 @@ fn parse_cidr_v6(cidr: &str) -> anyhow::Result<(Ipv6Addr, u32)> {
     Ok((ip, prefix_len))
 }
 
-fn populate_ip_rules(bpf: &mut Ebpf, ip_rules: &HashMap<String, IpRules>) -> anyhow::Result<()> {
+fn populate_ip_rules(bpf: &mut Ebpf, firewall_rules: &HashMap<String, FirewallRules>) -> anyhow::Result<()> {
     {
         // Populate IPv4 rules
         let mut ipv4_map: LpmTrie<&mut MapData, LpmKeyIpv4, IpRule> = LpmTrie::try_from(
@@ -297,7 +301,7 @@ fn populate_ip_rules(bpf: &mut Ebpf, ip_rules: &HashMap<String, IpRules>) -> any
         )?;
 
         // Sort rules by priority
-        let mut sorted_rules: Vec<_> = ip_rules.iter().collect();
+        let mut sorted_rules: Vec<_> = firewall_rules.iter().collect();
         sorted_rules.sort_by_key(|(_, rule)| rule.priority);
 
         for (cidr, rule) in &sorted_rules {
@@ -326,7 +330,7 @@ fn populate_ip_rules(bpf: &mut Ebpf, ip_rules: &HashMap<String, IpRules>) -> any
         )?;
 
         // Sort rules by priority
-        let mut sorted_rules: Vec<_> = ip_rules.iter().collect();
+        let mut sorted_rules: Vec<_> = firewall_rules.iter().collect();
         sorted_rules.sort_by_key(|(_, rule)| rule.priority);
 
         for (cidr, rule) in &sorted_rules {

@@ -1,20 +1,22 @@
-[ingress]
-enabled = "false"
-interface_name = "wlp2s0"
-icmp_ping = "true"
+[firewall]
+enabled = "true"
+interfaces = ["wlp2s0"]
+icmp_ping = "false"
+
+[firewall_rules]
+# The /32 CIDR block is used to represent a single IP address rather than a range
+"192.168.0.0/24" = { priority = 1, action = "allow", ports = [22, 8000, 80], protocol = "tcp", description = "Allow some web servers" }
 
 [egress]
 enabled = "true"
-interface_name = "proton0"
+interfaces = ["wlp2s0", "proton0"]
 
+#[egress_rules]
 
 [logging]
 log_level = "info" # trace, debug, info, warn, or error. Defaults to info if not set
 log_type = "json"  # text or json. Defaults to text if not set
 
-[ip_rules]
-# The /32 CIDR block is used to represent a single IP address rather than a range
-"192.168.0.0/24" = { priority = 1, action = "allow", ports = [22, 8000, 80], protocol = "tcp", description = "Allow some web servers" }
 
 # curl -6 -v http://\[::ffff:192.168.0.26\]:80
 #"fe80::5bc2:662b:ac2f:7e8b/128" = { priority = 3, action = "allow", ports = [80], protocol = "tcp", log = false, description = "Deny HTTP for specific IPv6 address" }

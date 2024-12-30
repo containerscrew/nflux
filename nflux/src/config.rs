@@ -27,30 +27,23 @@ pub enum IsEnabled {
     True,
     False,
 }
+
 #[derive(Debug, Deserialize)]
-pub struct Ingress {
+pub struct Firewall {
     pub enabled: IsEnabled,
-    pub interface_name: String,
+    pub interfaces: Vec<String>,
     pub icmp_ping: IsEnabled,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct Egress {
     pub enabled: IsEnabled,
-    pub interface_name: String,
-}
-
-// Logging config
-#[derive(Debug, Deserialize)]
-pub struct LoggingConfig {
-    pub log_level: String,
-    pub log_type: String,
+    pub interfaces: Vec<String>,
 }
 
 // Generic rule for both IPv4 and IPv6
 #[derive(Debug, Deserialize)]
-#[allow(dead_code)]
-pub struct IpRules {
+pub struct FirewallRules {
     pub priority: u32,
     pub action: Action,
     pub ports: Vec<u16>,
@@ -58,14 +51,19 @@ pub struct IpRules {
     pub description: String,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct LoggingConfig {
+    pub log_level: String,
+    pub log_type: String,
+}
 // Top-level configuration structure
 #[derive(Debug, Deserialize)]
 #[allow(dead_code)]
 pub struct Nflux {
-    pub ingress: Ingress,
+    pub firewall: Firewall,
+    pub firewall_rules: HashMap<String, FirewallRules>,
     pub egress: Egress,
     pub logging: LoggingConfig,
-    pub ip_rules: HashMap<String, IpRules>,
 }
 
 impl Nflux {
@@ -89,7 +87,7 @@ impl Nflux {
     pub fn validate(&self) -> Result<()> {
         let mut priorities: HashSet<u32> = HashSet::new();
 
-        for (ip, rule) in &self.ip_rules {
+        for (ip, rule) in &self.firewall_rules {
             // Ensure priority is greater than 0
             if rule.priority == 0 {
                 anyhow::bail!("Priority must be greater than 0 for rule: {}", ip);
@@ -151,12 +149,12 @@ mod tests {
         let config = Nflux::load_config().unwrap();
 
         // Assertions
-        assert_eq!(config.ingress.interface_name, "wlan0");
-        assert_eq!(config.ingress.icmp_ping, IsEnabled::True);
+        assert_eq!(config.firewall.interfaces, ["wlan0", "proton0"]);
+        assert_eq!(config.firewall.icmp_ping, IsEnabled::True);
         assert_eq!(config.logging.log_level, "debug");
         assert_eq!(config.logging.log_type, "json");
 
-        let rule = config.ip_rules.get("192.168.0.1").unwrap();
+        let rule = config.firewall_rules.get("192.168.0.1").unwrap();
         assert_eq!(rule.priority, 1);
         assert_eq!(rule.action, Action::Allow);
         assert_eq!(rule.ports, vec![22]);
