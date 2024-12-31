@@ -9,7 +9,6 @@ nflux-common = { path = "../nflux-common", features = ["user"] }
 anyhow = { workspace = true, default-features = true }
 aya = { workspace = true }
 aya-log = { workspace = true }
-env_logger = { workspace = true }
 libc = { workspace = true }
 log = { workspace = true }
 tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread", "net", "signal"] }
@@ -17,8 +16,6 @@ tracing-subscriber = { version = "0.3.18", features = ["json"] }
 tracing = "0.1.40"
 serde = { version = "1.0.217", features = ["derive"] }
 toml = "0.8.19"
-prometheus = "0.13.4"
-axum = "0.7.7"
 bytes = "1.8.0"
 dns-lookup = "2.0.4"
 

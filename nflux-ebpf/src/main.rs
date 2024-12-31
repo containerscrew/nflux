@@ -14,7 +14,10 @@ use aya_ebpf::{
 };
 use firewall::start_firewall;
 use core::mem;
-
+use aya_ebpf::bindings::TC_ACT_SHOT;
+use aya_ebpf::macros::classifier;
+use aya_ebpf::programs::TcContext;
+use crate::egress::try_tc_egress;
 
 // Start xdp firewall if enabled. Attach this program to the physical interface
 #[xdp]
@@ -26,12 +29,10 @@ pub fn xdp_firewall(ctx: XdpContext) -> u32 {
 }
 
 // Start traffic control egress if enabled.
-// #[classifier]
-// pub fn tc_egress(ctx: TcContext) -> i32 {
-//     try_tc_egress_vpn(ctx).unwrap_or_else(|_| TC_ACT_SHOT)
-// }
-
-
+#[classifier]
+pub fn tc_egress(ctx: TcContext) -> i32 {
+    try_tc_egress(ctx).unwrap_or_else(|_| TC_ACT_SHOT)
+}
 #[inline(always)]
 unsafe fn ptr_at<T>(ctx: &XdpContext, offset: usize) -> Result<*const T, ()> {
     let start = ctx.data();

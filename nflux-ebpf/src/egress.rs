@@ -4,7 +4,7 @@ use aya_ebpf::bindings::TC_ACT_PIPE;
 use aya_ebpf::programs::TcContext;
 use aya_log_ebpf::info;
 use network_types::eth::{EthHdr, EtherType};
-use network_types::ip::{IpProto, Ipv4Hdr, Ipv6Hdr};
+use network_types::ip::{IpProto, Ipv4Hdr};
 use network_types::tcp::TcpHdr;
 use network_types::udp::UdpHdr;
 use nflux_common::EgressEvent;
@@ -31,19 +31,20 @@ pub fn try_tc_egress(ctx: TcContext) -> Result<i32, ()> {
 
     match ethhdr.ether_type {
         EtherType::Ipv4 => unsafe {
-            info!(&ctx, "is an ipv4 packet!");
             let ipv4hdr: Ipv4Hdr = ctx.load(EthHdr::LEN).map_err(|_| ())?;
             let destination = u32::from_be(ipv4hdr.dst_addr);
 
             match ipv4hdr.proto {
                 IpProto::Tcp => {
                     let tcphdr: *const TcpHdr = ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)?;
+                    let src_port = u16::from_be((*tcphdr).source);
                     let dst_port = u16::from_be((*tcphdr).dest);
+                    let protocol = IpProto::Tcp as u8;
 
                     // Check if this destination is already active
                     if ACTIVE_CONNECTIONS.get(&destination).is_none() {
                         // Log only new connections
-                        let event = EgressEvent { dst_ip: destination, dst_port: dst_port };
+                        let event = EgressEvent { dst_ip: destination, src_port, dst_port, protocol };
                         EGRESS_EVENT.output(&ctx, &event, 0);
 
                         // Mark connection as active
@@ -55,8 +56,11 @@ pub fn try_tc_egress(ctx: TcContext) -> Result<i32, ()> {
                 }
                 IpProto::Udp => {
                     let udphdr: *const UdpHdr = ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)?;
+                    let src_port = u16::from_be((*udphdr).source);
                     let dst_port = u16::from_be((*udphdr).dest);
-                    let event = EgressEvent { dst_ip: destination, dst_port: dst_port };
+                    let protocol = IpProto::Udp as u8;
+
+                    let event = EgressEvent { dst_ip: destination, src_port, dst_port, protocol };
                     EGRESS_EVENT.output(&ctx, &event, 0);
 
                     return Ok(TC_ACT_PIPE)
@@ -71,7 +75,8 @@ pub fn try_tc_egress(ctx: TcContext) -> Result<i32, ()> {
             //let destination = unsafe { (*ipv6hdr).dst_addr.in6_u.u6_addr8 };
 
             // Create here a fake event
-            let event = EgressEvent { dst_ip: u32::from_be_bytes([192, 67, 4, 2]), dst_port: 99 };
+            // IPV6 is not implemented yet
+            let event = EgressEvent { dst_ip: u32::from_be_bytes([192, 67, 4, 2]), src_port: 111, dst_port: 99, protocol: 6 };
             EGRESS_EVENT.output(&ctx, &event, 0);
             return Ok(TC_ACT_PIPE)
         }
@@ -80,7 +85,7 @@ pub fn try_tc_egress(ctx: TcContext) -> Result<i32, ()> {
             return Ok(TC_ACT_PIPE)
         }
         EtherType::Arp => {
-            info!(&ctx, "ARP!!");
+            info!(&ctx, "ARP packet!!");
             return Ok(TC_ACT_PIPE)
         }
         _ => {

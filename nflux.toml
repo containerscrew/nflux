@@ -3,27 +3,30 @@ log_level = "info" # trace, debug, info, warn, or error (default: info)
 log_type = "text"  # text or json (default: text)
 
 [firewall]
-enabled = "true" # Decide if the firewall is enabled or not
+enabled = "false" # Decide if the firewall is enabled or not
 interfaces = ["enp0s20f0u4"] # Interfaces to protect (can be only physical interfaces)
 icmp_ping = "true" # Allow or deny ICMP ping requests
 
-[firewall_rules]
+[firewall.rules]
 # The /32 CIDR block is used to represent a single IP address rather than a range
-"192.168.0.0/24" = { priority = 1, action = "allow", ports = [22], protocol = "tcp", description = "Allow some web servers" }
+# The /128 CIDR block is used to represent a single IPv6 address rather than a range
+# The priority is used to determine the order in which rules are applied. Lower numbers are applied first.
+"192.168.0.0/24" = { priority = 1, action = "allow", ports = [22], protocol = "tcp", description = "Allow ssh from entire local net" }
 "192.168.0.76/32" = { priority = 2, action = "deny", ports = [8080], protocol = "tcp", description = "Deny a specific IP address" }
 
-
 [egress]
-enabled = "false"
-interfaces = ["enp0s20f0u4", "protonvpn"]
+# By the moment, working with physical interfaces (not virtual, like VPNs)
+enabled = "true"
+interfaces = ["enp0s20f0u4"]
 
 #[egress_rules]
+# TODO: filter outgoint traffic (block/deny)
 
 # curl -6 -v http://\[::ffff:192.168.0.26\]:80
 #"fe80::5bc2:662b:ac2f:7e8b/128" = { priority = 3, action = "allow", ports = [80], protocol = "tcp", log = false, description = "Deny HTTP for specific IPv6 address" }
 
 #[mac_rules]
-# todo: MAC address filtering
+# TODO: MAC address filtering
 # This is not implemented. Not necessary by the moment
 # Rules for MAC address filtering
 #"00:0a:95:9d:68:16" = { action = "allow" }
