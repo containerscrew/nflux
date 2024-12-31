@@ -154,7 +154,7 @@ pub async fn process_firewall_events(
             match parse_firewall_event(buf) {
                 Ok(event) => {
                     info!(
-                        "direction=incoming protocol={} port={} ip={} action={}",
+                        "program=xdp_firewall protocol={} port={} ip={} action={}",
                         convert_protocol(event.protocol),
                         event.dst_port,
                         Ipv4Addr::from(event.src_addr),
