@@ -18,7 +18,9 @@ pub struct ConnectionEvent {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct EgressEvent {
     pub dst_ip: u32,
+    pub src_port: u16,
     pub dst_port: u16,
+    pub protocol: u8,
 }
 
 #[repr(C)]
@@ -26,7 +28,7 @@ pub struct EgressEvent {
 pub struct IpRule {
     pub action: u8,       // 0 = deny, 1 = allow
     pub ports: [u16; 16], // Up to 16 ports
-    pub protocol: u8,     // 6 = TCP, 17 = UDP
+    pub protocol: u8,     // 6 = TCP, 17 = UDP, 1 = ICMP
     pub priority: u32,    // Lower number means higher priority
 }
 

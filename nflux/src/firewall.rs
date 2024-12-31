@@ -50,6 +50,30 @@ fn prepare_ip_rule(rule: &FirewallRules) -> anyhow::Result<IpRule> {
     })
 }
 
+pub fn attach_xdp_program(bpf: &mut Ebpf, icmp_enabled: IsEnabled, rules: &HashMap<String, FirewallRules>, interfaces: &Vec<String>) -> anyhow::Result<()> {
+    // Populate eBPF maps with configuration data
+    populate_ip_rules(bpf, &rules)?;
+    populate_icmp_rule(bpf, icmp_enabled)?;
+
+    // Load the XDP program
+    let program: &mut aya::programs::Xdp = bpf.program_mut("xdp_firewall").unwrap().try_into()?;
+    program.load()?;
+
+    // Attach the XDP program to multiple interfaces
+    for interface in interfaces {
+        if let Err(e) = program.attach(interface, aya::programs::XdpFlags::default()) {
+            error!(
+                "Failed to attach XDP program to interface {}: {}. Ensure it is a physical interface.",
+                interface, e
+            );
+        } else {
+            info!("XDP program attached to interface: {}", interface);
+        }
+    }
+
+    Ok(())
+}
+
 pub fn populate_ip_rules(bpf: &mut Ebpf, firewall_rules: &HashMap<String, FirewallRules>) -> anyhow::Result<()> {
     {
         // Populate IPv4 rules

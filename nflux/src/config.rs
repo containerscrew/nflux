@@ -33,6 +33,7 @@ pub struct Firewall {
     pub enabled: IsEnabled,
     pub interfaces: Vec<String>,
     pub icmp_ping: IsEnabled,
+    pub rules: HashMap<String, FirewallRules>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -48,6 +49,7 @@ pub struct FirewallRules {
     pub action: Action,
     pub ports: Vec<u16>,
     pub protocol: Protocol,
+    #[allow(dead_code)]
     pub description: String,
 }
 
@@ -60,10 +62,9 @@ pub struct LoggingConfig {
 #[derive(Debug, Deserialize)]
 #[allow(dead_code)]
 pub struct Nflux {
-    pub firewall: Firewall,
-    pub firewall_rules: HashMap<String, FirewallRules>,
-    pub egress: Egress,
     pub logging: LoggingConfig,
+    pub firewall: Firewall,
+    pub egress: Egress,
 }
 
 impl Nflux {
@@ -87,7 +88,7 @@ impl Nflux {
     pub fn validate(&self) -> Result<()> {
         let mut priorities: HashSet<u32> = HashSet::new();
 
-        for (ip, rule) in &self.firewall_rules {
+        for (ip, rule) in &self.firewall.rules {
             // Ensure priority is greater than 0
             if rule.priority == 0 {
                 anyhow::bail!("Priority must be greater than 0 for rule: {}", ip);
@@ -154,7 +155,7 @@ mod tests {
         assert_eq!(config.logging.log_level, "debug");
         assert_eq!(config.logging.log_type, "json");
 
-        let rule = config.firewall_rules.get("192.168.0.1").unwrap();
+        let rule = config.firewall.rules.get("192.168.0.1").unwrap();
         assert_eq!(rule.priority, 1);
         assert_eq!(rule.action, Action::Allow);
         assert_eq!(rule.ports, vec![22]);
