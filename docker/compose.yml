@@ -7,8 +7,13 @@ services:
     network_mode: host
     cap_add:
        - ALL
+      #  - CAP_BPF
+      #  - CAP_SYS_ADMIN
+      #  - CAP_PERFMON
+    security_opt:
+       - label=disable
     container_name: nflux
     environment:
       - NFLUX_CONFIG_FILE_PATH=/nflux.toml
     volumes:
-      - ${PWD}/nflux.toml:/nflux.toml
+      - ${PWD}/nflux.toml:/nflux.toml:z

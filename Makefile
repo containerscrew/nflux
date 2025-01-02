@@ -1,4 +1,4 @@
-SHELL:=/bin/sh
+SHELL:=/bin/bash
 .PHONY: all
 
 app_name="nflux"
@@ -24,17 +24,19 @@ generate-changelog: ## Generate changelog
 init-gitmoji: ## Init gitmoji (sudo npm i -g gitmoji-cli)
 	gitmoji --init
 
+DOCKER_COMPOSE := $(shell which docker-compose 2>/dev/null || echo podman-compose)
+
 compose-build: ## Run docker-compose build
-	docker-compose -f docker/compose.yml build
+	$(DOCKER_COMPOSE) -f docker/compose.yml build
 
 compose-up: ## Run docker-compose up
-	docker-compose -f docker/compose.yml up -d --force-recreate
+	$(DOCKER_COMPOSE) -f docker/compose.yml up -d --force-recreate
 
 compose-up-build: ## Run docker-compose and build
-	docker compose -f docker/compose.yml up --build -d
+	$(DOCKER_COMPOSE) -f docker/compose.yml up --build -d
 
 compose-down: ## Run docker-compose down
-	docker-compose -f docker/compose.yml down
+	$(DOCKER_COMPOSE) -f docker/compose.yml down
 
 remote-sync: ## Sync this repository to remote machine using rsync.
 	rsync -avzh --exclude='.git/' --exclude='target/' --exclude='.idea/' $(shell pwd)/ $(USER)@$(IP):/home/$(USER)/Documents/nflux
