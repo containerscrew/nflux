@@ -57,6 +57,19 @@ fn process_ipv4(ctx: &XdpContext) -> Result<u32, ()> {
 
                     let connection_key = ((source_ip as u64) << 32) | (dst_port as u64);
 
+                    // Handle new connection attempts (SYN packets)
+                    if syn == 1 && ack == 0 {
+                    if rule.ports.contains(&dst_port) && rule.action == 1 {
+                        let timestamp = unsafe { bpf_ktime_get_ns() };
+                        let _ = FIREWALL_CONNECTION_TRACKER.insert(&connection_key, &timestamp, 0);
+                        log_new_connection(ctx, source_ip, dst_port, IpProto::Tcp as u8, 1);
+                        return Ok(XDP_PASS);
+                    } else {
+                        log_new_connection(ctx, source_ip, dst_port, IpProto::Tcp as u8, 0);
+                        return Ok(XDP_DROP);
+                    }
+                }
+
                     // Handle ACK packets (responses to outgoing connections)
                     if ack == 1 {
                         // Allow if part of an active egress connection
@@ -83,18 +96,6 @@ fn process_ipv4(ctx: &XdpContext) -> Result<u32, ()> {
                         return Ok(XDP_DROP);
                     }
 
-                    // Handle new connection attempts (SYN packets)
-                    if syn == 1 && ack == 0 {
-                        if rule.ports.contains(&dst_port) && rule.action == 1 {
-                            let timestamp = unsafe { bpf_ktime_get_ns() };
-                            let _ = FIREWALL_CONNECTION_TRACKER.insert(&connection_key, &timestamp, 0);
-                            log_new_connection(ctx, source_ip, dst_port, IpProto::Tcp as u8, 1);
-                            return Ok(XDP_PASS);
-                        } else {
-                            log_new_connection(ctx, source_ip, dst_port, IpProto::Tcp as u8, 0);
-                            return Ok(XDP_DROP);
-                        }
-                    }
 
                     // Handle connection closure packets (FIN or RST)
                     if fin == 1 || rst == 1 {
