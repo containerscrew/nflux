@@ -5,9 +5,10 @@ use aya::maps::MapData;
 use aya::maps::perf::{AsyncPerfEventArrayBuffer, PerfBufferError};
 use aya::programs::{tc, SchedClassifier, TcAttachType};
 use bytes::BytesMut;
-use tracing::{error, info, warn};
+use tracing::{debug, error, info, warn};
 use nflux_common::{convert_protocol, EgressEvent};
-use crate::utils::lookup_address;
+use crate::config::IsEnabled;
+use crate::utils::{is_private_ip, lookup_address};
 
 pub fn attach_tc_egress_program(bpf: &mut Ebpf, interface_names: &[String]) -> anyhow::Result<()>{
     // Retrieve the eBPF program
@@ -63,6 +64,7 @@ pub fn attach_tc_egress_program(bpf: &mut Ebpf, interface_names: &[String]) -> a
 pub async fn process_egress_events(
     mut buf: AsyncPerfEventArrayBuffer<MapData>,
     cpu_id: u32,
+    log_private_connections: &IsEnabled,
 ) -> Result<(), PerfBufferError> {
     let mut buffers = vec![BytesMut::with_capacity(1024); 10];
 
@@ -75,14 +77,30 @@ pub async fn process_egress_events(
             let buf = &buffers[i];
             match parse_egress_event(buf) {
                 Ok(event) => {
-                    info!(
-                        "program=tc_egress protocol={}, ip={}, src_port={}, dst_port={}, fqdn={}",
-                        convert_protocol(event.protocol),
-                        Ipv4Addr::from(event.dst_ip),
-                        event.src_port,
-                        event.dst_port,
-                        lookup_address(event.dst_ip),
-                    );
+                    match log_private_connections {
+                        IsEnabled::True => {
+                             info!(
+                                "program=tc_egress protocol={}, ip={}, src_port={}, dst_port={}, fqdn={}",
+                                convert_protocol(event.protocol),
+                                Ipv4Addr::from(event.dst_ip),
+                                event.src_port,
+                                event.dst_port,
+                                "Private IP",
+                            );
+                        }
+                        IsEnabled::False => {
+                            if ! is_private_ip(event.dst_ip) {
+                             info!(
+                                "program=tc_egress protocol={}, ip={}, src_port={}, dst_port={}, fqdn={}",
+                                convert_protocol(event.protocol),
+                                Ipv4Addr::from(event.dst_ip),
+                                event.src_port,
+                                event.dst_port,
+                                lookup_address(event.dst_ip),
+                            );
+                        }
+                        }
+                    }
                 }
                 Err(e) => error!("Failed to parse egress event on CPU {}: {}", cpu_id, e),
             }
