@@ -3,7 +3,7 @@ log_level = "info" # trace, debug, info, warn, or error (default: info)
 log_type = "text"  # text or json (default: text)
 
 [firewall]
-enabled = "true" # Decide if the firewall is enabled or not
+enabled = "false" # Decide if the firewall is enabled or not
 interfaces = ["wlp2s0"] # Interfaces to protect (can be only physical interfaces)
 icmp_ping = "true" # Allow or deny ICMP ping requests
 
@@ -17,7 +17,8 @@ icmp_ping = "true" # Allow or deny ICMP ping requests
 [egress]
 # By the moment, working with physical interfaces (not virtual, like VPNs)
 enabled = "true"
-interfaces = ["wlp2s0"]
+interfaces = ["wlo1"]
+log_private_connections = "false" # Do not show private connections in the logs
 
 #[egress_rules]
 # TODO: filter outgoint traffic (block/deny)

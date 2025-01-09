@@ -40,6 +40,8 @@ pub struct Firewall {
 pub struct Egress {
     pub enabled: IsEnabled,
     pub interfaces: Vec<String>,
+    #[allow(dead_code)]
+    pub log_private_connections: IsEnabled,
 }
 
 // Generic rule for both IPv4 and IPv6

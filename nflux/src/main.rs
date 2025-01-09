@@ -92,7 +92,7 @@ async fn main() -> anyhow::Result<()> {
         // Spawn task for egress events
         {
             let buf = egress_events.open(cpu_id, None)?;
-            task::spawn(process_egress_events(buf, cpu_id));
+            task::spawn(process_egress_events(buf, cpu_id, &IsEnabled::False));
         }
     }
 
