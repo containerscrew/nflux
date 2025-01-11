@@ -7,6 +7,13 @@ pub const MAX_ALLOWED_IPV4: usize = 1024;
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct EgressConfig {
+    pub log_udp_connections: u8, // 0 = no, 1 = yes
+    pub log_tcp_connections: u8, // 0 = no, 1 = yes
+}
+
+#[repr(C)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ConnectionEvent {
     pub src_addr: u32,
     pub dst_port: u16,
@@ -21,6 +28,7 @@ pub struct EgressEvent {
     pub src_port: u16,
     pub dst_port: u16,
     pub protocol: u8,
+    pub pid: u64,
 }
 
 #[repr(C)]
@@ -53,6 +61,7 @@ pub mod user {
     unsafe impl aya::Pod for IpRule {}
     unsafe impl aya::Pod for LpmKeyIpv4 {}
     unsafe impl aya::Pod for LpmKeyIpv6 {}
+    unsafe impl aya::Pod for EgressConfig {}
 }
 
 // Define the default configuration if the user does not provide one

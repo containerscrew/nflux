@@ -15,7 +15,7 @@ use crate::utils::{parse_cidr_v4, parse_cidr_v6};
 
 pub fn populate_icmp_rule(bpf: &mut Ebpf, icmp_ping: IsEnabled) -> anyhow::Result<()> {
     let mut settings_map = Array::<_, u32>::try_from(
-        bpf.map_mut("ICMP_RULE").context("Failed to find GLOBAL_SETTINGS map")?,
+        bpf.map_mut("ICMP_RULE").context("Failed to find ICMP_RULE map")?,
     )?;
 
     let value = match icmp_ping {
