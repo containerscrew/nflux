@@ -33,6 +33,7 @@ pub fn xdp_firewall(ctx: XdpContext) -> u32 {
 pub fn tc_egress(ctx: TcContext) -> i32 {
     try_tc_egress(ctx).unwrap_or_else(|_| TC_ACT_SHOT)
 }
+
 #[inline(always)]
 unsafe fn ptr_at<T>(ctx: &XdpContext, offset: usize) -> Result<*const T, ()> {
     let start = ctx.data();
