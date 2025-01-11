@@ -518,7 +518,6 @@ dependencies = [
  "cargo_metadata",
  "dns-lookup",
  "libc",
- "log",
  "nflux-common",
  "nflux-ebpf",
  "serde",

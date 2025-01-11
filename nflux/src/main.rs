@@ -12,11 +12,10 @@ use aya_log::EbpfLogger;
 
 use config::{IsEnabled, Nflux};
 use firewall::{attach_xdp_program, process_firewall_events};
-use log::warn;
 use logger::setup_logger;
 use nflux_common::EgressConfig;
 use tokio::task;
-use tracing::{error, info};
+use tracing::{error, info, warn};
 use utils::{is_root_user, print_firewall_rules, set_mem_limit, wait_for_shutdown};
 use crate::egress::{attach_tc_egress_program, process_egress_events};
 
@@ -89,7 +88,6 @@ async fn main() -> anyhow::Result<()> {
     }
 
     // Start processing events from the eBPF program
-
     let mut firewall_events = AsyncPerfEventArray::try_from(
         bpf.take_map("FIREWALL_EVENTS")
             .context("Failed to find CONNECTION_EVENTS map")?,
@@ -101,9 +99,8 @@ async fn main() -> anyhow::Result<()> {
     )?;
 
     let cpus = online_cpus().map_err(|(_, error)| error)?;
-
     for cpu_id in cpus {
-        // Spawn task for connection events
+        // Spawn task for firewall events
         {
             let buf = firewall_events.open(cpu_id, None)?;
             task::spawn(process_firewall_events(buf, cpu_id));
@@ -117,6 +114,7 @@ async fn main() -> anyhow::Result<()> {
     }
 
     // Wait for shutdown signal
+    // This will removed in future versions, specially for container solution
     wait_for_shutdown().await?;
     Ok(())
 }
