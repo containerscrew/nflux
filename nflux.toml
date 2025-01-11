@@ -17,7 +17,9 @@ icmp_ping = "true" # Allow or deny ICMP ping requests
 [egress]
 # By the moment, working with physical interfaces (not virtual, like VPNs)
 enabled = "true"
-interfaces = ["wlo1"]
+interfaces = ["enp0s20f0u4"]
+log_udp_connections = "false" # Do not log UDP packets
+loc_tcp_connections = "true" # Log TCP packets
 log_private_connections = "false" # Do not show private connections in the logs
 
 #[egress_rules]

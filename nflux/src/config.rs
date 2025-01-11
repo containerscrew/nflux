@@ -40,6 +40,8 @@ pub struct Firewall {
 pub struct Egress {
     pub enabled: IsEnabled,
     pub interfaces: Vec<String>,
+    pub log_udp_connections: IsEnabled,
+    pub log_tcp_connections: IsEnabled,
     #[allow(dead_code)]
     pub log_private_connections: IsEnabled,
 }
