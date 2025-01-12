@@ -9,6 +9,7 @@ use aya::maps::AsyncPerfEventArray;
 use aya::util::online_cpus;
 use aya::{include_bytes_aligned, Ebpf};
 use aya_log::EbpfLogger;
+use std::process;
 
 use config::{IsEnabled, Nflux};
 use egress::populate_egress_config;
@@ -33,6 +34,9 @@ async fn main() -> anyhow::Result<()> {
         error!("This program must be run as root.");
         std::process::exit(1);
     }
+
+    // Welcome message
+    info!("Starting nflux with pid {}", process::id());
 
     // Set memory limit
     set_mem_limit();

@@ -9,7 +9,7 @@ use bytes::BytesMut;
 use tracing::{error, info, warn};
 use nflux_common::{convert_protocol, EgressConfig, EgressEvent};
 use crate::config::{Egress, IsEnabled};
-use crate::utils::lookup_address;
+use crate::utils::{get_process_name, lookup_address};
 
 pub fn populate_egress_config(bpf: &mut Ebpf, config: Egress) -> anyhow::Result<()> {
     let mut egress_config = Array::<_, EgressConfig>::try_from(
@@ -105,13 +105,14 @@ pub async fn process_egress_events(
             match parse_egress_event(buf) {
                 Ok(event) => {
                     info!(
-                        "program=tc_egress protocol={}, ip={}, src_port={}, dst_port={}, fqdn={}, pid={}",
+                        "program=tc_egress protocol={}, ip={}, src_port={}, dst_port={}, fqdn={}, pid={}, comm={}",
                         convert_protocol(event.protocol),
                         Ipv4Addr::from(event.dst_ip),
                         event.src_port,
                         event.dst_port,
                         lookup_address(event.dst_ip),
                         event.pid,
+                        get_process_name(event.pid)
                     );
                 }
                 Err(e) => error!("Failed to parse egress event on CPU {}: {}", cpu_id, e),
