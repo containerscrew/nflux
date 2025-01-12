@@ -3,6 +3,7 @@ use tracing::Level;
 
 pub fn setup_logger(log_level: &str, format: &str) {
     // Match the log level
+    // TODO: validate log level
     let log_level = match log_level {
         "trace" => Level::TRACE,
         "debug" => Level::DEBUG,

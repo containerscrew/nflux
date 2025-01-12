@@ -18,7 +18,6 @@ toml = "0.8.19"
 bytes = "1.8.0"
 dns-lookup = "2.0.4"
 
-
 [build-dependencies]
 cargo_metadata = { workspace = true }
 # TODO(https://github.com/rust-lang/cargo/issues/12375): this should be an artifact dependency, but
