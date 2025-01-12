@@ -79,11 +79,13 @@ pub fn lookup_address(ip: u32) -> String {
 pub fn get_process_name(pid: u64) -> String {
     let mut s = System::new_all();
 
+    // Is this causing overhead?
     s.refresh_all();
 
     match s.process(Pid::from(pid as usize)) {
         Some(process) => {
-            format!("{:?}", process.name()).to_string()
+            // Get the process name. Remove "" when have spaces or other special characters
+            format!("{:?}", process.name()).to_string().trim_matches('"').to_string()
         }
         None => String::new(),
     }
