@@ -23,9 +23,8 @@ virtual_interfaces = ["protonvpn"] # If using VPN, add the virtual interface her
 # For example, if you perform 1000 requests to google.com, just log 1 (or every you execute)
 # This affects to tcp and udp connections
 log_only_new_connections = "true"
-log_udp_connections = "true" # Decide if udp packets should be logged
+log_udp_connections = "false" # Decide if udp packets should be logged
 log_tcp_connections = "true" # Decide if tcp packets should be logged
-log_private_connections = "true" # Log private connections (10.X, 172.X, 192.X...) not only external ips
 
 #[egress_rules]
 # TODO: filter outgoint traffic (block/deny)
