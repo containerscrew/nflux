@@ -15,10 +15,15 @@ icmp_ping = "false" # Allow or deny ICMP ping requests
 "192.168.0.76/32" = { priority = 2, action = "deny", ports = [8080], protocol = "tcp", description = "Deny a specific IP address" }
 
 [egress]
-# By the moment, working with physical interfaces (not virtual, like VPNs)
 enabled = "true"
-interfaces = ["wlp2s0"]
-log_udp_connections = "false" # Decide if udp packets should be logged
+physical_interfaces = ["enp0s20f0u4"] # Physical interfaces, your LAN interface
+virtual_interfaces = ["protonvpn"] # If using VPN, add the virtual interface here
+
+[egress.logging]
+# For example, if you perform 1000 requests to google.com, just log 1 (or every you execute)
+# This affects to tcp and udp connections
+log_only_new_connections = "true"
+log_udp_connections = "true" # Decide if udp packets should be logged
 log_tcp_connections = "true" # Decide if tcp packets should be logged
 log_private_connections = "true" # Log private connections (10.X, 172.X, 192.X...) not only external ips
 

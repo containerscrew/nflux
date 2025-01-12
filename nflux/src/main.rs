@@ -5,15 +5,15 @@ mod firewall;
 mod egress;
 
 use anyhow::Context;
-use aya::maps::{Array, AsyncPerfEventArray};
+use aya::maps::AsyncPerfEventArray;
 use aya::util::online_cpus;
 use aya::{include_bytes_aligned, Ebpf};
 use aya_log::EbpfLogger;
 
 use config::{IsEnabled, Nflux};
+use egress::populate_egress_config;
 use firewall::{attach_xdp_program, process_firewall_events};
 use logger::setup_logger;
-use nflux_common::EgressConfig;
 use tokio::task;
 use tracing::{error, info, warn};
 use utils::{is_root_user, print_firewall_rules, set_mem_limit, wait_for_shutdown};
@@ -60,26 +60,8 @@ async fn main() -> anyhow::Result<()> {
     // Attach TC program (monitor egress connections)
     match config.egress.enabled {
         IsEnabled::True => {
-            attach_tc_egress_program(&mut bpf, &config.egress.interfaces)?;
-            let mut egress_config = Array::<_, EgressConfig>::try_from(
-                    bpf.map_mut("EGRESS_CONFIG").context("Failed to find EGRESS_CONFIG map")?,
-                )?;
-
-                let config = EgressConfig {
-                    log_udp_connections: match config.egress.log_udp_connections {
-                        IsEnabled::True => 1,
-                        IsEnabled::False => 0,
-                    },
-                    log_tcp_connections: match config.egress.log_tcp_connections {
-                        IsEnabled::True => 1,
-                        IsEnabled::False => 0,
-                    },
-                };
-
-                egress_config
-                    .set(0, config, 0)
-                    .context("Failed to set ICMP_MAP")?;
-
+            attach_tc_egress_program(&mut bpf, &config.egress.physical_interfaces)?;
+            populate_egress_config(&mut bpf, config.egress)?;
             info!("TC egress started successfully!")
         }
         IsEnabled::False => {
