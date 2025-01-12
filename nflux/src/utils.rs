@@ -2,6 +2,7 @@ use std::{collections::HashMap, net::{IpAddr, Ipv4Addr, Ipv6Addr}};
 use dns_lookup::lookup_addr;
 use libc::getuid;
 use nflux_common::utils::is_private_ip;
+use sysinfo::{Pid, System};
 use tokio::signal;
 use tracing::{info, warn};
 
@@ -72,5 +73,18 @@ pub fn lookup_address(ip: u32) -> String {
             // Perform the reverse DNS lookup
             lookup_addr(&ip).unwrap_or_else(|_| "Unknown host".to_string())
         },
+    }
+}
+
+pub fn get_process_name(pid: u64) -> String {
+    let mut s = System::new_all();
+
+    s.refresh_all();
+
+    match s.process(Pid::from(pid as usize)) {
+        Some(process) => {
+            format!("{:?}", process.name()).to_string()
+        }
+        None => String::new(),
     }
 }

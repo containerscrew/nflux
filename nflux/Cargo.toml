@@ -17,6 +17,7 @@ serde = { version = "1.0.217", features = ["derive"] }
 toml = "0.8.19"
 bytes = "1.8.0"
 dns-lookup = "2.0.4"
+sysinfo = "0.33.1"
 
 [build-dependencies]
 cargo_metadata = { workspace = true }
