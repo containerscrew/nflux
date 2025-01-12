@@ -12,7 +12,6 @@ use nflux_common::EgressEvent;
 
 use crate::maps::{ACTIVE_CONNECTIONS, EGRESS_CONFIG, EGRESS_EVENT};
 
-
 #[inline]
 fn ptr_at<T>(ctx: &TcContext, offset: usize) -> Result<*const T, ()> {
     let start = ctx.data();
@@ -24,6 +23,21 @@ fn ptr_at<T>(ctx: &TcContext, offset: usize) -> Result<*const T, ()> {
     }
 
     Ok((start + offset) as *const T)
+}
+
+#[inline]
+unsafe fn log_connection(ctx: &TcContext, destination: u32, src_port: u16, dst_port: u16, protocol: u8, pid: u64) {
+    // Check if this destination is already active
+    if ACTIVE_CONNECTIONS.get(&destination).is_none() {
+        // Log only new connections
+        let event = EgressEvent { dst_ip: destination, src_port, dst_port, protocol, pid };
+        EGRESS_EVENT.output(ctx, &event, 0);
+
+        // Mark connection as active
+        if ACTIVE_CONNECTIONS.insert(&destination, &1, 0).is_err() {
+            return;
+        }
+    }
 }
 
 pub fn try_tc_egress(ctx: TcContext) -> Result<i32, ()> {
@@ -52,16 +66,31 @@ pub fn try_tc_egress(ctx: TcContext) -> Result<i32, ()> {
                     let pid_tgid = bpf_get_current_pid_tgid();
                     let pid = pid_tgid >> 32;
 
-                    // Check if this destination is already active
-                    if ACTIVE_CONNECTIONS.get(&destination).is_none() {
-                        // Log only new connections
-                        let event = EgressEvent { dst_ip: destination, src_port, dst_port, protocol, pid };
-                        EGRESS_EVENT.output(&ctx, &event, 0);
+                    // If log_tcp_connections is enabled, log the connection
+                    if egress_config.log_tcp_connections == 1 {
+                        log_connection(&ctx, destination, src_port, dst_port, protocol, pid);
+                        // If log_only_new_connections is enabled, only log new connections
+                        // match egress_config.log_only_new_connections {
+                        //     0 => {
+                        //         // Check if this destination is already active
+                        //         if ACTIVE_CONNECTIONS.get(&destination).is_none() {
+                        //             // Log only new connections
+                        //             let event = EgressEvent { dst_ip: destination, src_port, dst_port, protocol, pid };
+                        //             EGRESS_EVENT.output(&ctx, &event, 0);
 
-                        // Mark connection as active
-                        if ACTIVE_CONNECTIONS.insert(&destination, &1, 0).is_err() {
-                            return Err(());
-                        }
+                        //             // Mark connection as active
+                        //             if ACTIVE_CONNECTIONS.insert(&destination, &1, 0).is_err() {
+                        //                 return Err(());
+                        //             }
+                        //         }
+                        //     }
+                        //     1 => {
+                        //         // Log all connections
+                        //         let event = EgressEvent { dst_ip: destination, src_port, dst_port, protocol, pid };
+                        //         EGRESS_EVENT.output(&ctx, &event, 0);
+                        //     }
+                        //     _ => {}
+                        // }
                     }
                     return Ok(TC_ACT_PIPE)
                 }
@@ -73,8 +102,31 @@ pub fn try_tc_egress(ctx: TcContext) -> Result<i32, ()> {
                     let pid_tgid = bpf_get_current_pid_tgid();
                     let pid = pid_tgid >> 32;
 
-                    let event = EgressEvent { dst_ip: destination, src_port, dst_port, protocol, pid};
-                    EGRESS_EVENT.output(&ctx, &event, 0);
+                    // If log_tcp_connections is enabled, log the connection
+                    if egress_config.log_udp_connections == 1 {
+                        // If log_only_new_connections is enabled, only log new connections
+                        match egress_config.log_only_new_connections {
+                            0 => {
+                                // Check if this destination is already active
+                                if ACTIVE_CONNECTIONS.get(&destination).is_none() {
+                                    // Log only new connections
+                                    let event = EgressEvent { dst_ip: destination, src_port, dst_port, protocol, pid };
+                                    EGRESS_EVENT.output(&ctx, &event, 0);
+
+                                    // Mark connection as active
+                                    if ACTIVE_CONNECTIONS.insert(&destination, &1, 0).is_err() {
+                                        return Err(());
+                                    }
+                                }
+                            }
+                            1 => {
+                                // Log all connections
+                                let event = EgressEvent { dst_ip: destination, src_port, dst_port, protocol, pid };
+                                EGRESS_EVENT.output(&ctx, &event, 0);
+                            }
+                            _ => {}
+                        }
+                    }
 
                     return Ok(TC_ACT_PIPE)
                 }

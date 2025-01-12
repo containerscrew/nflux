@@ -1,14 +1,46 @@
 use std::net::Ipv4Addr;
 use std::ptr;
+use anyhow::Context;
 use aya::Ebpf;
-use aya::maps::MapData;
+use aya::maps::{Array, MapData};
 use aya::maps::perf::{AsyncPerfEventArrayBuffer, PerfBufferError};
 use aya::programs::{tc, SchedClassifier, TcAttachType};
 use bytes::BytesMut;
 use tracing::{error, info, warn};
-use nflux_common::{convert_protocol, EgressEvent};
-use crate::config::IsEnabled;
+use nflux_common::{convert_protocol, EgressConfig, EgressEvent};
+use crate::config::{Egress, IsEnabled};
 use crate::utils::{is_private_ip, lookup_address};
+
+pub fn populate_egress_config(bpf: &mut Ebpf, config: Egress) -> anyhow::Result<()> {
+    let mut egress_config = Array::<_, EgressConfig>::try_from(
+        bpf.map_mut("EGRESS_CONFIG").context("Failed to find EGRESS_CONFIG map")?,
+    )?;
+
+    let config = EgressConfig {
+        log_only_new_connections: match config.logging.log_only_new_connections {
+            IsEnabled::True => 1,
+            IsEnabled::False => 0,
+        },
+        log_udp_connections: match config.logging.log_udp_connections {
+            IsEnabled::True => 1,
+            IsEnabled::False => 0,
+        },
+        log_tcp_connections: match config.logging.log_tcp_connections {
+            IsEnabled::True => 1,
+            IsEnabled::False => 0,
+        },
+        log_private_connections: match config.logging.log_private_connections {
+            IsEnabled::True => 1,
+            IsEnabled::False => 0,
+        },
+    };
+
+    egress_config
+        .set(0, config, 0)
+        .context("Failed to set ICMP_MAP")?;
+
+    Ok(())
+}
 
 pub fn attach_tc_egress_program(bpf: &mut Ebpf, interface_names: &[String]) -> anyhow::Result<()>{
     // Retrieve the eBPF program

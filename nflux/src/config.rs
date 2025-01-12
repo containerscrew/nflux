@@ -37,13 +37,19 @@ pub struct Firewall {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct Egress {
-    pub enabled: IsEnabled,
-    pub interfaces: Vec<String>,
+pub struct EgressLogging {
+    pub log_only_new_connections: IsEnabled,
     pub log_udp_connections: IsEnabled,
     pub log_tcp_connections: IsEnabled,
-    #[allow(dead_code)]
     pub log_private_connections: IsEnabled,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Egress {
+    pub enabled: IsEnabled,
+    pub physical_interfaces: Vec<String>,
+    pub virtual_interfaces: Vec<String>,
+    pub logging: EgressLogging,
 }
 
 // Generic rule for both IPv4 and IPv6
