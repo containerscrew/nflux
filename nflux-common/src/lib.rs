@@ -5,13 +5,14 @@ pub const MAX_RULES_PORT: usize = 32;
 pub const MAX_ALLOWED_PORTS: usize = 1024;
 pub const MAX_ALLOWED_IPV4: usize = 1024;
 
+pub mod utils;
+
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct EgressConfig {
     pub log_only_new_connections: u8, // 0 = no, 1 = yes
     pub log_udp_connections: u8, // 0 = no, 1 = yes
     pub log_tcp_connections: u8, // 0 = no, 1 = yes
-    pub log_private_connections: u8, // 0 = no, 1 = yes
 }
 
 #[repr(C)]

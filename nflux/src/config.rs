@@ -41,13 +41,13 @@ pub struct EgressLogging {
     pub log_only_new_connections: IsEnabled,
     pub log_udp_connections: IsEnabled,
     pub log_tcp_connections: IsEnabled,
-    pub log_private_connections: IsEnabled,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct Egress {
     pub enabled: IsEnabled,
     pub physical_interfaces: Vec<String>,
+    #[allow(dead_code)]
     pub virtual_interfaces: Vec<String>,
     pub logging: EgressLogging,
 }
