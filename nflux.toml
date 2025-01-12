@@ -17,10 +17,10 @@ icmp_ping = "false" # Allow or deny ICMP ping requests
 [egress]
 # By the moment, working with physical interfaces (not virtual, like VPNs)
 enabled = "true"
-interfaces = ["enp0s20f0u4"]
-log_udp_connections = "false" # Do not log UDP packets
-loc_tcp_connections = "true" # Log TCP packets
-log_private_connections = "false" # Do not show private connections in the logs
+interfaces = ["wlp2s0"]
+log_udp_connections = "false" # Decide if udp packets should be logged
+log_tcp_connections = "true" # Decide if tcp packets should be logged
+log_private_connections = "true" # Log private connections (10.X, 172.X, 192.X...) not only external ips
 
 #[egress_rules]
 # TODO: filter outgoint traffic (block/deny)

@@ -5,7 +5,7 @@ use aya::maps::MapData;
 use aya::maps::perf::{AsyncPerfEventArrayBuffer, PerfBufferError};
 use aya::programs::{tc, SchedClassifier, TcAttachType};
 use bytes::BytesMut;
-use tracing::{debug, error, info, warn};
+use tracing::{error, info, warn};
 use nflux_common::{convert_protocol, EgressEvent};
 use crate::config::IsEnabled;
 use crate::utils::{is_private_ip, lookup_address};
