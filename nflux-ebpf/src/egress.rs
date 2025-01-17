@@ -5,7 +5,7 @@ use aya_ebpf::helpers::gen::bpf_get_current_pid_tgid;
 use aya_ebpf::programs::TcContext;
 use aya_log_ebpf::{debug, warn};
 use network_types::eth::{EthHdr, EtherType};
-use network_types::ip::{IpProto, Ipv4Hdr};
+use network_types::ip::{IpProto, Ipv4Hdr, Ipv6Hdr};
 use network_types::tcp::TcpHdr;
 use network_types::udp::UdpHdr;
 use nflux_common::{EgressConfig, EgressEvent};
@@ -215,6 +215,9 @@ pub fn try_tc_egress_virtual(ctx: TcContext) -> Result<i32, ()> {
         IpProto::Tcp => handle_tcp_packet(&ctx, egress_config, destination),
         IpProto::Udp => handle_udp_packet(&ctx, egress_config, destination),
         IpProto::Icmp => handle_icmp_packet(&ctx, egress_config, destination),
-        _ => Ok(TC_ACT_PIPE),
+        _ => {
+            debug!(&ctx, "Probably ipv6 traffic, not implemented yet!");
+            Ok(TC_ACT_PIPE)
+        }
     }
 }
