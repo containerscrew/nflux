@@ -3,7 +3,6 @@
 #![allow(nonstandard_style, dead_code)]
 
 mod egress;
-mod egress_vpn;
 mod firewall;
 mod maps;
 

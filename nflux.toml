@@ -1,5 +1,5 @@
 [logging]
-log_level = "info" # trace, debug, info, warn, or error (default: info)
+log_level = "debug" # trace, debug, info, warn, or error (default: info)
 log_type = "text"  # text or json (default: text)
 
 [firewall]
