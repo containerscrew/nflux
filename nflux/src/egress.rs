@@ -173,7 +173,7 @@ pub async fn process_egress_events(
             match parse_egress_event(buf) {
                 Ok(event) => {
                     info!(
-                        "program=tc_egress protocol={}, ip={}, src_port={}, dst_port={}, fqdn={}, pid={}, comm={}",
+                        "new egress connection protocol={}, ip={}, src_port={}, dst_port={}, fqdn={}, pid={}, comm={}",
                         convert_protocol(event.protocol),
                         Ipv4Addr::from(event.dst_ip),
                         event.src_port,
