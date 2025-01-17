@@ -1,5 +1,6 @@
 use aya_ebpf::bindings::TC_ACT_PIPE;
 use aya_ebpf::programs::TcContext;
+use aya_log_ebpf::info;
 use network_types::eth::{EthHdr, EtherType};
 use network_types::ip::{IpProto, Ipv4Hdr, Ipv6Hdr};
 use nflux_common::EgressConfig;
@@ -27,7 +28,6 @@ pub fn try_tc_egress_physical(ctx: TcContext) -> Result<i32, ()> {
         EtherType::Ipv4 => handle_ipv4_packet(&ctx, &egress_config),
         EtherType::Ipv6 => {
             // IPV6 traffic is not implemented yet
-
             Ok(TC_ACT_PIPE)
         }
         _ => Ok(TC_ACT_PIPE),
@@ -48,7 +48,10 @@ pub fn try_tc_egress_virtual(ctx: TcContext) -> Result<i32, ()> {
             IpProto::Tcp => handle_tcp_packet(&ctx, egress_config, destination),
             IpProto::Udp => handle_udp_packet(&ctx, egress_config, destination),
             IpProto::Icmp => handle_icmp_packet(&ctx, egress_config, destination),
-            _ => Ok(TC_ACT_PIPE),
+            _ => {
+                info!(&ctx, "Probably, ipv6 traffic");
+                Ok(TC_ACT_PIPE)
+            }
         }
     } else if let Some(_) = ipv6hdr {
         // IPV6 traffic is not implemented yet
