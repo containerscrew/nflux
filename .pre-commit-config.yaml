@@ -18,12 +18,12 @@ repos:
     hooks:
       - id: mtoc
         args: [ "-e", ".target/" ]
-#  - repo: https://github.com/doublify/pre-commit-rust
-#    rev: v1.0
-#    hooks:
-#      - id: fmt
-#        args: ['--verbose', '--']
-#      - id: cargo-check
+  - repo: https://github.com/doublify/pre-commit-rust
+    rev: v1.0
+    hooks:
+      - id: fmt
+        args: ['--verbose', '--']
+      - id: cargo-check
 #      - id: clippy
 #        args: ["--", "-D", "warnings", "-D", "unused-imports"]
 #  - repo: local

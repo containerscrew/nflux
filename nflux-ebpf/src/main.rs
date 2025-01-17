@@ -4,6 +4,8 @@
 
 mod egress;
 mod firewall;
+mod handlers;
+mod logger;
 mod maps;
 
 use aya_ebpf::bindings::xdp_action::XDP_ABORTED;

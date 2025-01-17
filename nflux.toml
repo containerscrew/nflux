@@ -1,5 +1,5 @@
 [logging]
-log_level = "debug" # trace, debug, info, warn, or error (default: info)
+log_level = "info" # trace, debug, info, warn, or error (default: info)
 log_type = "text"  # text or json (default: text)
 
 [firewall]
@@ -17,13 +17,14 @@ icmp_ping = "false" # Allow or deny ICMP ping requests
 [egress]
 enabled = "true"
 physical_interfaces = ["enp0s20f0u4"] # Physical interfaces, your LAN interface
-virtual_interfaces = ["proton0"] # If using VPN, add the virtual interface here
+virtual_interfaces = [] # If using VPN, add the virtual interface here
 
 [egress.logging]
+# log_only_new_connections:
 # For example, if you perform 1000 requests to google.com, just log 1 (or every you execute)
 # This affects to tcp and udp connections
-log_only_new_connections = "false"
-log_udp_connections = "false" # Decide if udp packets should be logged
+log_only_new_connections = "true"
+log_udp_connections = "true" # Decide if udp packets should be logged
 log_tcp_connections = "true" # Decide if tcp packets should be logged
 log_icmp_connections = "true" # Decide if icmp packets should be logged
 
