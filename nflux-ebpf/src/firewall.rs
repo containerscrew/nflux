@@ -1,9 +1,23 @@
-use aya_ebpf::{bindings::xdp_action::{XDP_DROP, XDP_PASS}, helpers::bpf_ktime_get_ns, maps::lpm_trie::Key, programs::XdpContext};
-use network_types::{eth::{EthHdr, EtherType}, ip::{IpProto, Ipv4Hdr}, tcp::TcpHdr, udp::UdpHdr};
+use aya_ebpf::{
+    bindings::xdp_action::{XDP_DROP, XDP_PASS},
+    helpers::bpf_ktime_get_ns,
+    maps::lpm_trie::Key,
+    programs::XdpContext,
+};
+use network_types::{
+    eth::{EthHdr, EtherType},
+    ip::{IpProto, Ipv4Hdr},
+    tcp::TcpHdr,
+    udp::UdpHdr,
+};
 use nflux_common::{ConnectionEvent, LpmKeyIpv4};
 
-use crate::{maps::{ACTIVE_CONNECTIONS, FIREWALL_CONNECTION_TRACKER, FIREWALL_EVENTS, ICMP_RULE, IPV4_RULES}, ptr_at};
-
+use crate::{
+    maps::{
+        ACTIVE_CONNECTIONS, FIREWALL_CONNECTION_TRACKER, FIREWALL_EVENTS, ICMP_RULE, IPV4_RULES,
+    },
+    ptr_at,
+};
 
 pub fn start_firewall(ctx: XdpContext) -> Result<u32, ()> {
     let ethhdr: *const EthHdr = unsafe { ptr_at(&ctx, 0)? };
@@ -13,7 +27,7 @@ pub fn start_firewall(ctx: XdpContext) -> Result<u32, ()> {
         EtherType::Arp => {
             //let header: ArpHdr = ctx.load(EthHdr::LEN).map_err(|_| ())?;
             return Ok(XDP_PASS);
-        },
+        }
         _ => Ok(XDP_DROP),
     }
 }
@@ -59,16 +73,17 @@ fn process_ipv4(ctx: &XdpContext) -> Result<u32, ()> {
 
                     // Handle new connection attempts (SYN packets)
                     if syn == 1 && ack == 0 {
-                    if rule.ports.contains(&dst_port) && rule.action == 1 {
-                        let timestamp = unsafe { bpf_ktime_get_ns() };
-                        let _ = FIREWALL_CONNECTION_TRACKER.insert(&connection_key, &timestamp, 0);
-                        log_new_connection(ctx, source_ip, dst_port, IpProto::Tcp as u8, 1);
-                        return Ok(XDP_PASS);
-                    } else {
-                        log_new_connection(ctx, source_ip, dst_port, IpProto::Tcp as u8, 0);
-                        return Ok(XDP_DROP);
+                        if rule.ports.contains(&dst_port) && rule.action == 1 {
+                            let timestamp = unsafe { bpf_ktime_get_ns() };
+                            let _ =
+                                FIREWALL_CONNECTION_TRACKER.insert(&connection_key, &timestamp, 0);
+                            log_new_connection(ctx, source_ip, dst_port, IpProto::Tcp as u8, 1);
+                            return Ok(XDP_PASS);
+                        } else {
+                            log_new_connection(ctx, source_ip, dst_port, IpProto::Tcp as u8, 0);
+                            return Ok(XDP_DROP);
+                        }
                     }
-                }
 
                     // Handle ACK packets (responses to outgoing connections)
                     if ack == 1 {
@@ -77,7 +92,8 @@ fn process_ipv4(ctx: &XdpContext) -> Result<u32, ()> {
                             return Ok(XDP_PASS);
                         }
                         // Allow if part of an active incoming connection
-                        if let Some(_) = unsafe { FIREWALL_CONNECTION_TRACKER.get(&connection_key) } {
+                        if let Some(_) = unsafe { FIREWALL_CONNECTION_TRACKER.get(&connection_key) }
+                        {
                             return Ok(XDP_PASS);
                         }
                         log_new_connection(ctx, source_ip, dst_port, IpProto::Tcp as u8, 0);
@@ -89,13 +105,13 @@ fn process_ipv4(ctx: &XdpContext) -> Result<u32, ()> {
                         // Allow if part of an active egress connection
                         if let Some(_) = unsafe { ACTIVE_CONNECTIONS.get(&source_ip) } {
                             let timestamp = unsafe { bpf_ktime_get_ns() };
-                            let _ = FIREWALL_CONNECTION_TRACKER.insert(&connection_key, &timestamp, 0);
+                            let _ =
+                                FIREWALL_CONNECTION_TRACKER.insert(&connection_key, &timestamp, 0);
                             return Ok(XDP_PASS);
                         }
                         log_new_connection(ctx, source_ip, dst_port, IpProto::Tcp as u8, 0);
                         return Ok(XDP_DROP);
                     }
-
 
                     // Handle connection closure packets (FIN or RST)
                     if fin == 1 || rst == 1 {
@@ -129,7 +145,7 @@ fn process_ipv4(ctx: &XdpContext) -> Result<u32, ()> {
                     Ok(XDP_DROP)
                 }
                 _ => Ok(XDP_DROP),
-            }
+            };
         }
     }
 
