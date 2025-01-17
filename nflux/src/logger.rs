@@ -1,5 +1,5 @@
-use tracing_subscriber::fmt::format::FmtSpan;
 use tracing::Level;
+use tracing_subscriber::fmt::format::FmtSpan;
 
 pub fn setup_logger(log_level: &str, format: &str) {
     // Match the log level

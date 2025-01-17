@@ -1,4 +1,7 @@
-use aya_ebpf::{macros::map, maps::{Array, LpmTrie, LruHashMap, PerfEventArray}};
+use aya_ebpf::{
+    macros::map,
+    maps::{Array, LpmTrie, LruHashMap, PerfEventArray},
+};
 use nflux_common::{ConnectionEvent, EgressConfig, EgressEvent, IpRule, LpmKeyIpv4, LpmKeyIpv6};
 
 #[map]
@@ -17,7 +20,8 @@ pub static EGRESS_CONFIG: Array<EgressConfig> = Array::with_max_entries(1, 0);
 pub static FIREWALL_EVENTS: PerfEventArray<ConnectionEvent> = PerfEventArray::new(0);
 
 #[map]
-pub static FIREWALL_CONNECTION_TRACKER: LruHashMap<u64, u64> = LruHashMap::with_max_entries(4096, 0);
+pub static FIREWALL_CONNECTION_TRACKER: LruHashMap<u64, u64> =
+    LruHashMap::with_max_entries(4096, 0);
 
 #[map]
 pub static ACTIVE_CONNECTIONS: LruHashMap<u32, u32> = LruHashMap::with_max_entries(4096, 0);

@@ -1,8 +1,8 @@
 mod config;
+mod egress;
+mod firewall;
 mod logger;
 mod utils;
-mod firewall;
-mod egress;
 
 use anyhow::Context;
 use aya::maps::AsyncPerfEventArray;
@@ -11,15 +11,17 @@ use aya::{include_bytes_aligned, Ebpf};
 use aya_log::EbpfLogger;
 use std::process;
 
+use crate::egress::process_egress_events;
 use config::{IsEnabled, Nflux};
-use egress::populate_egress_config;
+use egress::{
+    attach_tc_egress_program_physical_interfaces, attach_tc_egress_program_virtual_interfaces,
+    populate_egress_config,
+};
 use firewall::{attach_xdp_program, process_firewall_events};
 use logger::setup_logger;
 use tokio::task;
 use tracing::{error, info, warn};
 use utils::{is_root_user, print_firewall_rules, set_mem_limit, wait_for_shutdown};
-use crate::egress::{attach_tc_egress_program, process_egress_events};
-
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -52,7 +54,12 @@ async fn main() -> anyhow::Result<()> {
     // Attach XDP program (monitor ingress connections to local ports)
     match config.firewall.enabled {
         IsEnabled::True => {
-            attach_xdp_program(&mut bpf, config.firewall.icmp_ping, &config.firewall.rules, &config.firewall.interfaces)?;
+            attach_xdp_program(
+                &mut bpf,
+                config.firewall.icmp_ping,
+                &config.firewall.rules,
+                &config.firewall.interfaces,
+            )?;
             info!("firewall started successfully!");
             print_firewall_rules(config.firewall.rules);
         }
@@ -64,7 +71,27 @@ async fn main() -> anyhow::Result<()> {
     // Attach TC program (monitor egress connections)
     match config.egress.enabled {
         IsEnabled::True => {
-            attach_tc_egress_program(&mut bpf, &config.egress.physical_interfaces)?;
+            if !config.egress.physical_interfaces.is_empty() {
+                info!(
+                    "Attaching TC egress program to physical interfaces: {:?}",
+                    config.egress.physical_interfaces
+                );
+                attach_tc_egress_program_physical_interfaces(
+                    &mut bpf,
+                    &config.egress.physical_interfaces,
+                )?;
+            }
+
+            if !config.egress.virtual_interfaces.is_empty() {
+                info!(
+                    "Attaching TC egress program to virtual interfaces: {:?}",
+                    config.egress.virtual_interfaces
+                );
+                attach_tc_egress_program_virtual_interfaces(
+                    &mut bpf,
+                    &config.egress.virtual_interfaces,
+                )?;
+            }
             populate_egress_config(&mut bpf, config.egress)?;
             info!("TC egress started successfully!")
         }

@@ -41,6 +41,7 @@ pub struct EgressLogging {
     pub log_only_new_connections: IsEnabled,
     pub log_udp_connections: IsEnabled,
     pub log_tcp_connections: IsEnabled,
+    pub log_icmp_connections: IsEnabled,
 }
 
 #[derive(Debug, Deserialize)]
@@ -106,7 +107,10 @@ impl Nflux {
 
             // Ensure port numbers are within the valid range
             if !rule.ports.iter().all(|&port| (1..=65535).contains(&port)) {
-                anyhow::bail!("Invalid port number in rule for IP: {}. Allowed ports: 1-65535", ip);
+                anyhow::bail!(
+                    "Invalid port number in rule for IP: {}. Allowed ports: 1-65535",
+                    ip
+                );
             }
 
             // Check for duplicate priorities

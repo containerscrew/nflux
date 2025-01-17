@@ -11,12 +11,12 @@ pub fn is_private_ip(ip: u32) -> bool {
 
     // Check for private IP ranges
     match octets {
-        [10, ..] => true,                             // 10.0.0.0/8
-        [172, 16..=31, ..] => true,                   // 172.16.0.0/12
-        [192, 168, ..] => true,                       // 192.168.0.0/16
-        [127, ..] => true,                            // 127.0.0.0/8 (loopback)
-        [169, 254, ..] => true,                       // 169.254.0.0/16 (link-local)
-        _ => false,                                   // All others are public
+        [10, ..] => true,           // 10.0.0.0/8
+        [172, 16..=31, ..] => true, // 172.16.0.0/12
+        [192, 168, ..] => true,     // 192.168.0.0/16
+        [127, ..] => true,          // 127.0.0.0/8 (loopback)
+        [169, 254, ..] => true,     // 169.254.0.0/16 (link-local)
+        _ => false,                 // All others are public
     }
 }
 

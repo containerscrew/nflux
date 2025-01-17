@@ -2,20 +2,21 @@ use std::collections::HashMap;
 use std::net::Ipv4Addr;
 use std::ptr;
 
+use crate::config::{Action, FirewallRules, IsEnabled, Protocol};
+use crate::utils::{parse_cidr_v4, parse_cidr_v6};
 use anyhow::Context;
 use aya::maps::lpm_trie::Key;
 use aya::maps::perf::{AsyncPerfEventArrayBuffer, PerfBufferError};
-use aya::Ebpf;
 use aya::maps::{Array, LpmTrie, MapData};
+use aya::Ebpf;
 use bytes::BytesMut;
 use nflux_common::{convert_protocol, ConnectionEvent, IpRule, LpmKeyIpv4, LpmKeyIpv6};
 use tracing::{error, info};
-use crate::config::{Action, FirewallRules, IsEnabled, Protocol};
-use crate::utils::{parse_cidr_v4, parse_cidr_v6};
 
 pub fn populate_icmp_rule(bpf: &mut Ebpf, icmp_ping: IsEnabled) -> anyhow::Result<()> {
     let mut settings_map = Array::<_, u32>::try_from(
-        bpf.map_mut("ICMP_RULE").context("Failed to find ICMP_RULE map")?,
+        bpf.map_mut("ICMP_RULE")
+            .context("Failed to find ICMP_RULE map")?,
     )?;
 
     let value = match icmp_ping {
@@ -50,7 +51,12 @@ fn prepare_ip_rule(rule: &FirewallRules) -> anyhow::Result<IpRule> {
     })
 }
 
-pub fn attach_xdp_program(bpf: &mut Ebpf, icmp_enabled: IsEnabled, rules: &HashMap<String, FirewallRules>, interfaces: &Vec<String>) -> anyhow::Result<()> {
+pub fn attach_xdp_program(
+    bpf: &mut Ebpf,
+    icmp_enabled: IsEnabled,
+    rules: &HashMap<String, FirewallRules>,
+    interfaces: &Vec<String>,
+) -> anyhow::Result<()> {
     // Populate eBPF maps with configuration data
     populate_ip_rules(bpf, &rules)?;
     populate_icmp_rule(bpf, icmp_enabled)?;
@@ -74,7 +80,10 @@ pub fn attach_xdp_program(bpf: &mut Ebpf, icmp_enabled: IsEnabled, rules: &HashM
     Ok(())
 }
 
-pub fn populate_ip_rules(bpf: &mut Ebpf, firewall_rules: &HashMap<String, FirewallRules>) -> anyhow::Result<()> {
+pub fn populate_ip_rules(
+    bpf: &mut Ebpf,
+    firewall_rules: &HashMap<String, FirewallRules>,
+) -> anyhow::Result<()> {
     {
         // Populate IPv4 rules
         let mut ipv4_map: LpmTrie<&mut MapData, LpmKeyIpv4, IpRule> = LpmTrie::try_from(
@@ -135,7 +144,6 @@ pub fn populate_ip_rules(bpf: &mut Ebpf, firewall_rules: &HashMap<String, Firewa
 
     Ok(())
 }
-
 
 // Process events
 pub async fn process_firewall_events(
