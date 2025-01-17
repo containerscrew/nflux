@@ -8,7 +8,6 @@ use anyhow::Context;
 use aya::maps::AsyncPerfEventArray;
 use aya::util::online_cpus;
 use aya::{include_bytes_aligned, Ebpf};
-use aya_log::EbpfLogger;
 use std::process;
 
 use crate::egress::process_egress_events;
@@ -20,7 +19,7 @@ use egress::{
 use firewall::{attach_xdp_program, process_firewall_events};
 use logger::setup_logger;
 use tokio::task;
-use tracing::{error, info, warn};
+use tracing::{error, info};
 use utils::{is_root_user, print_firewall_rules, set_mem_limit, wait_for_shutdown};
 
 #[tokio::main]
@@ -47,9 +46,9 @@ async fn main() -> anyhow::Result<()> {
     let mut bpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/nflux")))?;
 
     // Necessary to debug something in the ebpf code
-    if let Err(e) = EbpfLogger::init(&mut bpf) {
-        warn!("failed to initialize eBPF logger: {}", e);
-    }
+    // if let Err(e) = EbpfLogger::init(&mut bpf) {
+    //     warn!("failed to initialize eBPF logger: {}", e);
+    // }
 
     // Attach XDP program (monitor ingress connections to local ports)
     match config.firewall.enabled {

@@ -4,8 +4,12 @@
 
 mod egress;
 
+use crate::egress::try_tc_egress;
+use aya_ebpf::bindings::{TC_ACT_PIPE, TC_ACT_SHOT};
+use aya_ebpf::macros::classifier;
 use aya_ebpf::maps::lpm_trie::Key;
 use aya_ebpf::maps::{Array, LpmTrie, LruHashMap};
+use aya_ebpf::programs::TcContext;
 use aya_ebpf::{
     bindings::xdp_action,
     macros::{map, xdp},
@@ -13,9 +17,6 @@ use aya_ebpf::{
     programs::XdpContext,
 };
 use core::mem;
-use aya_ebpf::bindings::{TC_ACT_PIPE, TC_ACT_SHOT};
-use aya_ebpf::macros::classifier;
-use aya_ebpf::programs::TcContext;
 use network_types::ip::{IpProto, Ipv6Hdr};
 use network_types::{
     eth::{EthHdr, EtherType},
@@ -24,7 +25,6 @@ use network_types::{
     udp::UdpHdr,
 };
 use nflux_common::{ConnectionEvent, EgressEvent, IpRule, LpmKeyIpv4, LpmKeyIpv6};
-use crate::egress::try_tc_egress;
 
 #[map]
 static IPV4_RULES: LpmTrie<LpmKeyIpv4, IpRule> = LpmTrie::with_max_entries(1024, 0);
@@ -96,7 +96,8 @@ fn start_nflux(ctx: XdpContext) -> Result<u32, ()> {
                 if let Some(rule) = IPV4_RULES.get(&key) {
                     match proto {
                         IpProto::Tcp => {
-                            let tcphdr: *const TcpHdr = unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
+                            let tcphdr: *const TcpHdr =
+                                unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
                             let dst_port = u16::from_be(unsafe { (*tcphdr).dest });
                             let syn = unsafe { (*tcphdr).syn() };
                             let ack = unsafe { (*tcphdr).ack() };
