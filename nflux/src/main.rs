@@ -13,10 +13,7 @@ use std::process;
 
 use crate::egress::process_egress_events;
 use config::{IsEnabled, Nflux};
-use egress::{
-    attach_tc_egress_program_physical_interfaces, attach_tc_egress_program_virtual_interfaces,
-    populate_egress_config,
-};
+use egress::{attach_tc_egress_program, populate_egress_config};
 use firewall::{attach_xdp_program, process_firewall_events};
 use logger::setup_logger;
 use tokio::task;
@@ -76,8 +73,9 @@ async fn main() -> anyhow::Result<()> {
                     "Attaching TC egress program to physical interfaces: {:?}",
                     config.egress.physical_interfaces
                 );
-                attach_tc_egress_program_physical_interfaces(
+                attach_tc_egress_program(
                     &mut bpf,
+                    "tc_egress_physical",
                     &config.egress.physical_interfaces,
                 )?;
             }
@@ -87,8 +85,9 @@ async fn main() -> anyhow::Result<()> {
                     "Attaching TC egress program to virtual interfaces: {:?}",
                     config.egress.virtual_interfaces
                 );
-                attach_tc_egress_program_virtual_interfaces(
+                attach_tc_egress_program(
                     &mut bpf,
+                    "tc_egress_virtual",
                     &config.egress.virtual_interfaces,
                 )?;
             }

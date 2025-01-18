@@ -21,16 +21,16 @@ physical_interfaces = ["enp0s20f0u4"] # Physical interfaces, your LAN interface
 # Traffic sniffer for virtual interfaces like wireguard/openvpn, is not working correctly
 # If you are using a VPN, switch off if you want to use the egress logging feature
 # You will see the egress traffic for your physical interface (wifi or ethernet)
-virtual_interfaces = ["proton0"] # If using VPN, add the virtual interface here
+virtual_interfaces = [] # If using VPN, add the virtual interface here
 
 [egress.logging]
 # log_only_new_connections:
 # For example, if you perform 1000 requests to google.com, just log 1 (or every you execute)
 # This affects to tcp and udp connections
-log_only_new_connections = "true"
+log_only_new_connections = "false"
 log_udp_connections = "false" # Decide if udp packets should be logged
 log_tcp_connections = "true" # Decide if tcp packets should be logged
-log_icmp_connections = "false" # Decide if icmp packets should be logged
+log_icmp_connections = "true" # Decide if icmp packets should be logged
 
 #[egress_rules]
 # TODO: filter outgoint traffic (block/deny)
