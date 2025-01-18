@@ -21,7 +21,7 @@ physical_interfaces = ["enp0s20f0u4"] # Physical interfaces, your LAN interface
 # Traffic sniffer for virtual interfaces like wireguard/openvpn, is not working correctly
 # If you are using a VPN, switch off if you want to use the egress logging feature
 # You will see the egress traffic for your physical interface (wifi or ethernet)
-virtual_interfaces = [] # If using VPN, add the virtual interface here
+virtual_interfaces = ["proton0"] # If using VPN, add the virtual interface here
 
 [egress.logging]
 # log_only_new_connections:

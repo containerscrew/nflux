@@ -1,7 +1,7 @@
 use core::mem;
 
 use aya_ebpf::{
-    bindings::TC_ACT_PIPE, helpers::gen::bpf_get_current_pid_tgid, programs::TcContext,
+    bindings::TC_ACT_PIPE, helpers::bpf_get_current_pid_tgid, programs::TcContext
 };
 use network_types::{
     eth::EthHdr,
@@ -31,7 +31,7 @@ pub fn handle_icmp_packet(
     egress_config: &EgressConfig,
     destination: u32,
 ) -> Result<i32, ()> {
-    let pid_tgid = { unsafe { bpf_get_current_pid_tgid() } };
+    let pid_tgid = {  bpf_get_current_pid_tgid() };
     let pid = pid_tgid >> 32;
 
     if egress_config.log_icmp_connections == 1 {
@@ -61,7 +61,7 @@ pub fn handle_tcp_packet(
     let src_port = u16::from_be((unsafe { *tcphdr }).source);
     let dst_port = u16::from_be((unsafe { *tcphdr }).dest);
     let protocol = IpProto::Tcp as u8;
-    let pid_tgid = { unsafe { bpf_get_current_pid_tgid() } };
+    let pid_tgid = { bpf_get_current_pid_tgid() };
     let pid = pid_tgid >> 32;
 
     if egress_config.log_tcp_connections == 1 {
@@ -90,7 +90,7 @@ pub fn handle_udp_packet(
     let src_port = u16::from_be((unsafe { *udphdr }).source);
     let dst_port = u16::from_be((unsafe { *udphdr }).dest);
     let protocol = IpProto::Udp as u8;
-    let pid_tgid = { unsafe { bpf_get_current_pid_tgid() } };
+    let pid_tgid = { bpf_get_current_pid_tgid() };
     let pid = pid_tgid >> 32;
 
     if egress_config.log_udp_connections == 1 {
