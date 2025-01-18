@@ -13,7 +13,7 @@ log = "0.4.25"
 
 [build-dependencies]
 which = { workspace = true }
-xtask = { path = "../xtask" }
+
 
 [[bin]]
 name = "nflux"

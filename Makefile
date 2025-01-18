@@ -57,7 +57,10 @@ paru-uninstall: ## Uninstall nflux with paru
 	pacman -Rns nflux
 
 local-run: ## Run nflux locally
-	NFLUX_CONFIG_FILE_PATH=./nflux.toml cargo xtask run --
+	NFLUX_CONFIG_FILE_PATH=./nflux.toml cargo run --release --config 'target."cfg(all())".runner="sudo -E"'
+
+local-build: ## Build nflux locally
+	cargo build --release
 
 journal-logs: ## Show journal logs
 	sudo journalctl -u nflux.service -f

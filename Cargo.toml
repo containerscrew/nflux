@@ -1,10 +1,11 @@
 [workspace]
 resolver = "2"
-members = ["xtask", "nflux", "nflux-common", "nflux-ebpf"]
-default-members = ["xtask", "nflux", "nflux-common"]
+members = ["nflux", "nflux-common", "nflux-ebpf"]
+default-members = ["nflux", "nflux-common"]
 
 [workspace.dependencies]
 aya = { version = "0.13.0", default-features = false }
+aya-build = { version = "0.1.2", default-features = false }
 aya-ebpf = { version = "0.1.1", default-features = false }
 aya-log = { version = "0.2.1", default-features = false }
 aya-log-ebpf = { version = "0.1.1", default-features = false }
@@ -20,12 +21,6 @@ libc = { version = "0.2.169", default-features = false }
 log = { version = "0.4.25", default-features = false }
 tokio = { version = "1.43.0", default-features = false }
 which = { version = "6.0.0", default-features = false }
-
-[profile.dev]
-panic = "abort"
-
-[profile.release]
-panic = "abort"
 
 [profile.release.package.nflux-ebpf]
 debug = 2
