@@ -1,9 +1,3 @@
-> [!WARNING]
-> Ignore this README. It may change as I develop and adjust configurations.
-> The entire tool is under development, while I am learning Rust and eBPF.
-> I am not a Rust senior developer, so I am learning as I go. I am open to any suggestions or improvements.
-> Code is not optimized. I will try to split functionalities into different files. Also, some code comments are missing.
-
 <p align="center">
     <h3 align="center">nflux</h3>
     <p align="center">Network monitoring and firewall using EBPF, XDP and TC. Powered by Aya-rs</p>
@@ -37,12 +31,7 @@ Powerful, right? Same for traffic control (TC).
 
 # Features
 
-Basic XDP firewall:
-
-* Block incoming ipv4/ipv6-tcp/udp packets.
-* Allow incoming ipv4/ipv6-tcp/udp packets.
-* Block incoming ICMP packets.
-* Filter outgoing packets.
+Pending to add...
 
 # Installation
 
