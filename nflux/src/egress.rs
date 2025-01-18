@@ -1,5 +1,4 @@
 use crate::config::{Egress, IsEnabled};
-use crate::utils::{get_process_name, lookup_address};
 use anyhow::Context;
 use aya::maps::perf::{AsyncPerfEventArrayBuffer, PerfBufferError};
 use aya::maps::{Array, MapData};
@@ -43,16 +42,17 @@ pub fn populate_egress_config(bpf: &mut Ebpf, config: Egress) -> anyhow::Result<
     Ok(())
 }
 
-pub fn attach_tc_egress_program_virtual_interfaces(
+pub fn attach_tc_egress_program(
     bpf: &mut Ebpf,
-    virtual_interfaces: &[String],
+    program_name: &str,
+    interfaces: &[String],
 ) -> anyhow::Result<()> {
     // Retrieve the eBPF program
-    let program = match bpf.program_mut("tc_egress_virtual") {
+    let program = match bpf.program_mut(program_name) {
         Some(p) => p,
         None => {
-            error!("Failed to find the tc_egress program in BPF object");
-            return Err(anyhow::anyhow!("tc_egress program not found"));
+            error!("Failed to find the {} program in BPF object", program_name);
+            return Err(anyhow::anyhow!("{} program not found", program_name));
         }
     };
 
@@ -61,8 +61,8 @@ pub fn attach_tc_egress_program_virtual_interfaces(
         Ok(p) => p,
         Err(e) => {
             error!(
-                "Failed to convert tc_egress program to SchedClassifier: {:?}",
-                e
+                "Failed to convert {} program to SchedClassifier: {:?}",
+                program_name, e
             );
             return Err(e.into());
         }
@@ -70,12 +70,12 @@ pub fn attach_tc_egress_program_virtual_interfaces(
 
     // Load the eBPF program into the kernel
     if let Err(e) = program.load() {
-        error!("Failed to load tc_egress program: {:?}", e);
+        error!("Failed to load {} program: {:?}", program_name, e);
         return Err(e.into());
     }
 
     // Iterate over interfaces and attach the program
-    for interface in virtual_interfaces {
+    for interface in interfaces {
         // Add clsact qdisc to the interface
         if let Err(e) = tc::qdisc_add_clsact(interface) {
             warn!(
@@ -87,68 +87,12 @@ pub fn attach_tc_egress_program_virtual_interfaces(
         // Attach the eBPF program to the egress path of the interface
         if let Err(e) = program.attach(interface, TcAttachType::Egress) {
             error!(
-                "Failed to attach tc_egress program to interface {}: {:?}",
-                interface, e
+                "Failed to attach {} program to interface {}: {:?}",
+                program_name, interface, e
             );
             return Err(anyhow::anyhow!(
-                "Failed to attach tc_egress program to interface {}",
-                interface
-            ));
-        }
-    }
-
-    Ok(())
-}
-
-pub fn attach_tc_egress_program_physical_interfaces(
-    bpf: &mut Ebpf,
-    physical_interfaces: &[String],
-) -> anyhow::Result<()> {
-    // Retrieve the eBPF program
-    let program = match bpf.program_mut("tc_egress_physical") {
-        Some(p) => p,
-        None => {
-            error!("Failed to find the tc_egress program in BPF object");
-            return Err(anyhow::anyhow!("tc_egress program not found"));
-        }
-    };
-
-    // Try converting the program into a SchedClassifier
-    let program: &mut SchedClassifier = match program.try_into() {
-        Ok(p) => p,
-        Err(e) => {
-            error!(
-                "Failed to convert tc_egress program to SchedClassifier: {:?}",
-                e
-            );
-            return Err(e.into());
-        }
-    };
-
-    // Load the eBPF program into the kernel
-    if let Err(e) = program.load() {
-        error!("Failed to load tc_egress program: {:?}", e);
-        return Err(e.into());
-    }
-
-    // Iterate over interfaces and attach the program
-    for interface in physical_interfaces {
-        // Add clsact qdisc to the interface
-        if let Err(e) = tc::qdisc_add_clsact(interface) {
-            warn!(
-                "Failed to add clsact qdisc to interface {}: {:?}",
-                interface, e
-            );
-        }
-
-        // Attach the eBPF program to the egress path of the interface
-        if let Err(e) = program.attach(interface, TcAttachType::Egress) {
-            error!(
-                "Failed to attach tc_egress program to interface {}: {:?}",
-                interface, e
-            );
-            return Err(anyhow::anyhow!(
-                "Failed to attach tc_egress program to interface {}",
+                "Failed to attach {} program to interface {}",
+                program_name,
                 interface
             ));
         }
@@ -173,14 +117,12 @@ pub async fn process_egress_events(
             match parse_egress_event(buf) {
                 Ok(event) => {
                     info!(
-                        "new egress connection protocol={}, ip={}, src_port={}, dst_port={}, fqdn={}, pid={}, comm={}",
+                        "event=egress protocol={}, ip={}, src_port={}, dst_port={}, pid={}",
                         convert_protocol(event.protocol),
                         Ipv4Addr::from(event.dst_ip),
                         event.src_port,
                         event.dst_port,
-                        lookup_address(event.dst_ip),
                         event.pid,
-                        get_process_name(event.pid)
                     );
                 }
                 Err(e) => error!("Failed to parse egress event on CPU {}: {}", cpu_id, e),

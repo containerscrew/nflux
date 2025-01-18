@@ -1,8 +1,7 @@
 use core::mem;
 
-use aya_ebpf::{
-    bindings::TC_ACT_PIPE, helpers::bpf_get_current_pid_tgid, programs::TcContext
-};
+use aya_ebpf::{bindings::TC_ACT_PIPE, helpers::bpf_get_current_pid_tgid, programs::TcContext};
+
 use network_types::{
     eth::EthHdr,
     ip::{IpProto, Ipv4Hdr},
@@ -31,7 +30,7 @@ pub fn handle_icmp_packet(
     egress_config: &EgressConfig,
     destination: u32,
 ) -> Result<i32, ()> {
-    let pid_tgid = {  bpf_get_current_pid_tgid() };
+    let pid_tgid = { bpf_get_current_pid_tgid() };
     let pid = pid_tgid >> 32;
 
     if egress_config.log_icmp_connections == 1 {

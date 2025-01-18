@@ -63,7 +63,7 @@ pub fn parse_cidr_v6(cidr: &str) -> anyhow::Result<(Ipv6Addr, u32)> {
     Ok((ip, prefix_len))
 }
 
-pub fn lookup_address(ip: u32) -> String {
+pub fn _lookup_address(ip: u32) -> String {
     match is_private_ip(ip) {
         true => "Private IP".to_string(),
         false => {
@@ -79,7 +79,7 @@ pub fn lookup_address(ip: u32) -> String {
     }
 }
 
-pub fn get_process_name(pid: u64) -> String {
+pub fn _get_process_name(pid: u64) -> String {
     let mut s = System::new_all();
 
     // Is this causing overhead?
