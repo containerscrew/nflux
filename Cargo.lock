@@ -60,7 +60,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "765c92c523541cbf5e3a94c7a6ff4068a4d9537f98a2eeb136461c0537ded8c1"
 dependencies = [
  "anyhow",
- "cargo_metadata 0.19.1",
+ "cargo_metadata",
 ]
 
 [[package]]
@@ -215,20 +215,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e35af189006b9c0f00a064685c727031e3ed2d8020f7ba284d78cc2671bd36ea"
 dependencies = [
  "serde",
-]
-
-[[package]]
-name = "cargo_metadata"
-version = "0.18.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2d886547e41f740c616ae73108f6eb70afe6d940c7bc697cb30f13daec073037"
-dependencies = [
- "camino",
- "cargo-platform",
- "semver",
- "serde",
- "serde_json",
- "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -464,7 +450,7 @@ dependencies = [
  "aya-build",
  "aya-log",
  "bytes",
- "cargo_metadata 0.18.1",
+ "cargo_metadata",
  "dns-lookup",
  "libc",
  "nflux-common",
