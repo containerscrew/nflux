@@ -9,11 +9,11 @@ use aya::maps::AsyncPerfEventArray;
 use aya::programs::TcAttachType;
 use aya::util::online_cpus;
 use aya::{include_bytes_aligned, Ebpf};
+use egress::{attach_tc_program, populate_egress_config};
 use std::process;
 
 use crate::egress::process_egress_events;
 use config::{Firewall, IsEnabled, Monitoring, Nflux};
-use egress::{attach_tc_program, populate_egress_config};
 use firewall::{attach_xdp_program, process_firewall_events};
 use logger::setup_logger;
 use tokio::task;
