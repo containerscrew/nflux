@@ -29,7 +29,6 @@ pub fn handle_icmp_packet(
     egress_config: &EgressConfig,
     destination: u32,
 ) -> Result<i32, ()> {
-
     if egress_config.log_icmp_connections == 1 {
         unsafe {
             log_connection(
