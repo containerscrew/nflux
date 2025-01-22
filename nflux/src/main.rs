@@ -86,16 +86,10 @@ async fn main() -> anyhow::Result<()> {
     Ok(())
 }
 
-
 fn start_firewall(bpf: &mut Ebpf, config: Firewall) -> Result<(), anyhow::Error> {
     match config.enabled {
         IsEnabled::True => {
-            attach_xdp_program(
-                bpf,
-                config.icmp_ping,
-                &config.rules,
-                &config.interfaces,
-            )?;
+            attach_xdp_program(bpf, config.icmp_ping, &config.rules, &config.interfaces)?;
             info!("Firewall started successfully!");
             print_firewall_rules(config.rules);
         }
@@ -114,11 +108,7 @@ fn start_traffic_control(bpf: &mut Ebpf, config: Egress) -> Result<(), anyhow::E
                     "Attaching TC egress program to physical interfaces: {:?}",
                     config.physical_interfaces
                 );
-                attach_tc_egress_program(
-                    bpf,
-                    "tc_egress_physical",
-                    &config.physical_interfaces,
-                )?;
+                attach_tc_egress_program(bpf, "tc_egress_physical", &config.physical_interfaces)?;
             }
 
             if !config.virtual_interfaces.is_empty() {
@@ -126,11 +116,7 @@ fn start_traffic_control(bpf: &mut Ebpf, config: Egress) -> Result<(), anyhow::E
                     "Attaching TC egress program to virtual interfaces: {:?}",
                     config.virtual_interfaces
                 );
-                attach_tc_egress_program(
-                    bpf,
-                    "tc_egress_virtual",
-                    &config.virtual_interfaces,
-                )?;
+                attach_tc_egress_program(bpf, "tc_egress_virtual", &config.virtual_interfaces)?;
             }
             populate_egress_config(bpf, config)?;
             info!("TC egress started successfully!")
