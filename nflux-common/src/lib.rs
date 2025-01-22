@@ -32,7 +32,6 @@ pub struct EgressEvent {
     pub src_port: u16,
     pub dst_port: u16,
     pub protocol: u8,
-    pub pid: u64,
 }
 
 #[repr(C)]
@@ -67,13 +66,6 @@ pub mod user {
     unsafe impl aya::Pod for LpmKeyIpv6 {}
     unsafe impl aya::Pod for EgressConfig {}
 }
-
-// Define the default configuration if the user does not provide one
-// pub const DEFAULT_FIREWALL_RULES: GlobalFirewallRules = GlobalFirewallRules {
-//     : 0,
-//     allowed_ipv4: [0; MAX_ALLOWED_IPV4],
-//     allowed_ports: [0; MAX_ALLOWED_PORTS],
-// };
 
 pub fn convert_protocol(protocol: u8) -> &'static str {
     match protocol {

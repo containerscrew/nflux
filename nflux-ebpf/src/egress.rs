@@ -20,6 +20,20 @@ fn handle_ipv4_packet(ctx: &TcContext, egress_config: &EgressConfig) -> Result<i
     }
 }
 
+pub fn try_tc_ingress_physical(ctx: TcContext) -> Result<i32, ()> {
+    let ethhdr: EthHdr = ctx.load(0).map_err(|_| ())?;
+    let egress_config = EGRESS_CONFIG.get(0).ok_or(())?;
+
+    match ethhdr.ether_type {
+        EtherType::Ipv4 => handle_ipv4_packet(&ctx, &egress_config),
+        EtherType::Ipv6 => {
+            // IPV6 traffic is not implemented yet
+            Ok(TC_ACT_PIPE)
+        }
+        _ => Ok(TC_ACT_PIPE),
+    }
+}
+
 pub fn try_tc_egress_physical(ctx: TcContext) -> Result<i32, ()> {
     let ethhdr: EthHdr = ctx.load(0).map_err(|_| ())?;
     let egress_config = EGRESS_CONFIG.get(0).ok_or(())?;
@@ -49,7 +63,7 @@ pub fn try_tc_egress_virtual(ctx: TcContext) -> Result<i32, ()> {
             IpProto::Udp => handle_udp_packet(&ctx, egress_config, destination),
             IpProto::Icmp => handle_icmp_packet(&ctx, egress_config, destination),
             _ => {
-                info!(&ctx, "Probably, ipv6 traffic");
+                //info!(&ctx, "Probably, ipv6 traffic");
                 Ok(TC_ACT_PIPE)
             }
         }
@@ -62,6 +76,7 @@ pub fn try_tc_egress_virtual(ctx: TcContext) -> Result<i32, ()> {
         //     //IpProto::Icmpv6 => handle_icmpv6_packet(&ctx, egress_config, ipv6hdr.dst_addr),
         //     _ => Ok(TC_ACT_PIPE),
         // }
+        info!(&ctx, "Probably, ipv6 traffic");
         Ok(TC_ACT_PIPE)
     } else {
         Ok(TC_ACT_PIPE)

@@ -12,7 +12,7 @@ use aya_log::EbpfLogger;
 use std::process;
 
 use crate::egress::process_egress_events;
-use config::{IsEnabled, Nflux};
+use config::{Egress, Firewall, IsEnabled, Nflux};
 use egress::{attach_tc_egress_program, populate_egress_config};
 use firewall::{attach_xdp_program, process_firewall_events};
 use logger::setup_logger;
@@ -49,55 +49,10 @@ async fn main() -> anyhow::Result<()> {
     }
 
     // Attach XDP program (monitor ingress connections to local ports)
-    match config.firewall.enabled {
-        IsEnabled::True => {
-            attach_xdp_program(
-                &mut bpf,
-                config.firewall.icmp_ping,
-                &config.firewall.rules,
-                &config.firewall.interfaces,
-            )?;
-            info!("firewall started successfully!");
-            print_firewall_rules(config.firewall.rules);
-        }
-        IsEnabled::False => {
-            info!("Firewall not enabled")
-        }
-    }
+    start_firewall(&mut bpf, config.firewall)?;
 
     // Attach TC program (monitor egress connections)
-    match config.egress.enabled {
-        IsEnabled::True => {
-            if !config.egress.physical_interfaces.is_empty() {
-                info!(
-                    "Attaching TC egress program to physical interfaces: {:?}",
-                    config.egress.physical_interfaces
-                );
-                attach_tc_egress_program(
-                    &mut bpf,
-                    "tc_egress_physical",
-                    &config.egress.physical_interfaces,
-                )?;
-            }
-
-            if !config.egress.virtual_interfaces.is_empty() {
-                info!(
-                    "Attaching TC egress program to virtual interfaces: {:?}",
-                    config.egress.virtual_interfaces
-                );
-                attach_tc_egress_program(
-                    &mut bpf,
-                    "tc_egress_virtual",
-                    &config.egress.virtual_interfaces,
-                )?;
-            }
-            populate_egress_config(&mut bpf, config.egress)?;
-            info!("TC egress started successfully!")
-        }
-        IsEnabled::False => {
-            info!("Egress not enabled");
-        }
-    }
+    start_traffic_control(&mut bpf, config.egress)?;
 
     // Start processing events from the eBPF program
     let mut firewall_events = AsyncPerfEventArray::try_from(
@@ -128,5 +83,61 @@ async fn main() -> anyhow::Result<()> {
     // Wait for shutdown signal
     // This will removed in future versions, specially for container solution
     wait_for_shutdown().await?;
+    Ok(())
+}
+
+
+fn start_firewall(bpf: &mut Ebpf, config: Firewall) -> Result<(), anyhow::Error> {
+    match config.enabled {
+        IsEnabled::True => {
+            attach_xdp_program(
+                bpf,
+                config.icmp_ping,
+                &config.rules,
+                &config.interfaces,
+            )?;
+            info!("Firewall started successfully!");
+            print_firewall_rules(config.rules);
+        }
+        IsEnabled::False => {
+            info!("Firewall not enabled");
+        }
+    }
+    Ok(())
+}
+
+fn start_traffic_control(bpf: &mut Ebpf, config: Egress) -> Result<(), anyhow::Error> {
+    match config.enabled {
+        IsEnabled::True => {
+            if !config.physical_interfaces.is_empty() {
+                info!(
+                    "Attaching TC egress program to physical interfaces: {:?}",
+                    config.physical_interfaces
+                );
+                attach_tc_egress_program(
+                    bpf,
+                    "tc_egress_physical",
+                    &config.physical_interfaces,
+                )?;
+            }
+
+            if !config.virtual_interfaces.is_empty() {
+                info!(
+                    "Attaching TC egress program to virtual interfaces: {:?}",
+                    config.virtual_interfaces
+                );
+                attach_tc_egress_program(
+                    bpf,
+                    "tc_egress_virtual",
+                    &config.virtual_interfaces,
+                )?;
+            }
+            populate_egress_config(bpf, config)?;
+            info!("TC egress started successfully!")
+        }
+        IsEnabled::False => {
+            info!("Egress not enabled");
+        }
+    }
     Ok(())
 }

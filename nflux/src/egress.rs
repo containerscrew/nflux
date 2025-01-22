@@ -96,6 +96,19 @@ pub fn attach_tc_egress_program(
                 interface
             ));
         }
+
+        // Attach the eBPF program to the ingress path of the interface
+        // if let Err(e) = program.attach(interface, TcAttachType::Ingress) {
+        //     error!(
+        //         "Failed to attach {} program to interface {}: {:?}",
+        //         program_name, interface, e
+        //     );
+        //     return Err(anyhow::anyhow!(
+        //         "Failed to attach {} program to interface {}",
+        //         program_name,
+        //         interface
+        //     ));
+        // }
     }
 
     Ok(())
@@ -117,12 +130,11 @@ pub async fn process_egress_events(
             match parse_egress_event(buf) {
                 Ok(event) => {
                     info!(
-                        "event=egress protocol={}, ip={}, src_port={}, dst_port={}, pid={}",
+                        "program=traffic_control protocol={}, ip={}, src_port={}, dst_port={}",
                         convert_protocol(event.protocol),
                         Ipv4Addr::from(event.dst_ip),
                         event.src_port,
                         event.dst_port,
-                        event.pid,
                     );
                 }
                 Err(e) => error!("Failed to parse egress event on CPU {}: {}", cpu_id, e),

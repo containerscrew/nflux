@@ -4,7 +4,7 @@ log_type = "text"  # text or json (default: text)
 
 [firewall]
 enabled = "false" # Decide if the firewall is enabled or not
-interfaces = ["wlp2s0"] # Interfaces to protect (can be only physical interfaces)
+interfaces = ["enp0s20f0u4"] # Interfaces to protect (can be only physical interfaces)
 icmp_ping = "false" # Allow or deny ICMP ping requests
 
 [firewall.rules]
@@ -27,7 +27,7 @@ virtual_interfaces = [] # If using VPN, add the virtual interface here
 # log_only_new_connections:
 # For example, if you perform 1000 requests to google.com, just log 1 (or every you execute)
 # This affects to tcp and udp connections
-log_only_new_connections = "false"
+log_only_new_connections = "true"
 log_udp_connections = "false" # Decide if udp packets should be logged
 log_tcp_connections = "true" # Decide if tcp packets should be logged
 log_icmp_connections = "true" # Decide if icmp packets should be logged
