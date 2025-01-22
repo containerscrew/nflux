@@ -6,18 +6,18 @@ mod utils;
 
 use anyhow::Context;
 use aya::maps::AsyncPerfEventArray;
+use aya::programs::TcAttachType;
 use aya::util::online_cpus;
 use aya::{include_bytes_aligned, Ebpf};
-use aya_log::EbpfLogger;
 use std::process;
 
 use crate::egress::process_egress_events;
-use config::{Egress, Firewall, IsEnabled, Nflux};
-use egress::{attach_tc_egress_program, populate_egress_config};
+use config::{Firewall, IsEnabled, Monitoring, Nflux};
+use egress::{attach_tc_program, populate_egress_config};
 use firewall::{attach_xdp_program, process_firewall_events};
 use logger::setup_logger;
 use tokio::task;
-use tracing::{error, info, warn};
+use tracing::{error, info};
 use utils::{is_root_user, print_firewall_rules, set_mem_limit, wait_for_shutdown};
 
 #[tokio::main]
@@ -44,15 +44,15 @@ async fn main() -> anyhow::Result<()> {
     let mut bpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/nflux")))?;
 
     // Necessary to debug something in the ebpf code
-    if let Err(e) = EbpfLogger::init(&mut bpf) {
-        warn!("failed to initialize eBPF logger: {}", e);
-    }
+    // if let Err(e) = EbpfLogger::init(&mut bpf) {
+    //     warn!("failed to initialize eBPF logger: {}", e);
+    // }
 
     // Attach XDP program (monitor ingress connections to local ports)
     start_firewall(&mut bpf, config.firewall)?;
 
     // Attach TC program (monitor egress connections)
-    start_traffic_control(&mut bpf, config.egress)?;
+    start_traffic_control(&mut bpf, config.monitoring)?;
 
     // Start processing events from the eBPF program
     let mut firewall_events = AsyncPerfEventArray::try_from(
@@ -100,7 +100,7 @@ fn start_firewall(bpf: &mut Ebpf, config: Firewall) -> Result<(), anyhow::Error>
     Ok(())
 }
 
-fn start_traffic_control(bpf: &mut Ebpf, config: Egress) -> Result<(), anyhow::Error> {
+fn start_traffic_control(bpf: &mut Ebpf, config: Monitoring) -> Result<(), anyhow::Error> {
     match config.enabled {
         IsEnabled::True => {
             if !config.physical_interfaces.is_empty() {
@@ -108,16 +108,28 @@ fn start_traffic_control(bpf: &mut Ebpf, config: Egress) -> Result<(), anyhow::E
                     "Attaching TC egress program to physical interfaces: {:?}",
                     config.physical_interfaces
                 );
-                attach_tc_egress_program(bpf, "tc_egress_physical", &config.physical_interfaces)?;
+                attach_tc_program(
+                    bpf,
+                    "tc_egress_physical",
+                    &config.physical_interfaces,
+                    TcAttachType::Egress,
+                )?;
+                attach_tc_program(
+                    bpf,
+                    "tc_ingress_physical",
+                    &config.physical_interfaces,
+                    TcAttachType::Ingress,
+                )?;
             }
 
-            if !config.virtual_interfaces.is_empty() {
-                info!(
-                    "Attaching TC egress program to virtual interfaces: {:?}",
-                    config.virtual_interfaces
-                );
-                attach_tc_egress_program(bpf, "tc_egress_virtual", &config.virtual_interfaces)?;
-            }
+            // Virtual interface is not working fine ATM
+            // if !config.virtual_interfaces.is_empty() {
+            //     info!(
+            //         "Attaching TC egress program to virtual interfaces: {:?}",
+            //         config.virtual_interfaces
+            //     );
+            //     attach_tc_egress_program(bpf, "tc_egress_virtual", &config.virtual_interfaces)?;
+            // }
             populate_egress_config(bpf, config)?;
             info!("TC egress started successfully!")
         }

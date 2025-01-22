@@ -11,9 +11,10 @@ pub mod utils;
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct EgressConfig {
     pub log_only_new_connections: u8, // 0 = no, 1 = yes
-    pub log_udp_connections: u8,      // 0 = no, 1 = yes
-    pub log_tcp_connections: u8,      // 0 = no, 1 = yes
-    pub log_icmp_connections: u8,     // 0 = no, 1 = yes
+    pub log_refresh_new_connections_every: u32,
+    pub log_udp_connections: u8,  // 0 = no, 1 = yes
+    pub log_tcp_connections: u8,  // 0 = no, 1 = yes
+    pub log_icmp_connections: u8, // 0 = no, 1 = yes
 }
 
 #[repr(C)]
@@ -28,10 +29,12 @@ pub struct ConnectionEvent {
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct EgressEvent {
+    pub src_ip: u32,
     pub dst_ip: u32,
     pub src_port: u16,
     pub dst_port: u16,
     pub protocol: u8,
+    pub direction: u8, // 0: ingress, 1: egress
 }
 
 #[repr(C)]

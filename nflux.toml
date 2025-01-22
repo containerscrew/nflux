@@ -14,7 +14,8 @@ icmp_ping = "false" # Allow or deny ICMP ping requests
 "192.168.0.0/24" = { priority = 1, action = "allow", ports = [22], protocol = "tcp", description = "Allow ssh from entire local net" }
 "192.168.0.76/32" = { priority = 2, action = "deny", ports = [8080], protocol = "tcp", description = "Deny a specific IP address" }
 
-[egress]
+[monitoring]
+# Decide if ingres/egress traffic should be logged
 enabled = "true"
 physical_interfaces = ["enp0s20f0u4"] # Physical interfaces, your LAN interface
 
@@ -23,14 +24,17 @@ physical_interfaces = ["enp0s20f0u4"] # Physical interfaces, your LAN interface
 # You will see the egress traffic for your physical interface (wifi or ethernet)
 virtual_interfaces = [] # If using VPN, add the virtual interface here
 
-[egress.logging]
+[monitoring.logging]
 # log_only_new_connections:
 # For example, if you perform 1000 requests to google.com, just log 1 (or every you execute)
 # This affects to tcp and udp connections
+# This affects to ingress/egress. By the moment is not splitted
 log_only_new_connections = "true"
+log_refresh_new_connections_every = 2 # Refresh the new connections every X seconds
 log_udp_connections = "false" # Decide if udp packets should be logged
 log_tcp_connections = "true" # Decide if tcp packets should be logged
 log_icmp_connections = "true" # Decide if icmp packets should be logged
+
 
 #[egress_rules]
 # TODO: filter outgoint traffic (block/deny)

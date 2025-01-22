@@ -14,7 +14,7 @@ use aya_ebpf::macros::classifier;
 use aya_ebpf::programs::TcContext;
 use aya_ebpf::{macros::xdp, programs::XdpContext};
 use core::mem;
-use egress::{try_tc_egress_physical, try_tc_egress_virtual};
+use egress::try_tc_physical;
 use firewall::start_firewall;
 
 // Start xdp firewall if enabled. Attach this program to the physical interface
@@ -29,14 +29,19 @@ pub fn xdp_firewall(ctx: XdpContext) -> u32 {
 // Start traffic control egress for phisical interface if enabled.
 #[classifier]
 pub fn tc_egress_physical(ctx: TcContext) -> i32 {
-    try_tc_egress_physical(ctx).unwrap_or_else(|_| TC_ACT_SHOT)
+    try_tc_physical(ctx, 1).unwrap_or_else(|_| TC_ACT_SHOT)
+}
+
+#[classifier]
+pub fn tc_ingress_physical(ctx: TcContext) -> i32 {
+    try_tc_physical(ctx, 0).unwrap_or_else(|_| TC_ACT_SHOT)
 }
 
 // Start traffic control egress for virtual interface if enabled.
-#[classifier]
-pub fn tc_egress_virtual(ctx: TcContext) -> i32 {
-    try_tc_egress_virtual(ctx).unwrap_or_else(|_| TC_ACT_SHOT)
-}
+// #[classifier]
+// pub fn tc_egress_virtual(ctx: TcContext) -> i32 {
+//     try_tc_egress_virtual(ctx).unwrap_or_else(|_| TC_ACT_SHOT)
+// }
 
 #[inline(always)]
 unsafe fn ptr_at<T>(ctx: &XdpContext, offset: usize) -> Result<*const T, ()> {

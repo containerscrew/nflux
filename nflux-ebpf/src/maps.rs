@@ -24,7 +24,10 @@ pub static FIREWALL_CONNECTION_TRACKER: LruHashMap<u64, u64> =
     LruHashMap::with_max_entries(4096, 0);
 
 #[map]
-pub static ACTIVE_CONNECTIONS: LruHashMap<u32, u32> = LruHashMap::with_max_entries(4096, 0);
+pub static ACTIVE_EGRESS_CONNECTIONS: LruHashMap<u32, u32> = LruHashMap::with_max_entries(4096, 0);
+
+#[map]
+pub static ACTIVE_INGRESS_CONNECTIONS: LruHashMap<u32, u32> = LruHashMap::with_max_entries(4096, 0);
 
 #[map]
 pub static EGRESS_EVENT: PerfEventArray<EgressEvent> = PerfEventArray::new(0);

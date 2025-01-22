@@ -1,15 +1,15 @@
 services:
   nflux:
     build:
-      context: ../
-      dockerfile: docker/Dockerfile
-    restart: unless-stopped
+      context: ./
+      dockerfile: Dockerfile
+    image: docker.io/nflux/nflux:latest
+    restart: never
     network_mode: host
     cap_add:
-       - ALL
-      #  - CAP_BPF
-      #  - CAP_SYS_ADMIN
-      #  - CAP_PERFMON
+      - CAP_BPF
+      - CAP_SYS_ADMIN
+      - CAP_PERFMON
     security_opt:
        - label=disable
     container_name: nflux
