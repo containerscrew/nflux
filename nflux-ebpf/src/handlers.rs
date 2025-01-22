@@ -27,17 +27,22 @@ fn ptr_at<T>(ctx: &TcContext, offset: usize) -> Result<*const T, ()> {
 pub fn handle_icmp_packet(
     ctx: &TcContext,
     egress_config: &EgressConfig,
+    source: u32,
     destination: u32,
+    direction: u8,
 ) -> Result<i32, ()> {
     if egress_config.log_icmp_connections == 1 {
         unsafe {
             log_connection(
                 ctx,
                 egress_config.log_only_new_connections,
+                egress_config.log_refresh_new_connections_every,
+                source,
                 destination,
                 0,
                 0,
                 IpProto::Icmp as u8,
+                direction,
             )
         };
     }
@@ -48,7 +53,9 @@ pub fn handle_icmp_packet(
 pub fn handle_tcp_packet(
     ctx: &TcContext,
     egress_config: &EgressConfig,
+    source: u32,
     destination: u32,
+    direction: u8,
 ) -> Result<i32, ()> {
     let tcphdr: *const TcpHdr = ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)?;
 
@@ -61,10 +68,13 @@ pub fn handle_tcp_packet(
             log_connection(
                 ctx,
                 egress_config.log_only_new_connections,
+                egress_config.log_refresh_new_connections_every,
+                source,
                 destination,
                 src_port,
                 dst_port,
                 protocol,
+                direction,
             )
         };
     }
@@ -75,7 +85,9 @@ pub fn handle_tcp_packet(
 pub fn handle_udp_packet(
     ctx: &TcContext,
     egress_config: &EgressConfig,
+    source: u32,
     destination: u32,
+    direction: u8,
 ) -> Result<i32, ()> {
     let udphdr: *const UdpHdr = ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)?;
     let src_port = u16::from_be((unsafe { *udphdr }).source);
@@ -87,10 +99,13 @@ pub fn handle_udp_packet(
             log_connection(
                 ctx,
                 egress_config.log_only_new_connections,
+                egress_config.log_refresh_new_connections_every,
+                source,
                 destination,
                 src_port,
                 dst_port,
                 protocol,
+                direction,
             )
         };
     }

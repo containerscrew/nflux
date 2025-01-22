@@ -39,7 +39,7 @@ compose-down: ## Run docker-compose down
 	$(DOCKER_COMPOSE) -f compose.yml down
 
 remote-sync: ## Sync this repository to remote machine using rsync.
-	rsync -avzh --exclude='.git/' --exclude='target/' --exclude='.idea/' $(shell pwd)/ $(USER)@$(IP):/home/$(USER)/Documents/nflux
+	rsync -avzh --exclude='.git/' --exclude='target/' --exclude='.idea/' $(shell pwd)/ $(USER)@$(IP):/home/$(USER)/nflux
 
 install-dpkg: ## Install dpkg package
 	bash ./debian/build_deb.sh ;\

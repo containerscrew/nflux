@@ -14,7 +14,8 @@ use nflux_common::{ConnectionEvent, LpmKeyIpv4};
 
 use crate::{
     maps::{
-        ACTIVE_CONNECTIONS, FIREWALL_CONNECTION_TRACKER, FIREWALL_EVENTS, ICMP_RULE, IPV4_RULES,
+        ACTIVE_EGRESS_CONNECTIONS, FIREWALL_CONNECTION_TRACKER, FIREWALL_EVENTS, ICMP_RULE,
+        IPV4_RULES,
     },
     ptr_at,
 };
@@ -88,7 +89,7 @@ fn process_ipv4(ctx: &XdpContext) -> Result<u32, ()> {
                     // Handle ACK packets (responses to outgoing connections)
                     if ack == 1 {
                         // Allow if part of an active egress connection
-                        if let Some(_) = unsafe { ACTIVE_CONNECTIONS.get(&source_ip) } {
+                        if let Some(_) = unsafe { ACTIVE_EGRESS_CONNECTIONS.get(&source_ip) } {
                             return Ok(XDP_PASS);
                         }
                         // Allow if part of an active incoming connection
@@ -103,7 +104,7 @@ fn process_ipv4(ctx: &XdpContext) -> Result<u32, ()> {
                     // Handle SYN-ACK packets (handshake response from server)
                     if syn == 1 && ack == 1 {
                         // Allow if part of an active egress connection
-                        if let Some(_) = unsafe { ACTIVE_CONNECTIONS.get(&source_ip) } {
+                        if let Some(_) = unsafe { ACTIVE_EGRESS_CONNECTIONS.get(&source_ip) } {
                             let timestamp = unsafe { bpf_ktime_get_ns() };
                             let _ =
                                 FIREWALL_CONNECTION_TRACKER.insert(&connection_key, &timestamp, 0);

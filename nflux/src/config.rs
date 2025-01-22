@@ -37,20 +37,21 @@ pub struct Firewall {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct EgressLogging {
+pub struct MonitoringLogging {
     pub log_only_new_connections: IsEnabled,
+    pub log_refresh_new_connections_every: u32,
     pub log_udp_connections: IsEnabled,
     pub log_tcp_connections: IsEnabled,
     pub log_icmp_connections: IsEnabled,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct Egress {
+pub struct Monitoring {
     pub enabled: IsEnabled,
     pub physical_interfaces: Vec<String>,
     #[allow(dead_code)]
     pub virtual_interfaces: Vec<String>,
-    pub logging: EgressLogging,
+    pub logging: MonitoringLogging,
 }
 
 // Generic rule for both IPv4 and IPv6
@@ -75,7 +76,7 @@ pub struct LoggingConfig {
 pub struct Nflux {
     pub logging: LoggingConfig,
     pub firewall: Firewall,
-    pub egress: Egress,
+    pub monitoring: Monitoring,
 }
 
 impl Nflux {
