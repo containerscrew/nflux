@@ -10,12 +10,13 @@ Restart=on-failure
 PIDFile=/run/nflux.pid
 User=root
 Group=root
-StandardOutput=journal
-StandardError=journal
-# Alternatively, if you want to log to a file, uncomment these:
-# StandardOutput=file:/tmp/nflux.log
-# StandardError=file:/tmp/nflux.log
-# EnvironmentFile=/etc/nflux/nflux.env
+# StandardOutput=journal
+# StandardError=journal
+StandardOutput=file:/var/log/nflux/nflux.log
+StandardError=file:/var/log/nflux/nflux.log
+
+# Other
+#EnvironmentFile=/etc/nflux/nflux.env
 
 [Install]
 WantedBy=multi-user.target

@@ -16,7 +16,7 @@ cp debian/postrm deb-build/nflux/DEBIAN/
 cp nflux.toml deb-build/nflux/etc/nflux/nflux.toml
 
 # Build the Rust binary and place it in the package structure
-cargo xtask build --release
+cargo build --release
 cp target/release/nflux deb-build/nflux/usr/local/bin/
 
 # Set permissions for package files
