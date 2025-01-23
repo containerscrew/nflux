@@ -8,8 +8,9 @@ case "$1" in
     ;;
   purge)
     # Remove config and service files during a full purge
-    rm -f /etc/systemd/system/nflux.service
-    rm -rf /etc/nflux
+    rm -rf /etc/systemd/system/nflux.service
+    rm -rf /etc/nflux/nflux.toml
+    rm -rf /var/log/nflux
     systemctl daemon-reload
     ;;
 esac
