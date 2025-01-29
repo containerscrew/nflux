@@ -10,7 +10,7 @@ use nflux_common::{convert_protocol, EgressConfig, EgressEvent};
 use std::net::Ipv4Addr;
 use std::ptr;
 use std::sync::Arc;
-use tracing::{error, info, warn};
+use tracing::{error, warn};
 
 pub fn populate_egress_config(bpf: &mut Ebpf, config: Monitoring) -> anyhow::Result<()> {
     let mut egress_config = Array::<_, EgressConfig>::try_from(
@@ -121,16 +121,34 @@ pub async fn process_egress_events(
             let buf = &buffers[i];
             match parse_egress_event(buf) {
                 Ok(event) => {
-                    metrics.track_tcp_event("test", "test", "test", "test", "test");
-                    info!(
-                        "{} protocol={}, src_ip={}, dst_ip={}, src_port={}, dst_port={}",
-                        if event.direction == 0 {"ingress"} else { "egress"},
-                        convert_protocol(event.protocol),
-                        Ipv4Addr::from(event.src_ip),
-                        Ipv4Addr::from(event.dst_ip),
-                        event.src_port,
-                        event.dst_port,
-                    );
+                    if event.direction == 0 {
+                        metrics.track_ingress_event(
+                            convert_protocol(event.protocol),
+                            Ipv4Addr::from(event.src_ip).to_string().as_str(),
+                            Ipv4Addr::from(event.dst_ip).to_string().as_str(),
+                            event.src_port.to_string().as_str(),
+                            event.dst_port.to_string().as_str(),
+                        );
+                    } else {
+                        metrics.track_egress_event(
+                            convert_protocol(event.protocol),
+                            Ipv4Addr::from(event.src_ip).to_string().as_str(),
+                            Ipv4Addr::from(event.dst_ip).to_string().as_str(),
+                            event.src_port.to_string().as_str(),
+                            event.dst_port.to_string().as_str(),
+                        );
+                    }
+
+                    // By the moment, do not log, just publish metrics
+                    // info!(
+                    //     "{} protocol={}, src_ip={}, dst_ip={}, src_port={}, dst_port={}",
+                    //     if event.direction == 0 {"ingress"} else { "egress"},
+                    //     convert_protocol(event.protocol),
+                    //     Ipv4Addr::from(event.src_ip),
+                    //     Ipv4Addr::from(event.dst_ip),
+                    //     event.src_port,
+                    //     event.dst_port,
+                    // );
                 }
                 Err(e) => error!("Failed to parse egress event on CPU {}: {}", cpu_id, e),
             }
