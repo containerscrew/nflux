@@ -15,9 +15,9 @@ icmp_ping = "false" # Allow or deny ICMP ping requests
 "192.168.0.76/32" = { priority = 2, action = "deny", ports = [8080], protocol = "tcp", description = "Deny a specific IP address" }
 
 [monitoring]
-# Decide if ingres/egress traffic should be logged
+# Decide if ingres&egress traffic should be logged
 enabled = "true"
-physical_interfaces = ["enp0s20f0u4"] # Physical interfaces, your LAN interface
+physical_interfaces = ["wlo1"] # Physical interfaces, your LAN interface
 
 # Traffic sniffer for virtual interfaces like wireguard/openvpn, is not working correctly
 # If you are using a VPN, switch off if you want to use the egress logging feature

@@ -18,6 +18,8 @@ toml = "0.8.19"
 bytes = "1.8.0"
 dns-lookup = "2.0.4"
 sysinfo = "0.33.1"
+prometheus = "0.13.4"
+axum = "0.8.1"
 
 [build-dependencies]
 anyhow = { workspace = true }
