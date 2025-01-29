@@ -63,7 +63,7 @@ async fn main() -> anyhow::Result<()> {
     let app_state = Arc::new(Mutex::new(registry.clone()));
 
     // Start the API in the background
-    let api_handle = tokio::spawn(start_api(app_state.clone()));
+    tokio::spawn(start_api(app_state.clone()));
 
 
     // Attach XDP program (monitor ingress connections to local ports)
