@@ -8,8 +8,8 @@ pub struct Metrics {
 
 impl Metrics {
     pub fn new(registry: &Registry) -> Arc<Self> {
-        let ingress_connection = Opts::new("ingress_connections", "Total number of ingress connections.");
-        let egress_connection = Opts::new("egress_connections", "Total number of egress connections.");
+        let ingress_connection = Opts::new("ingress_connections", "Register new ingress connections.");
+        let egress_connection = Opts::new("egress_connections", "Register new egress connections.");
 
         let ingress_connection = IntCounterVec::new(ingress_connection, &["protocol", "src_addr", "dst_addr", "src_port", "dst_port"])
             .expect("Failed to create ingress connection counter");
