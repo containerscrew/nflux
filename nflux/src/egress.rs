@@ -1,4 +1,5 @@
 use crate::config::{IsEnabled, Monitoring};
+use crate::prometheus::Metrics;
 use anyhow::Context;
 use aya::maps::perf::{AsyncPerfEventArrayBuffer, PerfBufferError};
 use aya::maps::{Array, MapData};
@@ -8,6 +9,7 @@ use bytes::BytesMut;
 use nflux_common::{convert_protocol, EgressConfig, EgressEvent};
 use std::net::Ipv4Addr;
 use std::ptr;
+use std::sync::Arc;
 use tracing::{error, info, warn};
 
 pub fn populate_egress_config(bpf: &mut Ebpf, config: Monitoring) -> anyhow::Result<()> {
@@ -106,6 +108,7 @@ pub fn attach_tc_program(
 pub async fn process_egress_events(
     mut buf: AsyncPerfEventArrayBuffer<MapData>,
     cpu_id: u32,
+    metrics: Arc<Metrics>,
 ) -> Result<(), PerfBufferError> {
     let mut buffers = vec![BytesMut::with_capacity(1024); 10];
 
@@ -118,6 +121,7 @@ pub async fn process_egress_events(
             let buf = &buffers[i];
             match parse_egress_event(buf) {
                 Ok(event) => {
+                    metrics.track_tcp_event("test", "test", "test", "test", "test");
                     info!(
                         "{} protocol={}, src_ip={}, dst_ip={}, src_port={}, dst_port={}",
                         if event.direction == 0 {"ingress"} else { "egress"},

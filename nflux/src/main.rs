@@ -3,14 +3,22 @@ mod egress;
 mod firewall;
 mod logger;
 mod utils;
+mod prometheus;
 
 use anyhow::Context;
+use axum::extract::State;
+use axum::routing::get;
+use axum::Router;
 use aya::maps::AsyncPerfEventArray;
 use aya::programs::TcAttachType;
 use aya::util::online_cpus;
 use aya::{include_bytes_aligned, Ebpf};
 use egress::{attach_tc_program, populate_egress_config};
+use prometheus::Metrics;
+use ::prometheus::{Encoder, Registry, TextEncoder};
+use std::net::SocketAddr;
 use std::process;
+use std::sync::{Arc, Mutex};
 
 use crate::egress::process_egress_events;
 use config::{Firewall, IsEnabled, Monitoring, Nflux};
@@ -48,6 +56,16 @@ async fn main() -> anyhow::Result<()> {
     //     warn!("failed to initialize eBPF logger: {}", e);
     // }
 
+    // Prometheus metrics
+    let registry = Registry::new();
+    let metrics = Metrics::new(&registry);
+
+    let app_state = Arc::new(Mutex::new(registry.clone()));
+
+    // Start the API in the background
+    let api_handle = tokio::spawn(start_api(app_state.clone()));
+
+
     // Attach XDP program (monitor ingress connections to local ports)
     start_firewall(&mut bpf, config.firewall)?;
 
@@ -76,7 +94,7 @@ async fn main() -> anyhow::Result<()> {
         // Spawn task for egress events
         {
             let buf = egress_events.open(cpu_id, None)?;
-            task::spawn(process_egress_events(buf, cpu_id));
+            task::spawn(process_egress_events(buf, cpu_id, metrics.clone()));
         }
     }
 
@@ -85,6 +103,34 @@ async fn main() -> anyhow::Result<()> {
     wait_for_shutdown().await?;
     Ok(())
 }
+
+// API function
+async fn start_api(state: Arc<Mutex<Registry>>) {
+    let app = Router::new()
+        .route("/metrics", get(metrics_handler))
+        .with_state(state);
+
+    let addr = SocketAddr::from(([0, 0, 0, 0], 8080));
+    info!("Metrics server running at http://{}", addr);
+    let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
+    axum::serve(
+        listener,
+        // Don't forget to add `ConnectInfo` if you aren't behind a proxy
+        app.into_make_service_with_connect_info::<SocketAddr>(),
+    )
+    .await
+    .unwrap();
+}
+
+// `/metrics` handler
+async fn metrics_handler(State(state): State<Arc<Mutex<Registry>>>) -> String {
+    let encoder = TextEncoder::new();
+    let registry = state.lock().unwrap();
+    let mut buffer = Vec::new();
+    encoder.encode(&registry.gather(), &mut buffer).unwrap();
+    String::from_utf8(buffer).unwrap()
+}
+
 
 fn start_firewall(bpf: &mut Ebpf, config: Firewall) -> Result<(), anyhow::Error> {
     match config.enabled {
@@ -123,13 +169,24 @@ fn start_traffic_control(bpf: &mut Ebpf, config: Monitoring) -> Result<(), anyho
             }
 
             // Virtual interface is not working fine ATM
-            // if !config.virtual_interfaces.is_empty() {
-            //     info!(
-            //         "Attaching TC egress program to virtual interfaces: {:?}",
-            //         config.virtual_interfaces
-            //     );
-            //     attach_tc_egress_program(bpf, "tc_egress_virtual", &config.virtual_interfaces)?;
-            // }
+            if !config.virtual_interfaces.is_empty() {
+                info!(
+                    "Attaching TC egress program to virtual interfaces: {:?}",
+                    config.virtual_interfaces
+                );
+                attach_tc_program(
+                    bpf,
+                    "tc_egress_virtual",
+                    &config.virtual_interfaces,
+                    TcAttachType::Egress,
+                )?;
+                attach_tc_program(
+                    bpf,
+                    "tc_ingress_virtual",
+                    &config.virtual_interfaces,
+                    TcAttachType::Ingress,
+                )?;
+            }
             populate_egress_config(bpf, config)?;
             info!("TC egress started successfully!")
         }
