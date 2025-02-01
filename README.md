@@ -8,8 +8,7 @@
 **Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
 - [Nflux architecture](#nflux-architecture)
 - [Features](#features)
-- [Installation](#installation)
-  - [Requirements](#requirements)
+- [Running `nflux`](#running-nflux)
 - [Local development](#local-development)
 - [Contribution](#contribution)
 - [License](#license)
@@ -27,38 +26,26 @@ Powerful, right? Same for traffic control (TC).
 ![tc](./tc.png)
 
 > [!NOTE]
-> nflux uses XDP for incoming packet processing (only works with physical interfaces). For outgoing packets, it uses TC. If you want to use it with a virtual interface, you need to use the `tc` mode which is not implemented yet.
+> nflux uses XDP for incoming packet processing (only works with physical interfaces).
 
 # Features
 
 Pending to add...
 
-# Installation
-
-## Requirements
-
-* Docker
-
-By the moment, the quickest way to install **`nflux`** is using containers. Let's see how to run `nflux` with `docker-compose`.
-
-```bash
-git clone https://github.com/containerscrew/nflux.git
-make compose-build
-```
-
-Before running the container, you need to edit the configuration file [`nflux.toml`](./nflux.toml). The most important configuration is the `interface` name.
-
-```bash
-ip link show # get the name of your PHYSICAL interface
-# Once is changes in the conf file, lets run nflux
-make compose-up
-```
+# Running `nflux`
 
 > [!WARNING]
 > In Fedora, where selinux is enforced by default, I'm having some problems.
 > Quick fix (not secure): `sudo setenforce 0`
 
-> By default, nflux will allow SSH (22) connections from any IP. Avoid blocking your SSH connection if testing in remote servers (VPS).
+```bash
+ip link show # get the name of your PHYSICAL interface
+# edit nflux.toml and set your physical interface
+```
+
+> Monitoring for VPN interfaces like wireguard, not working properly yet
+
+By the moment, run `nflux` locally (see next [local-dev](https://github.com/containerscrew/nflux?tab=readme-ov-file#local-development))
 
 # Local development
 
