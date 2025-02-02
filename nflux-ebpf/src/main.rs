@@ -2,10 +2,8 @@
 #![no_main]
 #![allow(nonstandard_style, dead_code)]
 
-mod egress;
-mod firewall;
-mod handlers;
-mod logger;
+mod xdp_firewall;
+mod traffic_control;
 mod maps;
 
 use aya_ebpf::bindings::xdp_action::XDP_ABORTED;
@@ -13,11 +11,11 @@ use aya_ebpf::bindings::TC_ACT_SHOT;
 use aya_ebpf::macros::classifier;
 use aya_ebpf::programs::TcContext;
 use aya_ebpf::{macros::xdp, programs::XdpContext};
-use core::mem;
-use egress::{try_tc_physical, try_tc_virtual};
-use firewall::start_firewall;
+use xdp_firewall::firewall::start_firewall;
+use traffic_control::egress::try_tc_physical;
+use crate::traffic_control::egress::try_tc_virtual;
 
-// Start xdp firewall if enabled. Attach this program to the physical interface
+// Start xdp xdp_firewall if enabled. Attach this program to the physical interface
 #[xdp]
 pub fn xdp_firewall(ctx: XdpContext) -> u32 {
     match start_firewall(ctx) {
@@ -26,7 +24,7 @@ pub fn xdp_firewall(ctx: XdpContext) -> u32 {
     }
 }
 
-// Start traffic control egress for phisical interface if enabled.
+// Start traffic control egress for physical interface if enabled.
 #[classifier]
 pub fn tc_egress_physical(ctx: TcContext) -> i32 {
     try_tc_physical(ctx, 1).unwrap_or_else(|_| TC_ACT_SHOT)
@@ -38,6 +36,7 @@ pub fn tc_ingress_physical(ctx: TcContext) -> i32 {
 }
 
 // Start traffic control egress for virtual interface if enabled.
+// THIS IS NOT WORKING YET
 #[classifier]
 pub fn tc_egress_virtual(ctx: TcContext) -> i32 {
     try_tc_virtual(ctx, 1).unwrap_or_else(|_| TC_ACT_SHOT)
@@ -46,19 +45,6 @@ pub fn tc_egress_virtual(ctx: TcContext) -> i32 {
 #[classifier]
 pub fn tc_ingress_virtual(ctx: TcContext) -> i32 {
     try_tc_virtual(ctx, 0).unwrap_or_else(|_| TC_ACT_SHOT)
-}
-
-#[inline(always)]
-unsafe fn ptr_at<T>(ctx: &XdpContext, offset: usize) -> Result<*const T, ()> {
-    let start = ctx.data();
-    let end = ctx.data_end();
-    let len = mem::size_of::<T>();
-
-    if start + offset + len > end {
-        return Err(());
-    }
-
-    Ok((start + offset) as *const T)
 }
 
 #[cfg(not(test))]

@@ -10,7 +10,58 @@ use nflux_common::{convert_protocol, EgressConfig, EgressEvent};
 use std::net::Ipv4Addr;
 use std::ptr;
 use std::sync::Arc;
-use tracing::{error, warn};
+use tracing::{error, info, warn};
+
+pub fn start_traffic_control(bpf: &mut Ebpf, config: Monitoring) -> Result<(), anyhow::Error> {
+    match config.enabled {
+        IsEnabled::True => {
+            if !config.physical_interfaces.is_empty() {
+                info!(
+                    "Attaching TC egress program to physical interfaces: {:?}",
+                    config.physical_interfaces
+                );
+                attach_tc_program(
+                    bpf,
+                    "tc_egress_physical",
+                    &config.physical_interfaces,
+                    TcAttachType::Egress,
+                )?;
+                attach_tc_program(
+                    bpf,
+                    "tc_ingress_physical",
+                    &config.physical_interfaces,
+                    TcAttachType::Ingress,
+                )?;
+            }
+
+            // Virtual interface is not working fine ATM
+            if !config.virtual_interfaces.is_empty() {
+                info!(
+                    "Attaching TC egress program to virtual interfaces: {:?}",
+                    config.virtual_interfaces
+                );
+                attach_tc_program(
+                    bpf,
+                    "tc_egress_virtual",
+                    &config.virtual_interfaces,
+                    TcAttachType::Egress,
+                )?;
+                attach_tc_program(
+                    bpf,
+                    "tc_ingress_virtual",
+                    &config.virtual_interfaces,
+                    TcAttachType::Ingress,
+                )?;
+            }
+            populate_egress_config(bpf, config)?;
+            info!("TC egress started successfully!")
+        }
+        IsEnabled::False => {
+            info!("Egress not enabled");
+        }
+    }
+    Ok(())
+}
 
 pub fn populate_egress_config(bpf: &mut Ebpf, config: Monitoring) -> anyhow::Result<()> {
     let mut egress_config = Array::<_, EgressConfig>::try_from(

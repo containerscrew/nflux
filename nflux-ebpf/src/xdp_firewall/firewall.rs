@@ -1,3 +1,4 @@
+use core::mem;
 use aya_ebpf::{
     bindings::xdp_action::{XDP_DROP, XDP_PASS},
     helpers::bpf_ktime_get_ns,
@@ -17,8 +18,20 @@ use crate::{
         ACTIVE_EGRESS_CONNECTIONS, FIREWALL_CONNECTION_TRACKER, FIREWALL_EVENTS, ICMP_RULE,
         IPV4_RULES,
     },
-    ptr_at,
 };
+
+#[inline(always)]
+unsafe fn ptr_at<T>(ctx: &XdpContext, offset: usize) -> Result<*const T, ()> {
+    let start = ctx.data();
+    let end = ctx.data_end();
+    let len = mem::size_of::<T>();
+
+    if start + offset + len > end {
+        return Err(());
+    }
+
+    Ok((start + offset) as *const T)
+}
 
 pub fn start_firewall(ctx: XdpContext) -> Result<u32, ()> {
     let ethhdr: *const EthHdr = unsafe { ptr_at(&ctx, 0)? };

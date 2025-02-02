@@ -2,8 +2,8 @@ use std::collections::HashMap;
 use std::net::Ipv4Addr;
 use std::ptr;
 
-use crate::config::{Action, FirewallRules, IsEnabled, Protocol};
-use crate::utils::{parse_cidr_v4, parse_cidr_v6};
+use crate::config::{Action, Firewall, FirewallRules, IsEnabled, Protocol};
+use crate::utils::{parse_cidr_v4, parse_cidr_v6, print_firewall_rules};
 use anyhow::Context;
 use aya::maps::lpm_trie::Key;
 use aya::maps::perf::{AsyncPerfEventArrayBuffer, PerfBufferError};
@@ -12,6 +12,20 @@ use aya::Ebpf;
 use bytes::BytesMut;
 use nflux_common::{convert_protocol, ConnectionEvent, IpRule, LpmKeyIpv4, LpmKeyIpv6};
 use tracing::{error, info};
+
+pub fn start_firewall(bpf: &mut Ebpf, config: Firewall) -> Result<(), anyhow::Error> {
+    match config.enabled {
+        IsEnabled::True => {
+            attach_xdp_program(bpf, config.icmp_ping, &config.rules, &config.interfaces)?;
+            info!("Firewall started successfully!");
+            print_firewall_rules(config.rules);
+        }
+        IsEnabled::False => {
+            info!("Firewall not enabled");
+        }
+    }
+    Ok(())
+}
 
 pub fn populate_icmp_rule(bpf: &mut Ebpf, icmp_ping: IsEnabled) -> anyhow::Result<()> {
     let mut settings_map = Array::<_, u32>::try_from(
