@@ -4,8 +4,8 @@ use network_types::eth::{EthHdr, EtherType};
 use network_types::ip::{IpProto, Ipv4Hdr};
 use nflux_common::EgressConfig;
 
-use crate::handlers::{handle_icmp_packet, handle_tcp_packet, handle_udp_packet};
 use crate::maps::EGRESS_CONFIG;
+use crate::traffic_control::handlers::{handle_icmp_packet, handle_tcp_packet, handle_udp_packet};
 
 fn handle_ipv4_packet(
     ctx: &TcContext,

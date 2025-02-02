@@ -3,20 +3,21 @@ log_level = "info" # trace, debug, info, warn, or error (default: info)
 log_type = "text"  # text or json (default: text)
 
 [firewall]
-enabled = "false" # Decide if the firewall is enabled or not
-interfaces = ["enp0s20f0u4"] # Interfaces to protect (can be only physical interfaces)
-icmp_ping = "false" # Allow or deny ICMP ping requests
+enabled = "true" # Decide if the xdp_firewall is enabled or not
+interfaces = ["enp1s0"] # Interfaces to protect (can be only physical interfaces)
+icmp_ping = "true" # Allow or deny ICMP ping requests
 
 [firewall.rules]
 # The /32 CIDR block is used to represent a single IP address rather than a range
 # The /128 CIDR block is used to represent a single IPv6 address rather than a range
 # The priority is used to determine the order in which rules are applied. Lower numbers are applied first.
-"192.168.0.0/24" = { priority = 1, action = "allow", ports = [22], protocol = "tcp", description = "Allow ssh from entire local net" }
-"192.168.0.76/32" = { priority = 2, action = "deny", ports = [8080], protocol = "tcp", description = "Deny a specific IP address" }
+"0.0.0.0/24" = { priority = 1, action = "allow", ports = [22], protocol = "tcp", description = "Default allow 22 from anywhere" }
+"192.168.0.0/24" = { priority = 2, action = "allow", ports = [3306], protocol = "tcp", description = "Allow mysql port from entire local net"}
+"192.168.0.76/32" = { priority = 3, action = "deny", ports = [8080], protocol = "tcp", description = "Deny a specific IP address" }
 
 [monitoring]
 # Decide if ingres&egress traffic should be logged
-enabled = "true"
+enabled = "false"
 physical_interfaces = ["wlo1"] # Physical interfaces, your LAN interface
 
 # Traffic sniffer for virtual interfaces like wireguard/openvpn, is not working correctly
@@ -28,7 +29,7 @@ virtual_interfaces = [] # If using VPN, add the virtual interface here
 # log_only_new_connections:
 # For example, if you perform 1000 requests to google.com, just log 1 (or every you execute)
 # This affects to tcp and udp connections
-# This affects to ingress/egress. By the moment is not splitted
+# This affects to ingress/egress. By the moment is not split
 log_only_new_connections = "true"
 log_refresh_new_connections_every = 5 # Refresh the new connections every X seconds
 log_udp_connections = "false" # Decide if udp packets should be logged
