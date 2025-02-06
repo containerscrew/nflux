@@ -9,7 +9,7 @@ pub mod utils;
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct EgressConfig {
+pub struct TcConfig {
     pub log_only_new_connections: u8, // 0 = no, 1 = yes
     pub log_refresh_new_connections_every: u32,
     pub log_udp_connections: u8,  // 0 = no, 1 = yes
@@ -28,7 +28,7 @@ pub struct ConnectionEvent {
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct EgressEvent {
+pub struct TcEvent {
     pub src_ip: u32,
     pub dst_ip: u32,
     pub src_port: u16,
@@ -67,7 +67,7 @@ pub mod user {
     unsafe impl aya::Pod for IpRule {}
     unsafe impl aya::Pod for LpmKeyIpv4 {}
     unsafe impl aya::Pod for LpmKeyIpv6 {}
-    unsafe impl aya::Pod for EgressConfig {}
+    unsafe impl aya::Pod for TcConfig {}
 }
 
 pub fn convert_protocol(protocol: u8) -> &'static str {

@@ -15,6 +15,7 @@
 - [Nflux architecture](#nflux-architecture)
 - [Features](#features)
 - [Running `nflux`](#running-nflux)
+- [Example](#example)
 - [Local development](#local-development)
 - [Contribution](#contribution)
 - [License](#license)
@@ -40,18 +41,30 @@ Pending to add...
 
 # Running `nflux`
 
-> [!WARNING]
-> In Fedora, where selinux is enforced by default, I'm having some problems.
-> Quick fix (not secure): `sudo setenforce 0`
-
 ```bash
-ip link show # get the name of your PHYSICAL interface
-# edit nflux.toml and set your physical interface
+git clone https://github.com/containerscrew/nflux
+cargo run --release --config 'target."cfg(all())".runner="sudo -E"' -- -l info -i interface
 ```
 
-> Monitoring for VPN interfaces like wireguard, not working properly yet
+# Example
 
-By the moment, run `nflux` locally (see next [local-dev](https://github.com/containerscrew/nflux?tab=readme-ov-file#local-development))
+```bash
+2025-02-06T19:54:47.766496Z  INFO Starting nflux with pid 30730
+2025-02-06T19:54:47.798298Z  INFO Metrics server running at http://0.0.0.0:8080
+2025-02-06T19:54:47.798299Z  WARN Failed to add clsact qdisc to interface enp0s20f0u4: Os { code: 17, kind: AlreadyExists, message: "File exists" }
+2025-02-06T19:54:47.811127Z  INFO tc_egress program attached to interfaces: ["enp0s20f0u4"]
+2025-02-06T19:54:47.811301Z  WARN Failed to add clsact qdisc to interface enp0s20f0u4: Os { code: 17, kind: AlreadyExists, message: "File exists" }
+2025-02-06T19:54:47.820409Z  INFO tc_ingress program attached to interfaces: ["enp0s20f0u4"]
+2025-02-06T19:54:47.821857Z  INFO Waiting for Ctrl-C...
+2025-02-06T19:54:48.451749Z  INFO ingress protocol=udp, src_ip=192.168.0.17, dst_ip=192.168.0.255, src_port=43033, dst_port=15600
+2025-02-06T19:54:49.230114Z  INFO ingress protocol=udp, src_ip=130.195.250.66, dst_ip=192.168.0.173, src_port=443, dst_port=53227
+2025-02-06T19:54:49.230163Z  INFO egress protocol=icmp, src_ip=192.168.0.173, dst_ip=130.195.250.66, src_port=0, dst_port=0
+2025-02-06T19:54:49.248876Z  INFO ingress protocol=udp, src_ip=192.168.0.25, dst_ip=224.0.0.251, src_port=5353, dst_port=5353
+2025-02-06T19:54:50.909479Z  INFO egress protocol=udp, src_ip=192.168.0.173, dst_ip=212.166.132.192, src_port=50317, dst_port=53
+2025-02-06T19:54:52.046784Z  INFO ingress protocol=udp, src_ip=192.168.0.13, dst_ip=224.0.0.251, src_port=5353, dst_port=5353
+2025-02-06T19:54:52.409551Z  INFO egress protocol=udp, src_ip=192.168.0.173, dst_ip=212.166.132.96, src_port=58047, dst_port=53
+2025-02-06T19:58:16.209343Z  INFO ingress protocol=icmp, src_ip=1.1.1.1, dst_ip=192.168.0.173, src_port=0, dst_port=0
+```
 
 # Local development
 
