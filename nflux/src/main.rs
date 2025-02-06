@@ -1,18 +1,26 @@
 use std::process;
-
+use std::sync::{Arc, Mutex};
+use anyhow::Context;
 use aya::{include_bytes_aligned, Ebpf};
+use aya::maps::AsyncPerfEventArray;
+use aya::util::online_cpus;
 use clap::Parser;
+use prometheus::Registry;
+use tokio::task;
 use cli::Cli;
 use logger::{setup_logger, LogFormat};
 use tracing::{error, info};
 use traffic_control::start_traffic_control;
 use utils::{is_root_user, set_mem_limit, wait_for_shutdown};
-
+use crate::metrics::{start_api, Metrics};
+use crate::traffic_control::process_egress_events;
 
 mod cli;
 mod logger;
 mod utils;
 mod traffic_control;
+
+mod metrics;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -43,13 +51,13 @@ async fn main() -> anyhow::Result<()> {
     // // }
 
     // Prometheus metrics
-    // let registry = Registry::new();
-    // let metrics = Metrics::new(&registry);
+    let registry = Registry::new();
+    let metrics = Metrics::new(&registry);
 
-    // let app_state = Arc::new(Mutex::new(registry.clone()));
+    let app_state = Arc::new(Mutex::new(registry.clone()));
 
-    // // Start the API in the background
-    // tokio::spawn(start_api(app_state.clone()));
+    // Start the API in the background
+    tokio::spawn(start_api(app_state.clone()));
 
     // Attach TC program (monitor egress connections)
     start_traffic_control(&mut bpf, cli.interfaces)?;
@@ -60,26 +68,17 @@ async fn main() -> anyhow::Result<()> {
     //         .context("Failed to find CONNECTION_EVENTS map")?,
     // )?;
 
-    // let mut egress_events = AsyncPerfEventArray::try_from(
-    //     bpf.take_map("EGRESS_EVENT")
-    //         .context("Failed to find EGRESS_EVENT map")?,
-    // )?;
+    let mut egress_events = AsyncPerfEventArray::try_from(
+        bpf.take_map("TC_EVENT")
+            .context("Failed to find EGRESS_EVENT map")?,
+    )?;
 
-    // // Spawn tasks for each CPU
-    // let cpus = online_cpus().map_err(|(_, error)| error)?;
-    // for cpu_id in cpus {
-    //     // Spawn task for xdp_firewall events
-    //     {
-    //         let buf = firewall_events.open(cpu_id, None)?;
-    //         task::spawn(process_firewall_events(buf, cpu_id));
-    //     }
-
-    //     // Spawn task for traffic control events
-    //     {
-    //         let buf = egress_events.open(cpu_id, None)?;
-    //         task::spawn(process_egress_events(buf, cpu_id, metrics.clone()));
-    //     }
-    // }
+    // Spawn tasks for each CPU
+    let cpus = online_cpus().map_err(|(_, error)| error)?;
+    for cpu_id in cpus {
+        let buf = egress_events.open(cpu_id, None)?;
+        task::spawn(process_egress_events(buf, cpu_id, metrics.clone()));
+    }
 
     // // Wait for shutdown signal
     // // This will be removed in future versions, specially for container solution

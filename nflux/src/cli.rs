@@ -28,4 +28,20 @@ pub struct Cli {
         required = true
     )]
     pub interfaces: Vec<String>,
+
+    #[arg(
+        long = "disable-egress",
+        help = "Disable egress",
+        default_value_t = false,
+        required = false
+    )]
+    pub disable_egress: bool,
+
+    #[arg(
+        long = "disable-ingress",
+        help = "Disable ingress",
+        default_value_t = true,
+        required = false
+    )]
+    pub disable_ingress: bool,
 }
