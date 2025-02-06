@@ -1,7 +1,13 @@
 use tracing::Level;
 use tracing_subscriber::fmt::format::FmtSpan;
 
-pub fn setup_logger(log_level: &str, format: &str) {
+pub enum LogFormat {
+    #[allow(dead_code)]
+    Json,
+    Text,
+}
+
+pub fn setup_logger(log_level: &str, log_format: LogFormat) {
     // Match the log level
     // TODO: validate log level
     let log_level = match log_level {
@@ -22,9 +28,8 @@ pub fn setup_logger(log_level: &str, format: &str) {
         .with_target(false);
 
     // JSON or text format (default to JSON for container environments)
-    if format == "json" {
-        base_subscriber.json().init();
-    } else {
-        base_subscriber.init();
+    match log_format {
+        LogFormat::Json => base_subscriber.json().init(),
+        _ => base_subscriber.init(),
     }
 }

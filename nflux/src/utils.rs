@@ -9,7 +9,6 @@ use sysinfo::{Pid, System};
 use tokio::signal;
 use tracing::{info, warn};
 
-use crate::config::FirewallRules;
 
 // Check if the current user ID is 0 (root)
 pub fn is_root_user() -> bool {
@@ -28,18 +27,11 @@ pub fn set_mem_limit() {
     }
 }
 
-pub fn print_firewall_rules(rules: HashMap<String, FirewallRules>) {
-    info!("Firewall rules:");
-    for (key, value) in rules {
-        info!("CIDR: {:?}, Rule: {:?}", key, value);
-    }
-}
-
 pub async fn wait_for_shutdown() -> anyhow::Result<()> {
     let ctrl_c = signal::ctrl_c();
     info!("Waiting for Ctrl-C...");
     ctrl_c.await?;
-    warn!("Exiting...");
+    warn!("You press Ctrl-C, shutting down nflux...");
     Ok(())
 }
 
