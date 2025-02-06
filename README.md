@@ -15,7 +15,6 @@
 - [nflux](#nflux)
 - [Running `nflux`](#running-nflux)
 - [Features](#features)
-- [Nflux architecture](#nflux-architecture)
 - [Local development](#local-development)
 - [Contribution](#contribution)
 - [License](#license)
@@ -55,19 +54,6 @@ cargo run --release --config 'target."cfg(all())".runner="sudo -E"' -- -l info -
 # Features
 
 Pending to add...
-
-# Nflux architecture
-
-Look at what level it works XDP:
-
-![xdp](./xdp.png)
-
-Powerful, right? Same for traffic control (TC).
-
-![tc](./tc.png)
-
-> [!NOTE]
-> nflux uses XDP for incoming packet processing (only works with physical interfaces).
 
 # Local development
 
