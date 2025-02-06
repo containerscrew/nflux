@@ -43,7 +43,7 @@
 
 # Running `nflux`
 
-> ![NOTE]
+> [!NOTE]
 > Setup [local development](./docs/local_dev.md) before using `nflux`
 > Is the only way by the moment
 
