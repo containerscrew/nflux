@@ -11,7 +11,7 @@ icmp_ping = "true" # Allow or deny ICMP ping requests
 # The /32 CIDR block is used to represent a single IP address rather than a range
 # The /128 CIDR block is used to represent a single IPv6 address rather than a range
 # The priority is used to determine the order in which rules are applied. Lower numbers are applied first.
-"0.0.0.0/24" = { priority = 1, action = "allow", ports = [22], protocol = "tcp", description = "Default allow 22 from anywhere" }
+"0.0.0.0/0" = { priority = 1, action = "allow", ports = [22], protocol = "tcp", description = "Default allow 22 from anywhere" }
 "192.168.0.0/24" = { priority = 2, action = "allow", ports = [3306], protocol = "tcp", description = "Allow mysql port from entire local net"}
 "192.168.0.76/32" = { priority = 3, action = "deny", ports = [8080], protocol = "tcp", description = "Deny a specific IP address" }
 
