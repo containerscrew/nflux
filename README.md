@@ -43,8 +43,13 @@
 
 # Running `nflux`
 
+> ![NOTE]
+> Setup [local development](./docs/local_dev.md) before using `nflux`
+> Is the only way by the moment
+
 ```bash
 git clone https://github.com/containerscrew/nflux
+make local-build
 cargo run --release --config 'target."cfg(all())".runner="sudo -E"' -- -l info -i interface
 ```
 
