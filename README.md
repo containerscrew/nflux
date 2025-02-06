@@ -12,41 +12,16 @@
 
 <!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
 **Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
-- [Nflux architecture](#nflux-architecture)
-- [Features](#features)
+- [nflux](#nflux)
 - [Running `nflux`](#running-nflux)
-- [Example](#example)
+- [Features](#features)
+- [Nflux architecture](#nflux-architecture)
 - [Local development](#local-development)
 - [Contribution](#contribution)
 - [License](#license)
 <!-- END OF TOC -->
 
-
-# Nflux architecture
-
-Look at what level it works XDP:
-
-![xdp](./xdp.png)
-
-Powerful, right? Same for traffic control (TC).
-
-![tc](./tc.png)
-
-> [!NOTE]
-> nflux uses XDP for incoming packet processing (only works with physical interfaces).
-
-# Features
-
-Pending to add...
-
-# Running `nflux`
-
-```bash
-git clone https://github.com/containerscrew/nflux
-cargo run --release --config 'target."cfg(all())".runner="sudo -E"' -- -l info -i interface
-```
-
-# Example
+# nflux
 
 ```bash
 2025-02-06T19:54:47.766496Z  INFO Starting nflux with pid 30730
@@ -65,6 +40,30 @@ cargo run --release --config 'target."cfg(all())".runner="sudo -E"' -- -l info -
 2025-02-06T19:54:52.409551Z  INFO egress protocol=udp, src_ip=192.168.0.173, dst_ip=212.166.132.96, src_port=58047, dst_port=53
 2025-02-06T19:58:16.209343Z  INFO ingress protocol=icmp, src_ip=1.1.1.1, dst_ip=192.168.0.173, src_port=0, dst_port=0
 ```
+
+# Running `nflux`
+
+```bash
+git clone https://github.com/containerscrew/nflux
+cargo run --release --config 'target."cfg(all())".runner="sudo -E"' -- -l info -i interface
+```
+
+# Features
+
+Pending to add...
+
+# Nflux architecture
+
+Look at what level it works XDP:
+
+![xdp](./xdp.png)
+
+Powerful, right? Same for traffic control (TC).
+
+![tc](./tc.png)
+
+> [!NOTE]
+> nflux uses XDP for incoming packet processing (only works with physical interfaces).
 
 # Local development
 
