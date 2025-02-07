@@ -5,7 +5,7 @@ use aya::{programs::{tc, SchedClassifier, TcAttachType}, Ebpf};
 use aya::maps::MapData;
 use aya::maps::perf::{AsyncPerfEventArrayBuffer, PerfBufferError};
 use bytes::BytesMut;
-use tracing::{error, info, warn};
+use tracing::{debug, error, info, warn};
 use nflux_common::{convert_protocol, TcEvent};
 use crate::metrics::Metrics;
 
@@ -145,7 +145,7 @@ pub fn attach_tc_program(
     for interface in interfaces {
         // Add clsact qdisc to the interface
         if let Err(e) = tc::qdisc_add_clsact(interface) {
-            warn!(
+            debug!(
                 "Failed to add clsact qdisc to interface {}: {:?}",
                 interface, e
             );
