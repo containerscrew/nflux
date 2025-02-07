@@ -65,6 +65,7 @@ async fn main() -> anyhow::Result<()> {
         disable_egress: if cli.disable_private_ips { 1 } else { 0 },
         disable_ingress: if cli.disable_private_ips { 1 } else { 0 },
         disable_private_ips: if cli.disable_private_ips { 1 } else { 0 },
+        disable_udp: if cli.disable_udp { 1 } else { 0 },
     };
 
     // Attach TC program (monitor egress connections)
