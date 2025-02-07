@@ -11,8 +11,8 @@ pub unsafe fn log_connection(
     dst_port: u16,
     protocol: u8,
     direction: u8, // 0: ingress, 1: egress
+    pid: u32,
 ) {
-    //let current_time = (bpf_ktime_get_ns() / 1_000_000_000) as u32; // Convert to seconds
 
     let event = TcEvent {
         src_ip: source,
@@ -21,6 +21,7 @@ pub unsafe fn log_connection(
         dst_port,
         protocol,
         direction,
+        pid
     };
 
     TC_EVENT.output(ctx, &event, 0);
