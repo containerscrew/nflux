@@ -17,7 +17,14 @@ fn handle_ipv4_packet(
 
     match ipv4hdr.proto {
         IpProto::Tcp => handle_tcp_packet(ctx,  source, destination, direction, configmap),
-        IpProto::Udp => handle_udp_packet(ctx,  source, destination, direction, configmap),
+        IpProto::Udp => {
+            if configmap.disable_udp == 0 {
+                handle_udp_packet(ctx, source, destination, direction, configmap)
+            } else {
+                // UDP traffic monitoring is disabled
+                Ok(TC_ACT_PIPE)
+            }
+        },
         IpProto::Icmp => handle_icmp_packet(ctx, source, destination, direction),
         _ => Ok(TC_ACT_PIPE),
     }

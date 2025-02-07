@@ -7,6 +7,7 @@ pub struct TcConfig {
     pub disable_egress: u8, // 0 = no, 1 = yes
     pub disable_ingress: u32, // 0 = no, 1 = yes
     pub disable_private_ips: u8,  // 0 = no, 1 = yes
+    pub disable_udp: u8, // 0 = no, 1 = yes
 }
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
