@@ -35,7 +35,7 @@ async fn main() -> anyhow::Result<()> {
     // Ensure the program is run as root
     if !is_root_user() {
         error!("This program must be run as root.");
-        std::process::exit(1);
+        process::exit(1);
     }
 
     // Welcome message

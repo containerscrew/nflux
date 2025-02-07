@@ -71,7 +71,7 @@ pub fn _lookup_address(ip: u32) -> String {
     }
 }
 
-pub fn _get_process_name(pid: u64) -> String {
+pub fn get_process_name(pid: u32) -> String {
     let mut s = System::new_all();
 
     // Is this causing overhead?

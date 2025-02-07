@@ -9,6 +9,7 @@ use bytes::BytesMut;
 use tracing::{debug, error, info, warn};
 use nflux_common::{convert_protocol, TcConfig, TcEvent};
 use crate::metrics::Metrics;
+use crate::utils::get_process_name;
 
 pub fn start_traffic_control(
     bpf: &mut Ebpf, interfaces: Vec<String>,
@@ -128,13 +129,15 @@ pub async fn process_egress_events(
                 Ok(event) => {
                     // Log the connection
                     info!(
-                        "{} protocol={}, src_ip={}, dst_ip={}, src_port={}, dst_port={}",
+                        "direction={} protocol={}, src_ip={}, dst_ip={}, src_port={}, dst_port={}, pid={}, comm={}",
                         if event.direction == 0 {"ingress"} else { "egress"},
                         convert_protocol(event.protocol),
                         Ipv4Addr::from(event.src_ip),
                         Ipv4Addr::from(event.dst_ip),
                         event.src_port,
                         event.dst_port,
+                        event.pid,
+                        get_process_name(event.pid),
                     );
                     // if event.direction == 0 {
                     //     metrics.track_ingress_event(

@@ -1,14 +1,14 @@
 use core::mem;
 
 use aya_ebpf::{bindings::TC_ACT_PIPE, programs::TcContext};
-
+use aya_ebpf::helpers::bpf_get_current_pid_tgid;
 use network_types::{
     eth::EthHdr,
     ip::{IpProto, Ipv4Hdr},
     tcp::TcpHdr,
     udp::UdpHdr,
 };
-
+use nflux_common::TcConfig;
 use crate::logger::log_connection;
 
 #[inline]
@@ -30,6 +30,10 @@ pub fn handle_icmp_packet(
     direction: u8,
 ) -> Result<i32, ()> {
 
+    let pid_tgid = bpf_get_current_pid_tgid();
+    let pid = (pid_tgid >> 32) as u32; // Extract PID from PID/TGID. First 32 bits are TGID (Thread Group ID) and last 32 bits are PID
+
+
     unsafe {
         log_connection(
             ctx,
@@ -39,6 +43,7 @@ pub fn handle_icmp_packet(
             0,
             IpProto::Icmp as u8,
             direction,
+            pid,
         )
     };
 
@@ -50,12 +55,14 @@ pub fn handle_tcp_packet(
     source: u32,
     destination: u32,
     direction: u8,
+    configmap: &TcConfig,
 ) -> Result<i32, ()> {
     let tcphdr: *const TcpHdr = ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)?;
 
     let src_port = u16::from_be((unsafe { *tcphdr }).source);
     let dst_port = u16::from_be((unsafe { *tcphdr }).dest);
     let protocol = IpProto::Tcp as u8;
+    let pid = bpf_get_current_pid_tgid() as u32;
 
     unsafe {
         log_connection(
@@ -66,6 +73,7 @@ pub fn handle_tcp_packet(
             dst_port,
             protocol,
             direction,
+            pid,
         );
     }
 
@@ -77,11 +85,13 @@ pub fn handle_udp_packet(
     source: u32,
     destination: u32,
     direction: u8,
+    configmap: &TcConfig,
 ) -> Result<i32, ()> {
     let udphdr: *const UdpHdr = ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)?;
     let src_port = u16::from_be((unsafe { *udphdr }).source);
     let dst_port = u16::from_be((unsafe { *udphdr }).dest);
     let protocol = IpProto::Udp as u8;
+    let pid = bpf_get_current_pid_tgid() as u32;
 
     unsafe {
         log_connection(
@@ -92,6 +102,7 @@ pub fn handle_udp_packet(
             dst_port,
             protocol,
             direction,
+            pid,
         )
     };
 
