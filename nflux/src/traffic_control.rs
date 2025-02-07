@@ -1,112 +1,52 @@
 use std::net::Ipv4Addr;
 use std::ptr;
 use std::sync::Arc;
+use anyhow::Context;
 use aya::{programs::{tc, SchedClassifier, TcAttachType}, Ebpf};
-use aya::maps::MapData;
+use aya::maps::{Array, MapData};
 use aya::maps::perf::{AsyncPerfEventArrayBuffer, PerfBufferError};
 use bytes::BytesMut;
 use tracing::{debug, error, info, warn};
-use nflux_common::{convert_protocol, TcEvent};
+use nflux_common::{convert_protocol, TcConfig, TcEvent};
 use crate::metrics::Metrics;
 
-pub fn start_traffic_control(bpf: &mut Ebpf, interfaces: Vec<String>) -> Result<(), anyhow::Error> {
+pub fn start_traffic_control(
+    bpf: &mut Ebpf, interfaces: Vec<String>,
+    disable_ingress: bool,
+    disable_egress: bool,
+    configmap: TcConfig,
+) -> Result<(), anyhow::Error> {
     if interfaces.is_empty() {
         warn!("No interfaces provided to attach the TC program");
         return Ok(());
     }
 
-    for (prog_name, attach_type) in [
-        ("tc_egress", TcAttachType::Egress),
-        ("tc_ingress", TcAttachType::Ingress),
-    ] {
-        attach_tc_program(bpf, prog_name, interfaces.as_slice(), attach_type)?;
+    if !disable_egress {
+        attach_tc_program(bpf, "tc_egress", interfaces.as_slice(), TcAttachType::Egress)?;
     }
+
+    if !disable_ingress {
+        attach_tc_program(bpf, "tc_ingress", interfaces.as_slice(), TcAttachType::Ingress)?;
+    }
+
+    // Populate config
+    populate_egress_config(bpf, configmap)?;
     Ok(())
 }
 
-// pub fn start_traffic_control(bpf: &mut Ebpf, config: Monitoring) -> Result<(), anyhow::Error> {
-//     match config.enabled {
-//         IsEnabled::True => {
-//             if !config.physical_interfaces.is_empty() {
-//                 info!(
-//                     "Attaching TC egress program to physical interfaces: {:?}",
-//                     config.physical_interfaces
-//                 );
-//                 attach_tc_program(
-//                     bpf,
-//                     "tc_egress_physical",
-//                     &config.physical_interfaces,
-//                     TcAttachType::Egress,
-//                 )?;
-//                 attach_tc_program(
-//                     bpf,
-//                     "tc_ingress_physical",
-//                     &config.physical_interfaces,
-//                     TcAttachType::Ingress,
-//                 )?;
-//             }
 
-//             // Virtual interface is not working fine ATM
-//             if !config.virtual_interfaces.is_empty() {
-//                 info!(
-//                     "Attaching TC egress program to virtual interfaces: {:?}",
-//                     config.virtual_interfaces
-//                 );
-//                 attach_tc_program(
-//                     bpf,
-//                     "tc_egress_virtual",
-//                     &config.virtual_interfaces,
-//                     TcAttachType::Egress,
-//                 )?;
-//                 attach_tc_program(
-//                     bpf,
-//                     "tc_ingress_virtual",
-//                     &config.virtual_interfaces,
-//                     TcAttachType::Ingress,
-//                 )?;
-//             }
-//             populate_egress_config(bpf, config)?;
-//             info!("TC egress started successfully!")
-//         }
-//         IsEnabled::False => {
-//             info!("Egress not enabled");
-//         }
-//     }
-//     Ok(())
-// }
+pub fn populate_egress_config(bpf: &mut Ebpf, config: TcConfig) -> anyhow::Result<()> {
+    let mut tc_config = Array::<_, TcConfig>::try_from(
+        bpf.map_mut("TC_CONFIG")
+            .context("Failed to find TC_CONFIG map")?,
+    )?;
 
-// pub fn populate_egress_config(bpf: &mut Ebpf, config: Monitoring) -> anyhow::Result<()> {
-//     let mut egress_config = Array::<_, EgressConfig>::try_from(
-//         bpf.map_mut("EGRESS_CONFIG")
-//             .context("Failed to find EGRESS_CONFIG map")?,
-//     )?;
+    tc_config
+        .set(0, config, 0)
+        .context("Failed to set TC_CONFIG")?;
 
-//     let config = EgressConfig {
-//         log_only_new_connections: match config.logging.log_only_new_connections {
-//             IsEnabled::True => 1,
-//             IsEnabled::False => 0,
-//         },
-//         log_refresh_new_connections_every: config.logging.log_refresh_new_connections_every,
-//         log_udp_connections: match config.logging.log_udp_connections {
-//             IsEnabled::True => 1,
-//             IsEnabled::False => 0,
-//         },
-//         log_tcp_connections: match config.logging.log_tcp_connections {
-//             IsEnabled::True => 1,
-//             IsEnabled::False => 0,
-//         },
-//         log_icmp_connections: match config.logging.log_icmp_connections {
-//             IsEnabled::True => 1,
-//             IsEnabled::False => 0,
-//         },
-//     };
-
-//     egress_config
-//         .set(0, config, 0)
-//         .context("Failed to set ICMP_MAP")?;
-
-//     Ok(())
-// }
+    Ok(())
+}
 
 pub fn attach_tc_program(
     bpf: &mut Ebpf,
