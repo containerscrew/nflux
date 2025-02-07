@@ -16,10 +16,10 @@ impl Metrics {
         let ingress_connection = Opts::new("ingress_connections", "Register new ingress connections.");
         let egress_connection = Opts::new("egress_connections", "Register new egress connections.");
 
-        let ingress_connection = IntCounterVec::new(ingress_connection, &["protocol", "src_addr", "dst_addr", "src_port", "dst_port"])
+        let ingress_connection = IntCounterVec::new(ingress_connection, &["protocol", "src_addr", "dst_addr", "src_port", "pid", "command"])
             .expect("Failed to create ingress connection counter");
 
-        let egress_connection = IntCounterVec::new(egress_connection, &["protocol", "src_addr", "dst_addr", "src_port", "dst_port"]).expect("Failed to create egress connection counter");
+        let egress_connection = IntCounterVec::new(egress_connection, &["protocol", "src_addr", "dst_addr",  "dst_port", "pid", "command"]).expect("Failed to create egress connection counter");
 
         registry.register(Box::new(ingress_connection.clone())).expect("Failed to register TCP metric");
         registry.register(Box::new(egress_connection.clone())).expect("Failed to register UDP metric");
@@ -30,12 +30,12 @@ impl Metrics {
         })
     }
 
-    pub fn track_ingress_event(&self, protocol: &str, src_addr: &str, dst_addr: &str, src_port: &str, dst_port: &str) {
-        self.ingress_connection.with_label_values(&[protocol, src_addr, dst_addr, src_port, dst_port]).inc();
+    pub fn track_ingress_event(&self, protocol: &str, src_addr: &str, dst_addr: &str, src_port: &str, pid: &str, command: &str) {
+        self.ingress_connection.with_label_values(&[protocol, src_addr, dst_addr, src_port, pid, command]).inc();
     }
 
-    pub fn track_egress_event(&self, protocol: &str, src_addr: &str, dst_addr: &str, src_port: &str, dst_port: &str) {
-        self.egress_connection.with_label_values(&[protocol, src_addr, dst_addr, src_port, dst_port]).inc();
+    pub fn track_egress_event(&self, protocol: &str, src_addr: &str, dst_addr: &str, dst_port: &str, pid: &str, command: &str) {
+        self.egress_connection.with_label_values(&[protocol, src_addr, dst_addr, dst_port, pid, command]).inc();
     }
 }
 
