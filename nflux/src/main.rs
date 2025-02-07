@@ -4,9 +4,9 @@ use anyhow::Context;
 use aya::{include_bytes_aligned, Ebpf};
 use aya::maps::AsyncPerfEventArray;
 use aya::util::online_cpus;
-use aya_log::EbpfLogger;
 use clap::Parser;
 use prometheus::Registry;
+use tokio::sync::Semaphore;
 use tokio::task;
 use cli::Cli;
 use logger::{setup_logger, LogFormat};
@@ -15,7 +15,7 @@ use nflux_common::TcConfig;
 use traffic_control::start_traffic_control;
 use utils::{is_root_user, set_mem_limit, wait_for_shutdown};
 use crate::metrics::{start_api, Metrics};
-use crate::traffic_control::process_egress_events;
+use crate::traffic_control::{process_tc_events};
 
 mod cli;
 mod logger;
@@ -71,7 +71,7 @@ async fn main() -> anyhow::Result<()> {
     // Attach TC program (monitor egress connections)
     start_traffic_control(&mut bpf, cli.interfaces, cli.disable_ingress, cli.disable_egress, tc_config)?;
 
-    let mut egress_events = AsyncPerfEventArray::try_from(
+    let mut tc_events = AsyncPerfEventArray::try_from(
         bpf.take_map("TC_EVENT")
             .context("Failed to find EGRESS_EVENT map")?,
     )?;
@@ -79,8 +79,8 @@ async fn main() -> anyhow::Result<()> {
     // Spawn tasks for each CPU
     let cpus = online_cpus().map_err(|(_, error)| error)?;
     for cpu_id in cpus {
-        let buf = egress_events.open(cpu_id, None)?;
-        task::spawn(process_egress_events(buf, cpu_id, metrics.clone()));
+        let buf = tc_events.open(cpu_id, None)?;
+        task::spawn(process_tc_events(buf, cpu_id, metrics.clone()));
     }
 
     // Wait for shutdown signal

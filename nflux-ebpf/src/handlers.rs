@@ -55,7 +55,6 @@ pub fn handle_tcp_packet(
     source: u32,
     destination: u32,
     direction: u8,
-    configmap: &TcConfig,
 ) -> Result<i32, ()> {
     let tcphdr: *const TcpHdr = ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)?;
 
@@ -85,7 +84,6 @@ pub fn handle_udp_packet(
     source: u32,
     destination: u32,
     direction: u8,
-    configmap: &TcConfig,
 ) -> Result<i32, ()> {
     let udphdr: *const UdpHdr = ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)?;
     let src_port = u16::from_be((unsafe { *udphdr }).source);

@@ -2,9 +2,9 @@ use dns_lookup::lookup_addr;
 use libc::getuid;
 use nflux_common::utils::is_private_ip;
 use std::{
-    collections::HashMap,
-    net::{IpAddr, Ipv4Addr, Ipv6Addr},
+    net::{IpAddr},
 };
+use std::net::Ipv4Addr;
 use sysinfo::{Pid, System};
 use tokio::signal;
 use tracing::{info, warn};
@@ -34,27 +34,6 @@ pub async fn wait_for_shutdown() -> anyhow::Result<()> {
     warn!("You press Ctrl-C, shutting down nflux...");
     Ok(())
 }
-
-pub fn parse_cidr_v4(cidr: &str) -> anyhow::Result<(Ipv4Addr, u32)> {
-    let parts: Vec<&str> = cidr.split('/').collect();
-    if parts.len() != 2 {
-        return Err(anyhow::anyhow!("Invalid CIDR format: {}", cidr));
-    }
-    let ip = parts[0].parse::<Ipv4Addr>()?;
-    let prefix_len = parts[1].parse::<u32>()?;
-    Ok((ip, prefix_len))
-}
-
-pub fn parse_cidr_v6(cidr: &str) -> anyhow::Result<(Ipv6Addr, u32)> {
-    let parts: Vec<&str> = cidr.split('/').collect();
-    if parts.len() != 2 {
-        return Err(anyhow::anyhow!("Invalid CIDR format: {}", cidr));
-    }
-    let ip = parts[0].parse::<Ipv6Addr>()?;
-    let prefix_len = parts[1].parse::<u32>()?;
-    Ok((ip, prefix_len))
-}
-
 pub fn _lookup_address(ip: u32) -> String {
     match is_private_ip(ip) {
         true => "Private IP".to_string(),

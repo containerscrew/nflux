@@ -111,7 +111,7 @@ pub fn attach_tc_program(
     Ok(())
 }
 
-pub async fn process_egress_events(
+pub async fn process_tc_events(
     mut buf: AsyncPerfEventArrayBuffer<MapData>,
     cpu_id: u32,
     metrics: Arc<Metrics>,
@@ -128,6 +128,7 @@ pub async fn process_egress_events(
             match parse_egress_event(buf) {
                 Ok(event) => {
                     // Log the connection
+                    let command = get_process_name(event.pid);
                     info!(
                         "direction={} protocol={}, src_ip={}, dst_ip={}, src_port={}, dst_port={}, pid={}, comm={}",
                         if event.direction == 0 {"ingress"} else { "egress"},
@@ -137,25 +138,27 @@ pub async fn process_egress_events(
                         event.src_port,
                         event.dst_port,
                         event.pid,
-                        get_process_name(event.pid),
+                        command,
                     );
-                    // if event.direction == 0 {
-                    //     metrics.track_ingress_event(
-                    //         convert_protocol(event.protocol),
-                    //         Ipv4Addr::from(event.src_ip).to_string().as_str(),
-                    //         Ipv4Addr::from(event.dst_ip).to_string().as_str(),
-                    //         event.src_port.to_string().as_str(),
-                    //         event.dst_port.to_string().as_str(),
-                    //     );
-                    // } else {
-                    //     metrics.track_egress_event(
-                    //         convert_protocol(event.protocol),
-                    //         Ipv4Addr::from(event.src_ip).to_string().as_str(),
-                    //         Ipv4Addr::from(event.dst_ip).to_string().as_str(),
-                    //         event.src_port.to_string().as_str(),
-                    //         event.dst_port.to_string().as_str(),
-                    //     );
-                    // }
+                    if event.direction == 0 {
+                        metrics.track_ingress_event(
+                            convert_protocol(event.protocol),
+                            Ipv4Addr::from(event.src_ip).to_string().as_str(),
+                            Ipv4Addr::from(event.dst_ip).to_string().as_str(),
+                            event.src_port.to_string().as_str(),
+                            event.pid.to_string().as_str(),
+                            command.as_str(),
+                        );
+                    } else {
+                        metrics.track_egress_event(
+                            convert_protocol(event.protocol),
+                            Ipv4Addr::from(event.src_ip).to_string().as_str(),
+                            Ipv4Addr::from(event.dst_ip).to_string().as_str(),
+                            event.dst_port.to_string().as_str(),
+                            event.pid.to_string().as_str(),
+                            command.as_str(),
+                        );
+                    }
                 }
                 Err(e) => error!("Failed to parse egress event on CPU {}: {}", cpu_id, e),
             }

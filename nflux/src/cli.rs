@@ -56,7 +56,7 @@ pub struct Cli {
     #[arg(
         long = "disable-udp",
         help = "Disable udp network monitoring",
-        default_value_t = true,
+        default_value_t = false,
         required = false
     )]
     pub disable_udp: bool,
