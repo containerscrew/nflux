@@ -44,4 +44,12 @@ pub struct Cli {
         required = false
     )]
     pub disable_ingress: bool,
+
+    #[arg(
+        long = "disable-private-ips",
+        help = "Disable private ips network monitoring",
+        default_value_t = true,
+        required = false
+    )]
+    pub disable_private_ips: bool,
 }

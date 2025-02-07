@@ -1,9 +1,11 @@
 use aya_ebpf::bindings::TC_ACT_PIPE;
 use aya_ebpf::programs::TcContext;
+use aya_log_ebpf::{debug, info};
 use network_types::eth::{EthHdr, EtherType};
 use network_types::ip::{IpProto, Ipv4Hdr};
 
 use crate::handlers::{handle_icmp_packet, handle_tcp_packet, handle_udp_packet};
+use crate::maps::TC_CONFIG;
 
 fn handle_ipv4_packet(
     ctx: &TcContext,
@@ -23,7 +25,7 @@ fn handle_ipv4_packet(
 
 pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
     let ethhdr: EthHdr = ctx.load(0).map_err(|_| ())?;
-    //let egress_config = unsafe {TC_CONFIG.get(0).ok_or(())?};
+    let tc_config = unsafe {TC_CONFIG.get(0).ok_or(())?};
 
     match ethhdr.ether_type {
         EtherType::Ipv4 => handle_ipv4_packet(&ctx, direction),
@@ -31,7 +33,10 @@ pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
             // IPV6 traffic is not implemented yet
             Ok(TC_ACT_PIPE)
         }
-        _ => Ok(TC_ACT_PIPE),
+        _ => {
+            //debug!(&ctx, "Probably, not an IP packet. Are you using a tunnel?. This is not implemented yet, sorry :(");
+            Ok(TC_ACT_PIPE)
+        },
     }
 }
 
