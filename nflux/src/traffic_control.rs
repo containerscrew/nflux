@@ -13,7 +13,7 @@ use crate::utils::get_process_name;
 
 pub fn start_traffic_control(
     bpf: &mut Ebpf, interfaces: Vec<String>,
-    disable_ingress: bool,
+    enable_ingress: bool,
     disable_egress: bool,
     configmap: TcConfig,
 ) -> Result<(), anyhow::Error> {
@@ -26,7 +26,7 @@ pub fn start_traffic_control(
         attach_tc_program(bpf, "tc_egress", interfaces.as_slice(), TcAttachType::Egress)?;
     }
 
-    if !disable_ingress {
+    if enable_ingress {
         attach_tc_program(bpf, "tc_ingress", interfaces.as_slice(), TcAttachType::Ingress)?;
     }
 
