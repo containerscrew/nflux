@@ -4,6 +4,7 @@ use anyhow::Context;
 use aya::{include_bytes_aligned, Ebpf};
 use aya::maps::AsyncPerfEventArray;
 use aya::util::online_cpus;
+use aya_log::EbpfLogger;
 use clap::Parser;
 use prometheus::Registry;
 use tokio::sync::Semaphore;
@@ -48,9 +49,9 @@ async fn main() -> anyhow::Result<()> {
     let mut bpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/nflux")))?;
 
     // Necessary to debug something in the ebpf code
-    // if let Err(e) = EbpfLogger::init(&mut bpf) {
-    //     warn!("failed to initialize eBPF logger: {}", e);
-    // }
+    if let Err(e) = EbpfLogger::init(&mut bpf) {
+        warn!("failed to initialize eBPF logger: {}", e);
+    }
 
     // Prometheus metrics
     let registry = Registry::new();
