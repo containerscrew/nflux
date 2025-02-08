@@ -47,7 +47,8 @@
 ```bash
 git clone https://github.com/containerscrew/nflux
 make local-build
-cargo run --release --config 'target."cfg(all())".runner="sudo -E"' -- -l info -i interface
+sudo ./target/release/nflux -i wlo1
+sudo ./target/release/nflux -l info -i proton0 --enable-udp # for iface using wireguard
 ```
 
 # Features
