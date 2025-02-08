@@ -33,7 +33,6 @@ pub fn handle_icmp_packet(
     let pid_tgid = bpf_get_current_pid_tgid();
     let pid = (pid_tgid >> 32) as u32; // Extract PID from PID/TGID. First 32 bits are TGID (Thread Group ID) and last 32 bits are PID
 
-
     unsafe {
         log_connection(
             ctx,
@@ -55,13 +54,24 @@ pub fn handle_tcp_packet(
     source: u32,
     destination: u32,
     direction: u8,
+    is_ether: bool,
 ) -> Result<i32, ()> {
-    let tcphdr: *const TcpHdr = ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)?;
-
-    let src_port = u16::from_be((unsafe { *tcphdr }).source);
-    let dst_port = u16::from_be((unsafe { *tcphdr }).dest);
     let protocol = IpProto::Tcp as u8;
     let pid = bpf_get_current_pid_tgid() as u32;
+
+    let (src_port, dst_port);
+
+    if is_ether {
+        let tcphdr: *const TcpHdr = ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)?;
+        unsafe {
+            src_port = u16::from_be((*tcphdr).source);
+            dst_port = u16::from_be((*tcphdr).dest);
+        }
+    } else {
+        let tcphdr: TcpHdr = ctx.load(20).map_err(|_| ())?;
+        src_port = u16::from_be(tcphdr.source);
+        dst_port = u16::from_be(tcphdr.dest);
+    }
 
     unsafe {
         log_connection(
@@ -84,12 +94,24 @@ pub fn handle_udp_packet(
     source: u32,
     destination: u32,
     direction: u8,
+    is_ether: bool,
 ) -> Result<i32, ()> {
-    let udphdr: *const UdpHdr = ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)?;
-    let src_port = u16::from_be((unsafe { *udphdr }).source);
-    let dst_port = u16::from_be((unsafe { *udphdr }).dest);
     let protocol = IpProto::Udp as u8;
     let pid = bpf_get_current_pid_tgid() as u32;
+
+    let (src_port, dst_port);
+
+    if is_ether {
+        let udphdr: *const UdpHdr = ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)?;
+        unsafe {
+            src_port = u16::from_be((unsafe { *udphdr }).source);
+            dst_port = u16::from_be((unsafe { *udphdr }).dest);
+        }
+    } else {
+        let udphdr: UdpHdr = ctx.load(20).map_err(|_| ())?;
+        src_port = u16::from_be(udphdr.source);
+        dst_port = u16::from_be(udphdr.dest);
+    }
 
     unsafe {
         log_connection(

@@ -7,7 +7,6 @@ use aya::util::online_cpus;
 use aya_log::EbpfLogger;
 use clap::Parser;
 use prometheus::Registry;
-use tokio::sync::Semaphore;
 use tokio::task;
 use cli::Cli;
 use logger::{setup_logger, LogFormat};
@@ -64,13 +63,13 @@ async fn main() -> anyhow::Result<()> {
 
     let tc_config = TcConfig {
         disable_egress: if cli.disable_private_ips { 1 } else { 0 },
-        disable_ingress: if cli.disable_private_ips { 1 } else { 0 },
+        enable_ingress: if cli.disable_private_ips { 1 } else { 0 },
         disable_private_ips: if cli.disable_private_ips { 1 } else { 0 },
-        disable_udp: if cli.disable_udp { 1 } else { 0 },
+        enable_udp: if cli.enable_udp { 1 } else { 0 },
     };
 
     // Attach TC program (monitor egress connections)
-    start_traffic_control(&mut bpf, cli.interfaces, cli.disable_ingress, cli.disable_egress, tc_config)?;
+    start_traffic_control(&mut bpf, cli.interfaces, cli.enable_ingress, cli.disable_egress, tc_config)?;
 
     let mut tc_events = AsyncPerfEventArray::try_from(
         bpf.take_map("TC_EVENT")

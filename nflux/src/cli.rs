@@ -38,12 +38,12 @@ pub struct Cli {
     pub disable_egress: bool,
 
     #[arg(
-        long = "disable-ingress",
-        help = "Disable ingress",
-        default_value_t = true,
+        long = "enable-ingress",
+        help = "Enable ingress traffic monitoring",
+        default_value_t = false,
         required = false
     )]
-    pub disable_ingress: bool,
+    pub enable_ingress: bool,
 
     #[arg(
         long = "disable-private-ips",
@@ -54,10 +54,10 @@ pub struct Cli {
     pub disable_private_ips: bool,
 
     #[arg(
-        long = "disable-udp",
-        help = "Disable udp network monitoring",
+        long = "enable-udp",
+        help = "Enable udp network monitoring",
         default_value_t = false,
         required = false
     )]
-    pub disable_udp: bool,
+    pub enable_udp: bool,
 }
