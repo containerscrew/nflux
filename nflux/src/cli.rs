@@ -1,6 +1,7 @@
 use clap::Parser;
 
 #[derive(Parser, Debug)]
+
 #[clap(
     about = "nflux",
     version = env!("CARGO_PKG_VERSION"),
@@ -8,6 +9,7 @@ use clap::Parser;
     about = "Network monitoring tool using eBPF. Powered by Aya-rs 🐝",
     arg_required_else_help = false
 )]
+
 
 pub struct Cli {
     #[arg(
