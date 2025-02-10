@@ -1,16 +1,19 @@
 use std::net::Ipv4Addr;
 
 use anyhow::Context;
-use aya::{maps::{MapData, RingBuf}, programs::{tc, SchedClassifier, TcAttachType}, Ebpf};
-use aya::maps::Array;
-use tracing::{debug, error, info, warn};
+use aya::{
+    maps::{Array, MapData, RingBuf},
+    programs::{tc, SchedClassifier, TcAttachType},
+    Ebpf,
+};
 use nflux_common::{convert_protocol, TcConfig, TcEvent};
+use tracing::{debug, error, info, warn};
 
 use crate::utils::get_process_name;
 
-
 pub fn start_traffic_control(
-    bpf: &mut Ebpf, interfaces: Vec<String>,
+    bpf: &mut Ebpf,
+    interfaces: Vec<String>,
     enable_ingress: bool,
     disable_egress: bool,
     configmap: TcConfig,
@@ -21,18 +24,27 @@ pub fn start_traffic_control(
     }
 
     if !disable_egress {
-        attach_tc_program(bpf, "tc_egress", interfaces.as_slice(), TcAttachType::Egress)?;
+        attach_tc_program(
+            bpf,
+            "tc_egress",
+            interfaces.as_slice(),
+            TcAttachType::Egress,
+        )?;
     }
 
     if enable_ingress {
-        attach_tc_program(bpf, "tc_ingress", interfaces.as_slice(), TcAttachType::Ingress)?;
+        attach_tc_program(
+            bpf,
+            "tc_ingress",
+            interfaces.as_slice(),
+            TcAttachType::Ingress,
+        )?;
     }
 
     // Populate config
     populate_egress_config(bpf, configmap)?;
     Ok(())
 }
-
 
 pub fn populate_egress_config(bpf: &mut Ebpf, config: TcConfig) -> anyhow::Result<()> {
     let mut tc_config = Array::<_, TcConfig>::try_from(
@@ -104,7 +116,10 @@ pub fn attach_tc_program(
         }
     }
 
-    info!("{} program attached to interfaces: {:?}", program_name, interfaces);
+    info!(
+        "{} program attached to interfaces: {:?}",
+        program_name, interfaces
+    );
 
     Ok(())
 }

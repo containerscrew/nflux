@@ -5,11 +5,11 @@ pub mod utils;
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct TcConfig {
-    pub disable_egress: u8, // 0 = no, 1 = yes
-    pub enable_ingress: u32, // 0 = no, 1 = yes
-    pub disable_private_ips: u8,  // 0 = no, 1 = yes
-    pub enable_udp: u8, // 0 = no, 1 = yes
-    pub log_every: u32, // default 5
+    pub disable_egress: u8,      // 0 = no, 1 = yes
+    pub enable_ingress: u32,     // 0 = no, 1 = yes
+    pub disable_private_ips: u8, // 0 = no, 1 = yes
+    pub enable_udp: u8,          // 0 = no, 1 = yes
+    pub log_every: u32,          // default 5
 }
 
 #[repr(C)]
