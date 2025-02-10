@@ -1,9 +1,7 @@
 use dns_lookup::lookup_addr;
 use libc::getuid;
 use nflux_common::utils::is_private_ip;
-use std::{
-    net::{IpAddr},
-};
+use std::net::IpAddr;
 use std::net::Ipv4Addr;
 use sysinfo::{Pid, System};
 use tokio::signal;
@@ -34,6 +32,7 @@ pub async fn wait_for_shutdown() -> anyhow::Result<()> {
     warn!("You press Ctrl-C, shutting down nflux...");
     Ok(())
 }
+
 pub fn _lookup_address(ip: u32) -> String {
     match is_private_ip(ip) {
         true => "Private IP".to_string(),
@@ -64,6 +63,6 @@ pub fn get_process_name(pid: u32) -> String {
                 .trim_matches('"')
                 .to_string()
         }
-        None => String::new(),
+        None => "unknown".to_string(),
     }
 }

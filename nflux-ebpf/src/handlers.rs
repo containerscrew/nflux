@@ -28,6 +28,7 @@ pub fn handle_icmp_packet(
     source: u32,
     destination: u32,
     direction: u8,
+    log_every: u32,
 ) -> Result<i32, ()> {
 
     let pid_tgid = bpf_get_current_pid_tgid();
@@ -43,6 +44,7 @@ pub fn handle_icmp_packet(
             IpProto::Icmp as u8,
             direction,
             pid,
+            log_every
         )
     };
 
@@ -55,6 +57,7 @@ pub fn handle_tcp_packet(
     destination: u32,
     direction: u8,
     is_ether: bool,
+    log_every: u32,
 ) -> Result<i32, ()> {
     let protocol = IpProto::Tcp as u8;
     let pid = bpf_get_current_pid_tgid() as u32;
@@ -83,6 +86,7 @@ pub fn handle_tcp_packet(
             protocol,
             direction,
             pid,
+            log_every
         );
     }
 
@@ -95,6 +99,7 @@ pub fn handle_udp_packet(
     destination: u32,
     direction: u8,
     is_ether: bool,
+    log_every: u32,
 ) -> Result<i32, ()> {
     let protocol = IpProto::Udp as u8;
     let pid = bpf_get_current_pid_tgid() as u32;
@@ -123,6 +128,7 @@ pub fn handle_udp_packet(
             protocol,
             direction,
             pid,
+            log_every
         )
     };
 

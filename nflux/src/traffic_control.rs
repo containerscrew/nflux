@@ -1,15 +1,13 @@
 use std::net::Ipv4Addr;
-use std::ptr;
-use std::sync::Arc;
+
 use anyhow::Context;
-use aya::{programs::{tc, SchedClassifier, TcAttachType}, Ebpf};
-use aya::maps::{Array, MapData};
-use aya::maps::perf::{AsyncPerfEventArrayBuffer, PerfBufferError};
-use bytes::BytesMut;
+use aya::{maps::{MapData, RingBuf}, programs::{tc, SchedClassifier, TcAttachType}, Ebpf};
+use aya::maps::Array;
 use tracing::{debug, error, info, warn};
 use nflux_common::{convert_protocol, TcConfig, TcEvent};
-use crate::metrics::Metrics;
+
 use crate::utils::get_process_name;
+
 
 pub fn start_traffic_control(
     bpf: &mut Ebpf, interfaces: Vec<String>,
@@ -111,67 +109,32 @@ pub fn attach_tc_program(
     Ok(())
 }
 
-pub async fn process_tc_events(
-    mut buf: AsyncPerfEventArrayBuffer<MapData>,
-    cpu_id: u32,
-    metrics: Arc<Metrics>,
-) -> Result<(), PerfBufferError> {
-    let mut buffers = vec![BytesMut::with_capacity(1024); 10];
-
+pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow::Error> {
     loop {
-        // Wait for events
-        let events = buf.read_events(&mut buffers).await?;
+        while let Some(event) = ring_buf.next() {
+            // Get the data from the event
+            let data = event.as_ref();
 
-        // Process each event in the buffer
-        for i in 0..events.read {
-            let buf = &buffers[i];
-            match parse_egress_event(buf) {
-                Ok(event) => {
-                    // Log the connection
-                    let command = get_process_name(event.pid);
-                    info!(
-                        "direction={} protocol={}, src_ip={}, dst_ip={}, src_port={}, dst_port={}, pid={}, comm={}",
-                        if event.direction == 0 {"ingress"} else { "egress"},
-                        convert_protocol(event.protocol),
-                        Ipv4Addr::from(event.src_ip),
-                        Ipv4Addr::from(event.dst_ip),
-                        event.src_port,
-                        event.dst_port,
-                        event.pid,
-                        command,
-                    );
-                    if event.direction == 0 {
-                        metrics.track_ingress_event(
-                            convert_protocol(event.protocol),
-                            Ipv4Addr::from(event.src_ip).to_string().as_str(),
-                            Ipv4Addr::from(event.dst_ip).to_string().as_str(),
-                            event.src_port.to_string().as_str(),
-                            event.pid.to_string().as_str(),
-                            command.as_str(),
-                        );
-                    } else {
-                        metrics.track_egress_event(
-                            convert_protocol(event.protocol),
-                            Ipv4Addr::from(event.src_ip).to_string().as_str(),
-                            Ipv4Addr::from(event.dst_ip).to_string().as_str(),
-                            event.dst_port.to_string().as_str(),
-                            event.pid.to_string().as_str(),
-                            command.as_str(),
-                        );
-                    }
-                }
-                Err(e) => error!("Failed to parse egress event on CPU {}: {}", cpu_id, e),
+            // Make sure the data is the correct size
+            if data.len() == std::mem::size_of::<TcEvent>() {
+                let event: &TcEvent = unsafe { &*(data.as_ptr() as *const TcEvent) };
+                // Log the connection
+                let command = get_process_name(event.pid);
+                info!(
+                    "direction={} protocol={}, src_ip={}, dst_ip={}, src_port={}, dst_port={}, pid={}, comm={}",
+                    if event.direction == 0 {"ingress"} else { "egress"},
+                    convert_protocol(event.protocol),
+                    Ipv4Addr::from(event.src_ip),
+                    Ipv4Addr::from(event.dst_ip),
+                    event.src_port,
+                    event.dst_port,
+                    event.pid,
+                    command,
+                );
             }
         }
-    }
-}
 
-pub fn parse_egress_event(buf: &BytesMut) -> anyhow::Result<TcEvent> {
-    if buf.len() >= std::mem::size_of::<TcEvent>() {
-        let ptr = buf.as_ptr() as *const TcEvent;
-        let event = unsafe { ptr::read_unaligned(ptr) };
-        Ok(event)
-    } else {
-        Err(anyhow::anyhow!("Buffer size is too small for EgressEvent"))
+        // Sleep for a while
+        tokio::time::sleep(std::time::Duration::from_millis(100)).await;
     }
 }

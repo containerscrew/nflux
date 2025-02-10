@@ -60,4 +60,12 @@ pub struct Cli {
         required = false
     )]
     pub enable_udp: bool,
+
+    #[arg(
+        long = "log-every",
+        help = "Log every N seconds. Do not log every packet for the same pid every N seconds.",
+        default_value_t = 5,
+        required = false
+    )]
+    pub log_every: u32,
 }

@@ -1,4 +1,5 @@
 #![no_std]
+
 pub mod utils;
 
 #[repr(C)]
@@ -8,7 +9,9 @@ pub struct TcConfig {
     pub enable_ingress: u32, // 0 = no, 1 = yes
     pub disable_private_ips: u8,  // 0 = no, 1 = yes
     pub enable_udp: u8, // 0 = no, 1 = yes
+    pub log_every: u32, // default 5
 }
+
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct TcEvent {
@@ -20,6 +23,7 @@ pub struct TcEvent {
     pub direction: u8, // 0: ingress, 1: egress
     pub pid: u32,
 }
+
 #[cfg(feature = "user")]
 pub mod user {
     use super::*;
