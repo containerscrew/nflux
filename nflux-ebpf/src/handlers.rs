@@ -1,7 +1,6 @@
 use core::mem;
 
-use aya_ebpf::{bindings::TC_ACT_PIPE, programs::TcContext};
-use aya_ebpf::helpers::bpf_get_current_pid_tgid;
+use aya_ebpf::{bindings::TC_ACT_PIPE, helpers::bpf_get_current_pid_tgid, programs::TcContext};
 use network_types::{
     eth::EthHdr,
     ip::{IpProto, Ipv4Hdr},
@@ -9,6 +8,7 @@ use network_types::{
     udp::UdpHdr,
 };
 use nflux_common::TcConfig;
+
 use crate::logger::log_connection;
 
 #[inline]
@@ -30,7 +30,6 @@ pub fn handle_icmp_packet(
     direction: u8,
     log_every: u32,
 ) -> Result<i32, ()> {
-
     let pid_tgid = bpf_get_current_pid_tgid();
     let pid = (pid_tgid >> 32) as u32; // Extract PID from PID/TGID. First 32 bits are TGID (Thread Group ID) and last 32 bits are PID
 
@@ -44,7 +43,7 @@ pub fn handle_icmp_packet(
             IpProto::Icmp as u8,
             direction,
             pid,
-            log_every
+            log_every,
         )
     };
 
@@ -86,7 +85,7 @@ pub fn handle_tcp_packet(
             protocol,
             direction,
             pid,
-            log_every
+            log_every,
         );
     }
 
@@ -128,7 +127,7 @@ pub fn handle_udp_packet(
             protocol,
             direction,
             pid,
-            log_every
+            log_every,
         )
     };
 

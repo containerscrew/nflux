@@ -1,12 +1,11 @@
+use std::net::{IpAddr, Ipv4Addr};
+
 use dns_lookup::lookup_addr;
 use libc::getuid;
 use nflux_common::utils::is_private_ip;
-use std::net::IpAddr;
-use std::net::Ipv4Addr;
 use sysinfo::{Pid, System};
 use tokio::signal;
 use tracing::{info, warn};
-
 
 // Check if the current user ID is 0 (root)
 pub fn is_root_user() -> bool {

@@ -1,8 +1,7 @@
-use aya_ebpf::programs::TcContext;
-use aya_ebpf::helpers::bpf_ktime_get_ns;
+use aya_ebpf::{helpers::bpf_ktime_get_ns, programs::TcContext};
 use nflux_common::TcEvent;
-use crate::maps::{ACTIVE_CONNECTIONS, TC_EVENT};
 
+use crate::maps::{ACTIVE_CONNECTIONS, TC_EVENT};
 
 #[inline]
 pub unsafe fn log_connection(
@@ -25,7 +24,7 @@ pub unsafe fn log_connection(
         dst_port,
         protocol,
         direction,
-        pid
+        pid,
     };
 
     if let Some(&last_seen) = ACTIVE_CONNECTIONS.get(&pid) {
@@ -37,14 +36,12 @@ pub unsafe fn log_connection(
     }
 
     // Log the connection
-    if let Some(mut data) =  TC_EVENT.reserve::<TcEvent>(0) {
-        unsafe { *data.as_mut_ptr() = event}
+    if let Some(mut data) = TC_EVENT.reserve::<TcEvent>(0) {
+        unsafe { *data.as_mut_ptr() = event }
 
         data.submit(0);
     }
 
     // Update the last seen time
-    ACTIVE_CONNECTIONS
-        .insert(&pid, &current_time, 0)
-        .ok();
+    ACTIVE_CONNECTIONS.insert(&pid, &current_time, 0).ok();
 }

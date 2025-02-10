@@ -2,17 +2,13 @@
 #![no_main]
 #![allow(nonstandard_style, dead_code)]
 
-
-mod maps;
-pub mod tc;
 mod handlers;
 mod logger;
+mod maps;
+pub mod tc;
 
-use aya_ebpf::bindings::TC_ACT_SHOT;
-use aya_ebpf::macros::classifier;
-use aya_ebpf::programs::TcContext;
+use aya_ebpf::{bindings::TC_ACT_SHOT, macros::classifier, programs::TcContext};
 use tc::try_tc;
-
 
 #[classifier]
 pub fn tc_egress(ctx: TcContext) -> i32 {

@@ -1,6 +1,9 @@
-use tracing::Level;
-use tracing_subscriber::fmt::{format::FmtSpan, time::FormatTime, format::Writer};
 use chrono::Local;
+use tracing::Level;
+use tracing_subscriber::fmt::{
+    format::{FmtSpan, Writer},
+    time::FormatTime,
+};
 
 pub struct MyTimer;
 
@@ -27,7 +30,7 @@ pub fn setup_logger(log_level: &str, log_format: LogFormat) {
         _ => {
             eprintln!("Invalid log level: {}. Defaulting to info", log_level);
             Level::INFO
-        },
+        }
     };
 
     let base_subscriber = tracing_subscriber::fmt()

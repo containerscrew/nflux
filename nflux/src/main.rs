@@ -1,20 +1,19 @@
 use std::process;
-use aya::{include_bytes_aligned, Ebpf};
-use aya::maps::RingBuf;
+
+use aya::{include_bytes_aligned, maps::RingBuf, Ebpf};
 use aya_log::EbpfLogger;
 use clap::Parser;
-use nflux_common::TcConfig;
 use cli::Cli;
 use logger::{setup_logger, LogFormat};
+use nflux_common::TcConfig;
 use tracing::{error, info, warn};
 use traffic_control::{process_event, start_traffic_control};
 use utils::{is_root_user, set_mem_limit, wait_for_shutdown};
 
 mod cli;
 mod logger;
-mod utils;
 mod traffic_control;
-
+mod utils;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -53,10 +52,17 @@ async fn main() -> anyhow::Result<()> {
     };
 
     // Attach TC program (monitor egress connections)
-    start_traffic_control(&mut bpf, cli.interfaces, cli.enable_ingress, cli.disable_egress, tc_config)?;
+    start_traffic_control(
+        &mut bpf,
+        cli.interfaces,
+        cli.enable_ingress,
+        cli.disable_egress,
+        tc_config,
+    )?;
 
     // Traffic control event ring buffer
-    let tc_event_ring_map = bpf.take_map("TC_EVENT")
+    let tc_event_ring_map = bpf
+        .take_map("TC_EVENT")
         .ok_or_else(|| anyhow::anyhow!("Failed to find TC_EVENT"))?;
 
     let ring_buf = RingBuf::try_from(tc_event_ring_map)?;

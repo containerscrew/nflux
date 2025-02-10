@@ -1,8 +1,7 @@
 use aya_ebpf::{
     macros::map,
-    maps::Array,
+    maps::{Array, LruHashMap, RingBuf},
 };
-use aya_ebpf::maps::{LruHashMap, RingBuf};
 use nflux_common::TcConfig;
 
 #[map]
