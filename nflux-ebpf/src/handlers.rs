@@ -7,7 +7,7 @@ use network_types::{
     tcp::TcpHdr,
     udp::UdpHdr,
 };
-use nflux_common::TcConfig;
+
 
 use crate::logger::log_connection;
 
@@ -107,10 +107,9 @@ pub fn handle_udp_packet(
 
     if is_ether {
         let udphdr: *const UdpHdr = ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)?;
-        unsafe {
-            src_port = u16::from_be((unsafe { *udphdr }).source);
-            dst_port = u16::from_be((unsafe { *udphdr }).dest);
-        }
+        src_port = u16::from_be((unsafe { *udphdr }).source);
+        dst_port = u16::from_be((unsafe { *udphdr }).dest);
+
     } else {
         let udphdr: UdpHdr = ctx.load(20).map_err(|_| ())?;
         src_port = u16::from_be(udphdr.source);

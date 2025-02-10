@@ -18,7 +18,7 @@ pub struct Test {
 
 pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
     let ethhdr: EthHdr = ctx.load(0).map_err(|_| ())?;
-    let tc_config = unsafe { TC_CONFIG.get(0).ok_or(())? };
+    let tc_config =  TC_CONFIG.get(0).ok_or(())?;
 
     match ethhdr.ether_type {
         EtherType::Ipv4 => {
@@ -33,8 +33,6 @@ pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
             // Ipv4 under a tunnel? (wireguard)
             let ipv4hdr: Option<Ipv4Hdr> = ctx.load(0).ok();
             if let Some(ipv4hdr) = ipv4hdr {
-                let destination = u32::from_be(ipv4hdr.dst_addr);
-                let source = u32::from_be(ipv4hdr.src_addr);
                 handle_ipv4_packet(&ctx, direction, tc_config, ipv4hdr, false)
             } else {
                 // Is ipv6? Not implemented :(

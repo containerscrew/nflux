@@ -1,12 +1,11 @@
 use std::process;
 
 use aya::{include_bytes_aligned, maps::RingBuf, Ebpf};
-use aya_log::EbpfLogger;
 use clap::Parser;
 use cli::Cli;
 use logger::{setup_logger, LogFormat};
 use nflux_common::TcConfig;
-use tracing::{error, info, warn};
+use tracing::{error, info};
 use traffic_control::{process_event, start_traffic_control};
 use utils::{is_root_user, set_mem_limit, wait_for_shutdown};
 
@@ -39,9 +38,9 @@ async fn main() -> anyhow::Result<()> {
     let mut bpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/nflux")))?;
 
     // Necessary to debug something in the ebpf code
-    if let Err(e) = EbpfLogger::init(&mut bpf) {
-        warn!("failed to initialize eBPF logger: {}", e);
-    }
+    // if let Err(e) = EbpfLogger::init(&mut bpf) {
+    //     warn!("failed to initialize eBPF logger: {}", e);
+    // }
 
     let tc_config = TcConfig {
         disable_egress: if cli.disable_private_ips { 1 } else { 0 },
