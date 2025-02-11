@@ -1,9 +1,0 @@
-#!/bin/bash
-set -e
-
-# Enable and start the service after installation
-# systemctl enable nflux --now
-sudo mkdir /var/log/nflux
-systemctl enable nflux
-
-exit 0
