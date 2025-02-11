@@ -41,26 +41,12 @@ compose-down: ## Run docker-compose down
 remote-sync: ## Sync this repository to remote machine using rsync.
 	rsync -avzh --exclude='.git/' --exclude='target/' --exclude='.idea/' $(shell pwd)/ $(USER)@$(IP):/home/$(USER)/nflux
 
-install-dpkg: ## Install dpkg package
-	bash ./debian/build_deb.sh ;\
-	sudo dpkg -i nflux.deb
-
-uninstall-dpkg: ## Uninstall dpkg package
-	sudo dpkg --purge nflux
-
-paru-install: ## Install nflux with paru
-	paru -U .
-	#ls /usr/local/bin/nflux              # Check if the binary is installed
-	#ls /etc/systemd/system/nflux.service  # Check if the service file is in place
-
-paru-uninstall: ## Uninstall nflux with paru
-	pacman -Rns nflux
-
 local-run: ## Run nflux locally
-	NFLUX_CONFIG_FILE_PATH=./nflux.toml cargo run --release --config 'target."cfg(all())".runner="sudo -E"'
+	cargo run --release --config 'target."cfg(all())".runner="sudo -E"'
 
 local-build: ## Build nflux locally
 	cargo build --release
 
-journal-logs: ## Show journal logs
-	sudo journalctl -u nflux.service -f
+local-install: local-build ## Install nflux binary locally
+	sudo cp target/release/$(app_name) /usr/local/bin/$(app_name) ;
+	sudo chmod +x /usr/local/bin/$(app_name)
