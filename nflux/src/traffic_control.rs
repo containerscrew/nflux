@@ -6,10 +6,10 @@ use aya::{
     programs::{tc, SchedClassifier, TcAttachType},
     Ebpf,
 };
-use nflux_common::{convert_protocol, utils::is_private_ip, TcConfig, TcEvent};
+use nflux_common::{convert_protocol, TcConfig, TcEvent};
 use tracing::{debug, error, info, warn};
 
-use crate::{ipinfo::get_geolocation, utils::get_process_name};
+use crate::utils::get_process_name;
 
 pub fn start_traffic_control(
     bpf: &mut Ebpf,
