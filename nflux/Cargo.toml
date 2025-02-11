@@ -20,6 +20,7 @@ prometheus = "0.13.4"
 axum = "0.8.1"
 clap = { version = "4.5.28", features = ["derive"] }
 chrono = "0.4.39"
+reqwest = "0.12.12"
 
 [build-dependencies]
 anyhow = { workspace = true }

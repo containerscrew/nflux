@@ -13,6 +13,7 @@ mod cli;
 mod logger;
 mod traffic_control;
 mod utils;
+mod ipinfo;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
