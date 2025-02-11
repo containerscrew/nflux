@@ -10,7 +10,6 @@ use clap::Parser;
     arg_required_else_help = false
 )]
 
-
 pub struct Cli {
     #[arg(
         short = 'l',
