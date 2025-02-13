@@ -1,6 +1,6 @@
 use core::mem;
 
-use aya_ebpf::{bindings::TC_ACT_PIPE, helpers::bpf_get_current_pid_tgid, programs::TcContext};
+use aya_ebpf::{bindings::TC_ACT_PIPE, programs::TcContext};
 use network_types::{
     eth::EthHdr,
     ip::{IpProto, Ipv4Hdr},
@@ -23,8 +23,6 @@ fn ptr_at<T>(ctx: &TcContext, offset: usize) -> Result<*const T, ()> {
     Ok((start + offset) as *const T)
 }
 pub fn handle_icmp_packet(source: u32, destination: u32, direction: u8) -> Result<i32, ()> {
-    let pid_tgid = bpf_get_current_pid_tgid();
-    let pid = (pid_tgid >> 32) as u32; // Extract PID from PID/TGID. First 32 bits are TGID (Thread Group ID) and last 32 bits are PID
 
     unsafe {
         log_connection(
@@ -34,7 +32,6 @@ pub fn handle_icmp_packet(source: u32, destination: u32, direction: u8) -> Resul
             0,
             IpProto::Icmp as u8,
             direction,
-            pid,
         )
     };
 
@@ -49,7 +46,6 @@ pub fn handle_tcp_packet(
     is_ether: bool,
 ) -> Result<i32, ()> {
     let protocol = IpProto::Tcp as u8;
-    let pid = bpf_get_current_pid_tgid() as u32;
 
     let (src_port, dst_port);
 
@@ -73,7 +69,6 @@ pub fn handle_tcp_packet(
             dst_port,
             protocol,
             direction,
-            pid,
         );
     }
 
@@ -88,7 +83,6 @@ pub fn handle_udp_packet(
     is_ether: bool,
 ) -> Result<i32, ()> {
     let protocol = IpProto::Udp as u8;
-    let pid = bpf_get_current_pid_tgid() as u32;
 
     let (src_port, dst_port);
 
@@ -110,7 +104,6 @@ pub fn handle_udp_packet(
             dst_port,
             protocol,
             direction,
-            pid,
         )
     };
 
