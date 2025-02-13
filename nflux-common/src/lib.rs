@@ -20,7 +20,6 @@ pub struct TcEvent {
     pub dst_port: u16,
     pub protocol: u8,
     pub direction: u8, // 0: ingress, 1: egress
-    pub pid: u32,
 }
 
 #[cfg(feature = "user")]

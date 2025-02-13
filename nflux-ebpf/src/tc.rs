@@ -10,12 +10,6 @@ use crate::{
     maps::TC_CONFIG,
 };
 
-#[repr(C)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct Test {
-    pub data: u64,
-}
-
 pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
     let ethhdr: EthHdr = ctx.load(0).map_err(|_| ())?;
     let tc_config = TC_CONFIG.get(0).ok_or(())?;
