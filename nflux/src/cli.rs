@@ -1,7 +1,6 @@
 use clap::Parser;
 
 #[derive(Parser, Debug)]
-
 #[clap(
     about = "nflux",
     version = env!("CARGO_PKG_VERSION"),

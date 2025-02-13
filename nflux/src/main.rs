@@ -5,15 +5,14 @@ use clap::Parser;
 use cli::Cli;
 use logger::{setup_logger, LogFormat};
 use nflux_common::{utils::is_true, TcConfig};
-use tracing::{error, info};
 use tc::{process_event, start_traffic_control};
+use tracing::{error, info};
 use utils::{is_root_user, set_mem_limit, wait_for_shutdown};
 
 mod cli;
 mod logger;
 mod tc;
 mod utils;
-
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {

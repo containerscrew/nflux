@@ -18,7 +18,7 @@ pub struct Test {
 
 pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
     let ethhdr: EthHdr = ctx.load(0).map_err(|_| ())?;
-    let tc_config =  TC_CONFIG.get(0).ok_or(())?;
+    let tc_config = TC_CONFIG.get(0).ok_or(())?;
 
     match ethhdr.ether_type {
         EtherType::Ipv4 => {
@@ -53,30 +53,16 @@ fn handle_ipv4_packet(
     let destination = u32::from_be(ipv4hdr.dst_addr);
 
     match ipv4hdr.proto {
-        IpProto::Tcp => handle_tcp_packet(
-            ctx,
-            source,
-            destination,
-            direction,
-            is_ether,
-        ),
+        IpProto::Tcp => handle_tcp_packet(ctx, source, destination, direction, is_ether),
         IpProto::Udp => {
             if configmap.enable_udp == 1 {
-                handle_udp_packet(
-                    ctx,
-                    source,
-                    destination,
-                    direction,
-                    is_ether,
-                )
+                handle_udp_packet(ctx, source, destination, direction, is_ether)
             } else {
                 // UDP traffic monitoring is disabled
                 Ok(TC_ACT_PIPE)
             }
         }
-        IpProto::Icmp => {
-            handle_icmp_packet(source, destination, direction)
-        }
+        IpProto::Icmp => handle_icmp_packet(source, destination, direction),
         _ => Ok(TC_ACT_PIPE),
     }
 }
