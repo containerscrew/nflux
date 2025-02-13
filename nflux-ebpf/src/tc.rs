@@ -59,7 +59,6 @@ fn handle_ipv4_packet(
             destination,
             direction,
             is_ether,
-            configmap.log_every,
         ),
         IpProto::Udp => {
             if configmap.enable_udp == 1 {
@@ -69,7 +68,6 @@ fn handle_ipv4_packet(
                     destination,
                     direction,
                     is_ether,
-                    configmap.log_every,
                 )
             } else {
                 // UDP traffic monitoring is disabled
@@ -77,7 +75,7 @@ fn handle_ipv4_packet(
             }
         }
         IpProto::Icmp => {
-            handle_icmp_packet(ctx, source, destination, direction, configmap.log_every)
+            handle_icmp_packet(source, destination, direction)
         }
         _ => Ok(TC_ACT_PIPE),
     }
