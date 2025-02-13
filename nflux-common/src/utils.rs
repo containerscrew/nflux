@@ -20,6 +20,13 @@ pub fn is_private_ip(ip: u32) -> bool {
     }
 }
 
+pub fn is_true(value: bool) -> u8 {
+    if value {
+        return 1
+    }
+    0
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

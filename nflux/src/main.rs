@@ -4,14 +4,14 @@ use aya::{include_bytes_aligned, maps::RingBuf, Ebpf};
 use clap::Parser;
 use cli::Cli;
 use logger::{setup_logger, LogFormat};
-use nflux_common::TcConfig;
+use nflux_common::{utils::is_true, TcConfig};
 use tracing::{error, info};
-use traffic_control::{process_event, start_traffic_control};
+use tc::{process_event, start_traffic_control};
 use utils::{is_root_user, set_mem_limit, wait_for_shutdown};
 
 mod cli;
 mod logger;
-mod traffic_control;
+mod tc;
 mod utils;
 
 
@@ -44,14 +44,13 @@ async fn main() -> anyhow::Result<()> {
     // }
 
     let tc_config = TcConfig {
-        disable_egress: if cli.disable_private_ips { 1 } else { 0 },
-        enable_ingress: if cli.disable_private_ips { 1 } else { 0 },
-        disable_private_ips: if cli.disable_private_ips { 1 } else { 0 },
-        enable_udp: if cli.enable_udp { 1 } else { 0 },
-        log_every: cli.log_every,
+        disable_egress: is_true(cli.disable_egress),
+        enable_ingress: is_true(cli.enable_ingress),
+        disable_private_ips: is_true(cli.disable_private_ips),
+        enable_udp: is_true(cli.enable_udp),
     };
 
-    // Attach TC program (monitor egress connections)
+    // Attach TC program to interfaces
     start_traffic_control(
         &mut bpf,
         cli.interfaces,
@@ -63,7 +62,7 @@ async fn main() -> anyhow::Result<()> {
     // Traffic control event ring buffer
     let tc_event_ring_map = bpf
         .take_map("TC_EVENT")
-        .ok_or_else(|| anyhow::anyhow!("Failed to find TC_EVENT"))?;
+        .ok_or_else(|| anyhow::anyhow!("Failed to find TC_EVENT map"))?;
 
     let ring_buf = RingBuf::try_from(tc_event_ring_map)?;
 

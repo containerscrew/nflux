@@ -7,7 +7,7 @@ use aya::{
     Ebpf,
 };
 use nflux_common::{convert_protocol, TcConfig, TcEvent};
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error, info};
 
 use crate::utils::get_process_name;
 
@@ -18,11 +18,6 @@ pub fn start_traffic_control(
     disable_egress: bool,
     configmap: TcConfig,
 ) -> Result<(), anyhow::Error> {
-    if interfaces.is_empty() {
-        warn!("No interfaces provided to attach the TC program");
-        return Ok(());
-    }
-
     if !disable_egress {
         attach_tc_program(
             bpf,
