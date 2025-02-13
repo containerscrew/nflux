@@ -30,7 +30,10 @@ pub unsafe fn log_connection(
         pid,
     };
 
-    let key = ConnectionKey { pid, dst_ip: destination };
+    let key = ConnectionKey {
+        pid,
+        dst_ip: destination,
+    };
 
     // If the connection (pid, dst_ip) is already tracked, return
     if ACTIVE_CONNECTIONS.get(&key).is_some() {

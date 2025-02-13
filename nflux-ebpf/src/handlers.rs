@@ -8,7 +8,6 @@ use network_types::{
     udp::UdpHdr,
 };
 
-
 use crate::logger::log_connection;
 
 #[inline]
@@ -23,11 +22,7 @@ fn ptr_at<T>(ctx: &TcContext, offset: usize) -> Result<*const T, ()> {
 
     Ok((start + offset) as *const T)
 }
-pub fn handle_icmp_packet(
-    source: u32,
-    destination: u32,
-    direction: u8,
-) -> Result<i32, ()> {
+pub fn handle_icmp_packet(source: u32, destination: u32, direction: u8) -> Result<i32, ()> {
     let pid_tgid = bpf_get_current_pid_tgid();
     let pid = (pid_tgid >> 32) as u32; // Extract PID from PID/TGID. First 32 bits are TGID (Thread Group ID) and last 32 bits are PID
 
@@ -101,7 +96,6 @@ pub fn handle_udp_packet(
         let udphdr: *const UdpHdr = ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)?;
         src_port = u16::from_be((unsafe { *udphdr }).source);
         dst_port = u16::from_be((unsafe { *udphdr }).dest);
-
     } else {
         let udphdr: UdpHdr = ctx.load(20).map_err(|_| ())?;
         src_port = u16::from_be(udphdr.source);
