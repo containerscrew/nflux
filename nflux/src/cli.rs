@@ -8,7 +8,6 @@ use clap::Parser;
     about = "Network monitoring tool using eBPF. Powered by Aya-rs 🐝",
     arg_required_else_help = false
 )]
-
 pub struct Cli {
     #[arg(
         short = 'l',
