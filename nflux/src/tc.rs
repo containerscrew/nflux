@@ -129,7 +129,11 @@ pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow:
                 // Log the connection
                 info!(
                     "direction={} protocol={}, src_ip={}, dst_ip={}, src_port={}, dst_port={}",
-                    if event.direction == 0 {"ingress"} else { "egress"},
+                    if event.direction == 0 {
+                        "ingress"
+                    } else {
+                        "egress"
+                    },
                     convert_protocol(event.protocol),
                     Ipv4Addr::from(event.src_ip),
                     Ipv4Addr::from(event.dst_ip),

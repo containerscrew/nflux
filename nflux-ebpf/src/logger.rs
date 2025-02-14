@@ -1,14 +1,6 @@
 use nflux_common::TcEvent;
 
-use crate::maps::TC_EVENT;
-
-// Define a struct for the key: (pid, destination IP)
-// #[repr(C)]
-// #[derive(Clone, Copy)]
-// pub struct ConnectionKey {
-//     pid: u32,
-//     dst_ip: u32,
-// }
+use crate::maps::{ActiveConnectionKey, ACTIVE_CONNECTIONS, TC_EVENT};
 
 #[inline]
 pub unsafe fn log_connection(
@@ -28,15 +20,15 @@ pub unsafe fn log_connection(
         direction,
     };
 
-    // let key = ConnectionKey {
-    //     pid,
-    //     dst_ip: destination,
-    // };
+    let key = ActiveConnectionKey {
+        src_port: src_port as u32,
+        dst_ip: destination as u32,
+    };
 
-    // If the connection (pid, dst_ip) is already tracked, return
-    // if ACTIVE_CONNECTIONS.get(&key).is_some() {
-    //     return;
-    // }
+    // If the connection (src_port, dst_ip) is already tracked, return
+    if ACTIVE_CONNECTIONS.get(&key).is_some() {
+        return;
+    }
 
     // Log the connection event
     if let Some(mut data) = TC_EVENT.reserve::<TcEvent>(0) {
@@ -45,6 +37,6 @@ pub unsafe fn log_connection(
     }
 
     // Store the active connection: (PID, Destination IP) -> 1 (dummy value)
-    // let value: u8 = 1;
-    // ACTIVE_CONNECTIONS.insert(&key, &value, 0).ok();
+    let value: u8 = 1;
+    ACTIVE_CONNECTIONS.insert(&key, &value, 0).ok();
 }
