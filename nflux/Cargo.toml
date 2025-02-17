@@ -46,4 +46,4 @@ name = "nflux"
 path = "src/main.rs"
 
 [dev-dependencies]
-tempfile = "3.16.0"
+tempfile = "3.17.1"
