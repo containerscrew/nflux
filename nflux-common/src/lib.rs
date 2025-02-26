@@ -16,6 +16,8 @@ pub struct TcConfig {
 pub struct TcEvent {
     pub src_ip: u32,
     pub dst_ip: u32,
+    pub total_len: u16,
+    pub ttl: u8,
     pub src_port: u16,
     pub dst_port: u16,
     pub protocol: u8,
