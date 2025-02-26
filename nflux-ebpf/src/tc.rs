@@ -45,9 +45,11 @@ fn handle_ipv4_packet(
 ) -> Result<i32, ()> {
     let source = u32::from_be(ipv4hdr.src_addr);
     let destination = u32::from_be(ipv4hdr.dst_addr);
+    let total_len = u16::from_be(ipv4hdr.tot_len);
+    let ttl = u8::from_be(ipv4hdr.ttl);
 
     match ipv4hdr.proto {
-        IpProto::Tcp => handle_tcp_packet(ctx, source, destination, direction, is_ether),
+        IpProto::Tcp => handle_tcp_packet(ctx, source, destination, total_len, ttl, direction, is_ether),
         IpProto::Udp => {
             if configmap.enable_udp == 1 {
                 handle_udp_packet(ctx, source, destination, direction, is_ether)

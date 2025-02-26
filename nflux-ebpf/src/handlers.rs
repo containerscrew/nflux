@@ -23,7 +23,7 @@ fn ptr_at<T>(ctx: &TcContext, offset: usize) -> Result<*const T, ()> {
     Ok((start + offset) as *const T)
 }
 pub fn handle_icmp_packet(source: u32, destination: u32, direction: u8) -> Result<i32, ()> {
-    unsafe { log_connection(source, destination, 0, 0, IpProto::Icmp as u8, direction) };
+    unsafe { log_connection(source, destination,0, 0, 0, 0, IpProto::Icmp as u8, direction) };
 
     Ok(TC_ACT_PIPE)
 }
@@ -32,6 +32,8 @@ pub fn handle_tcp_packet(
     ctx: &TcContext,
     source: u32,
     destination: u32,
+    total_len: u16,
+    ttl: u8,
     direction: u8,
     is_ether: bool,
 ) -> Result<i32, ()> {
@@ -52,7 +54,7 @@ pub fn handle_tcp_packet(
     }
 
     unsafe {
-        log_connection(source, destination, src_port, dst_port, protocol, direction);
+        log_connection(source, destination, total_len, ttl, src_port, dst_port, protocol, direction);
     }
 
     Ok(TC_ACT_PIPE)
@@ -79,7 +81,7 @@ pub fn handle_udp_packet(
         dst_port = u16::from_be(udphdr.dest);
     }
 
-    unsafe { log_connection(source, destination, src_port, dst_port, protocol, direction) };
+    unsafe { log_connection(source, destination,0, 0,  src_port, dst_port, protocol, direction) };
 
     Ok(TC_ACT_PIPE)
 }

@@ -6,6 +6,8 @@ use crate::maps::{ActiveConnectionKey, ACTIVE_CONNECTIONS, TC_EVENT};
 pub unsafe fn log_connection(
     source: u32,
     destination: u32,
+    total_len: u16,
+    ttl: u8,
     src_port: u16,
     dst_port: u16,
     protocol: u8,
@@ -14,6 +16,8 @@ pub unsafe fn log_connection(
     let event = TcEvent {
         src_ip: source,
         dst_ip: destination,
+        total_len,
+        ttl,
         src_port,
         dst_port,
         protocol,
