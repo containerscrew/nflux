@@ -7,11 +7,12 @@ use sysinfo::{Pid, System};
 use tokio::signal;
 use tracing::{info, warn};
 
-// Check if the current user ID is 0 (root)
+/// is_root_user checks if the current user who runs the program is root.
 pub fn is_root_user() -> bool {
     unsafe { getuid() == 0 }
 }
 
+/// set_mem_limit bumps the memlock rlimit to infinity.
 pub fn set_mem_limit() {
     // Bump the memlock rlimit
     let rlim = libc::rlimit {
