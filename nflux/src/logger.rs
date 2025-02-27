@@ -5,8 +5,10 @@ use tracing_subscriber::fmt::{
     time::FormatTime,
 };
 
+/// MyTimer is a custom timer for the logs.
 pub struct MyTimer;
 
+/// Implement the FormatTime trait for MyTimer.
 impl FormatTime for MyTimer {
     fn format_time(&self, w: &mut Writer<'_>) -> std::fmt::Result {
         let now = Local::now();
@@ -14,12 +16,14 @@ impl FormatTime for MyTimer {
     }
 }
 
+/// LogFormat represents the format of the logs.
 pub enum LogFormat {
     #[allow(dead_code)]
     Json,
     Text,
 }
 
+/// setup_logger initializes the logger with the given log level and format.
 pub fn setup_logger(log_level: &str, log_format: LogFormat) {
     let log_level = match log_level {
         "trace" => Level::TRACE,
