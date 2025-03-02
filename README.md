@@ -23,6 +23,32 @@
 # nflux
 
 ```bash
+$ nflux --help
+
+    ███╗   ██╗███████╗██╗     ██╗   ██╗██╗  ██╗
+    ████╗  ██║██╔════╝██║     ██║   ██║╚██╗██╔╝
+    ██╔██╗ ██║█████╗  ██║     ██║   ██║ ╚███╔╝
+    ██║╚██╗██║██╔══╝  ██║     ██║   ██║ ██╔██╗
+    ██║ ╚████║██║     ███████╗╚██████╔╝██╔╝ ██╗
+    ╚═╝  ╚═══╝╚═╝     ╚══════╝ ╚═════╝ ╚═╝  ╚═╝
+
+
+Network monitoring tool using eBPF. Powered by Aya-rs 🐝
+
+Usage: nflux [OPTIONS] --interfaces <INTERFACES>...
+
+Options:
+  -l, --log-level <LOG_LEVEL>       Log level for logging tracing. Possible values: info, warn, trace, debug, error. Default: info [default: info]
+  -i, --interfaces <INTERFACES>...  List of interfaces to attach the program
+      --disable-egress              Disable egress
+      --enable-ingress              Enable ingress traffic monitoring
+      --disable-private-ips         Disable private ips network monitoring
+      --enable-udp                  Enable udp network monitoring
+  -h, --help                        Print help
+  -V, --version                     Print version
+```
+
+```bash
 2025-02-07-10:56:48  INFO Starting nflux with pid 61345
 2025-02-07-10:56:48  INFO Metrics server running at http://0.0.0.0:8080
 2025-02-07-10:56:48  INFO tc_egress program attached to interfaces: ["enp0s20f0u4"]

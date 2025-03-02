@@ -50,3 +50,6 @@ local-build: ## Build nflux locally
 local-install: local-build ## Install nflux binary locally
 	sudo cp target/release/$(app_name) /usr/local/bin/$(app_name) ;
 	sudo chmod +x /usr/local/bin/$(app_name)
+
+test: ## Run tests
+	cargo test --locked

@@ -1,4 +1,5 @@
 use clap::Parser;
+use colored::Colorize;
 
 #[derive(Parser, Debug)]
 #[clap(
@@ -6,7 +7,8 @@ use clap::Parser;
     version = env!("CARGO_PKG_VERSION"),
     author = "Containerscrew info@containerscrew.com",
     about = "Network monitoring tool using eBPF. Powered by Aya-rs 🐝",
-    arg_required_else_help = false
+    arg_required_else_help = false,
+    before_help = print_banner()
 )]
 pub struct Cli {
     #[arg(
@@ -59,4 +61,15 @@ pub struct Cli {
         required = false
     )]
     pub enable_udp: bool,
+}
+
+fn print_banner() -> String {
+    r#"
+    ███╗   ██╗███████╗██╗     ██╗   ██╗██╗  ██╗
+    ████╗  ██║██╔════╝██║     ██║   ██║╚██╗██╔╝
+    ██╔██╗ ██║█████╗  ██║     ██║   ██║ ╚███╔╝
+    ██║╚██╗██║██╔══╝  ██║     ██║   ██║ ██╔██╗
+    ██║ ╚████║██║     ███████╗╚██████╔╝██╔╝ ██╗
+    ╚═╝  ╚═══╝╚═╝     ╚══════╝ ╚═════╝ ╚═╝  ╚═╝
+    "#.red().to_string()
 }

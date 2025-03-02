@@ -1,62 +1,64 @@
-# name: Test 🤖
+name: Test & Lint 🤖
 
-# on:
-#   pull_request:
-#   push:
-#     paths:
-#       - '**.rs'
-#     branches:
-#       - '**'
+on:
+  pull_request:
+  push:
+    paths:
+      - '**.rs'
+    branches:
+      - '**'
 
-# env:
-#   CARGO_TERM_COLOR: always
+env:
+  CARGO_TERM_COLOR: always
 
-# jobs:
-#   test:
-#     name: Test
-#     strategy:
-#       matrix:
-#         include:
-#           - os: ubuntu-latest
-#             target: x86_64-unknown-linux-gnu
-#           - os: macOS-latest
-#             target: x86_64-apple-darwin
-#     runs-on: ${{ matrix.os }}
-#     steps:
-#       - uses: actions/checkout@v4
+jobs:
+  test:
+    name: Test
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
 
-#       - uses: dtolnay/rust-toolchain@v1
-#         with:
-#           toolchain: stable
-#           targets: ${{ matrix.target }}
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
 
-#       - name: Run cargo test
-#         run: cargo test --locked --target ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
 
-#       - name: Run tests feature variation
-#         run: cargo test --locked --target ${{ matrix.target }} --no-default-features
-#   rusfmt:
-#      runs-on: ubuntu-latest
-#      steps:
-#        - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: stable
+          targets: ${{ matrix.target }}
 
-#        - uses: dtolnay/rust-toolchain@v1
-#          with:
-#            toolchain: stable
-#            components: rustfmt
+      - name: Run cargo test
+        run: cargo test --locked --target ${{ matrix.target }}
 
-#        - name: Check formatting
-#          run: cargo fmt --all -- --check
+      - name: Run tests feature variation
+        run: cargo test --locked --target ${{ matrix.target }} --no-default-features
+  rusfmt:
+     runs-on: ubuntu-latest
+     steps:
+       - uses: actions/checkout@v4
 
-#   clippy:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@v4
+       - uses: dtolnay/rust-toolchain@v1
+         with:
+           toolchain: stable
+           components: rustfmt
 
-#       - uses: dtolnay/rust-toolchain@v1
-#         with:
-#           toolchain: stable
-#           components: clippy
+       - name: Check formatting
+         run: cargo fmt --all -- --check
 
-#       - name: Check formatting
-#         run: cargo clippy --all-features -- -D warnings
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: stable
+          components: clippy
+
+      - name: Check formatting
+        run: cargo clippy --all-features -- -D warnings
