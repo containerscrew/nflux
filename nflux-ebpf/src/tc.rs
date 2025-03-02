@@ -1,7 +1,8 @@
+use core::mem;
+
 use aya_ebpf::{bindings::TC_ACT_PIPE, programs::TcContext};
 use network_types::{
-    eth::{EthHdr, EtherType},
-    ip::{IpProto, Ipv4Hdr},
+    eth::{EthHdr, EtherType}, icmp::IcmpHdr, ip::{IpProto, Ipv4Hdr, Ipv6Hdr}, tcp::TcpHdr, udp::UdpHdr
 };
 use nflux_common::TcConfig;
 
@@ -9,6 +10,19 @@ use crate::{
     handlers::{handle_icmp_packet, handle_tcp_packet, handle_udp_packet},
     maps::TC_CONFIG,
 };
+
+#[inline]
+fn ptr_at<T>(ctx: &TcContext, offset: usize) -> Result<*const T, ()> {
+    let start = ctx.data();
+    let end = ctx.data_end();
+    let len = mem::size_of::<T>();
+
+    if start + offset + len > end {
+        return Err(());
+    }
+
+    Ok((start + offset) as *const T)
+}
 
 pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
     let ethhdr: EthHdr = ctx.load(0).map_err(|_| ())?;
@@ -20,7 +34,21 @@ pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
             handle_ipv4_packet(&ctx, direction, tc_config, ipv4hdr, true)
         }
         EtherType::Ipv6 => {
-            // IPV6 traffic is not implemented yet
+            let ipv6hdr: Ipv6Hdr = ctx.load(EthHdr::LEN).map_err(|_| ())?;
+
+            match ipv6hdr.next_hdr {
+                IpProto::Tcp => {
+                    let _tcphdr: *const TcpHdr = ptr_at(&ctx, EthHdr::LEN + Ipv6Hdr::LEN)?;
+                },
+                IpProto::Udp => {
+                    let _udphdr: *const UdpHdr = ptr_at(&ctx, EthHdr::LEN + Ipv6Hdr::LEN)?;
+                },
+                IpProto::Icmp => {
+                    let _icmphdr: *const IcmpHdr = ptr_at(&ctx, EthHdr::LEN + Ipv6Hdr::LEN)?;
+                },
+                _ => {},
+            }
+
             Ok(TC_ACT_PIPE)
         }
         _ => {
@@ -49,7 +77,15 @@ fn handle_ipv4_packet(
     let ttl = u8::from_be(ipv4hdr.ttl);
 
     match ipv4hdr.proto {
-        IpProto::Tcp => handle_tcp_packet(ctx, source, destination, total_len, ttl, direction, is_ether),
+        IpProto::Tcp => handle_tcp_packet(
+            ctx,
+            source,
+            destination,
+            total_len,
+            ttl,
+            direction,
+            is_ether,
+        ),
         IpProto::Udp => {
             if configmap.enable_udp == 1 {
                 handle_udp_packet(ctx, source, destination, direction, is_ether)

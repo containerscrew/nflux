@@ -1,13 +1,16 @@
-use std::process;
+use std::process::{self, exit};
 
 use aya::{include_bytes_aligned, maps::RingBuf, Ebpf};
 use clap::Parser;
 use cli::Cli;
+use libc::getuid;
 use logger::{setup_logger, LogFormat};
 use nflux_common::{utils::is_true, TcConfig};
 use tc::{process_event, start_traffic_control};
 use tracing::{error, info};
-use utils::{is_root_user, set_mem_limit, wait_for_shutdown};
+use utils::{set_mem_limit, wait_for_shutdown};
+
+use crate::utils::check_is_root_user;
 
 mod cli;
 mod logger;
@@ -23,9 +26,10 @@ async fn main() -> anyhow::Result<()> {
     setup_logger(&cli.log_level, LogFormat::Text);
 
     // Ensure the program is run as root
-    if !is_root_user() {
-        error!("This program must be run as root.");
-        process::exit(1);
+    let uid = unsafe { getuid() };
+    if let Err(e) = check_is_root_user(uid) {
+        error!("{}", e);
+        exit(1);
     }
 
     // Welcome message
@@ -61,7 +65,7 @@ async fn main() -> anyhow::Result<()> {
     // Traffic control event ring buffer
     let tc_event_ring_map = bpf
         .take_map("TC_EVENT")
-        .ok_or_else(|| anyhow::anyhow!("Failed to find TC_EVENT map"))?;
+        .ok_or_else(|| anyhow::anyhow!("Failed to find ring buffer TC_EVENT map"))?;
 
     let ring_buf = RingBuf::try_from(tc_event_ring_map)?;
 

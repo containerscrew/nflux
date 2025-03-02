@@ -1,15 +1,18 @@
 use std::net::{IpAddr, Ipv4Addr};
 
 use dns_lookup::lookup_addr;
-use libc::getuid;
+use libc::setrlimit;
 use nflux_common::utils::is_private_ip;
 use sysinfo::{Pid, System};
 use tokio::signal;
 use tracing::{info, warn};
 
 /// is_root_user checks if the current user who runs the program is root.
-pub fn is_root_user() -> bool {
-    unsafe { getuid() == 0 }
+pub fn check_is_root_user(uid: u32) -> Result<(), String> {
+    if uid != 0 {
+        return Err("This program must be run as root. Try: $ sudo nflux --help".to_string());
+    }
+    Ok(())
 }
 
 /// set_mem_limit bumps the memlock rlimit to infinity.
@@ -19,7 +22,7 @@ pub fn set_mem_limit() {
         rlim_cur: libc::RLIM_INFINITY,
         rlim_max: libc::RLIM_INFINITY,
     };
-    let ret = unsafe { libc::setrlimit(libc::RLIMIT_MEMLOCK, &rlim) };
+    let ret = unsafe { setrlimit(libc::RLIMIT_MEMLOCK, &rlim) };
     if ret != 0 {
         warn!("remove limit on locked memory failed, ret is: {}", ret);
     }
@@ -64,5 +67,26 @@ pub fn _get_process_name(pid: u32) -> String {
                 .to_string()
         }
         None => "unknown".to_string(),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_check_is_root_user_with_root_uid() {
+        let result = check_is_root_user(0);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_check_is_root_user_with_non_root_uid() {
+        let result = check_is_root_user(1000);
+        assert!(result.is_err());
+        assert_eq!(
+            result.unwrap_err(),
+            "This program must be run as root. Try: $ sudo nflux --help"
+        );
     }
 }
