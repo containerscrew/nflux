@@ -48,33 +48,13 @@ Options:
   -V, --version                     Print version
 ```
 
-```bash
-2025-02-07-10:56:48  INFO Starting nflux with pid 61345
-2025-02-07-10:56:48  INFO Metrics server running at http://0.0.0.0:8080
-2025-02-07-10:56:48  INFO tc_egress program attached to interfaces: ["enp0s20f0u4"]
-2025-02-07-10:56:48  INFO tc_ingress program attached to interfaces: ["enp0s20f0u4"]
-2025-02-07-10:56:48  INFO Waiting for Ctrl-C...
-2025-02-07-10:56:48  INFO ingress protocol=udp, src_ip=185.76.11.17, dst_ip=192.168.0.173, src_port=443, dst_port=43548
-2025-02-07-10:56:48  INFO egress protocol=icmp, src_ip=192.168.0.173, dst_ip=185.76.11.17, src_port=0, dst_port=0
-2025-02-07-10:56:49  INFO ingress protocol=udp, src_ip=185.76.11.17, dst_ip=192.168.0.173, src_port=443, dst_port=43548
-2025-02-07-10:56:49  INFO egress protocol=icmp, src_ip=192.168.0.173, dst_ip=185.76.11.17, src_port=0, dst_port=0
-2025-02-07-10:56:49  INFO egress protocol=udp, src_ip=192.168.0.173, dst_ip=239.255.255.250, src_port=46230, dst_port=1900
-2025-02-07-10:56:49  INFO ingress protocol=udp, src_ip=192.168.0.13, dst_ip=192.168.0.173, src_port=1900, dst_port=46230
-2025-02-07-10:56:49  INFO ingress protocol=udp, src_ip=192.168.0.23, dst_ip=192.168.0.173, src_port=1900, dst_port=46230
-2025-02-07-10:56:49  INFO ingress protocol=udp, src_ip=185.76.11.17, dst_ip=192.168.0.173, src_port=443, dst_port=43548
-2025-02-07-10:56:49  INFO egress protocol=icmp, src_ip=192.168.0.173, dst_ip=185.76.11.17, src_port=0, dst_port=0
-```
-
 # Running `nflux`
 
 > [!NOTE]
 > Setup [local development](./docs/local_dev.md) before using `nflux`. Is the only way by the moment
 
 ```bash
-git clone https://github.com/containerscrew/nflux
-make local-build
-sudo ./target/release/nflux -i wlo1
-sudo ./target/release/nflux -l info -i proton0 --enable-udp # for iface using wireguard
+make local-run INTERFACE=proton0
 ```
 
 # Features
