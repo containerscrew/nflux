@@ -2,7 +2,11 @@ use core::mem;
 
 use aya_ebpf::{bindings::TC_ACT_PIPE, programs::TcContext};
 use network_types::{
-    eth::{EthHdr, EtherType}, icmp::IcmpHdr, ip::{IpProto, Ipv4Hdr, Ipv6Hdr}, tcp::TcpHdr, udp::UdpHdr
+    eth::{EthHdr, EtherType},
+    icmp::IcmpHdr,
+    ip::{IpProto, Ipv4Hdr, Ipv6Hdr},
+    tcp::TcpHdr,
+    udp::UdpHdr,
 };
 use nflux_common::TcConfig;
 
@@ -39,14 +43,14 @@ pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
             match ipv6hdr.next_hdr {
                 IpProto::Tcp => {
                     let _tcphdr: *const TcpHdr = ptr_at(&ctx, EthHdr::LEN + Ipv6Hdr::LEN)?;
-                },
+                }
                 IpProto::Udp => {
                     let _udphdr: *const UdpHdr = ptr_at(&ctx, EthHdr::LEN + Ipv6Hdr::LEN)?;
-                },
+                }
                 IpProto::Icmp => {
                     let _icmphdr: *const IcmpHdr = ptr_at(&ctx, EthHdr::LEN + Ipv6Hdr::LEN)?;
-                },
-                _ => {},
+                }
+                _ => {}
             }
 
             Ok(TC_ACT_PIPE)

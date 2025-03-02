@@ -42,7 +42,7 @@ remote-sync: ## Sync this repository to remote machine using rsync.
 	rsync -avzh --exclude='.git/' --exclude='target/' --exclude='.idea/' $(shell pwd)/ $(USER)@$(IP):/home/$(USER)/nflux
 
 local-run: ## Run nflux locally
-	cargo run --release --config 'target."cfg(all())".runner="sudo -E"'
+	cargo run --release --config 'target."cfg(all())".runner="sudo -E"' -- -i $(INTERFACE)
 
 local-build: ## Build nflux locally
 	cargo build --release
