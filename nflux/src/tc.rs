@@ -111,7 +111,7 @@ pub fn attach_tc_program(
 
     info!(
         "{} program attached to interfaces: {:?}",
-        program_name, interfaces
+        program_name, interfaces.join(",")
     );
 
     Ok(())
