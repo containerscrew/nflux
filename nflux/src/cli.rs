@@ -26,7 +26,8 @@ pub struct Cli {
         help = "List of interfaces to attach the program",
         value_delimiter = ' ',
         num_args = 1..,
-        required = true
+        required = true,
+        default_value_t = get_interfaces().unwr
     )]
     pub interfaces: Vec<String>,
 
