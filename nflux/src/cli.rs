@@ -1,6 +1,8 @@
 use clap::Parser;
 use colored::Colorize;
 
+use crate::utils::set_default_iface;
+
 #[derive(Parser, Debug)]
 #[clap(
     about = "nflux",
@@ -26,8 +28,8 @@ pub struct Cli {
         help = "List of interfaces to attach the program",
         value_delimiter = ' ',
         num_args = 1..,
-        required = true,
-        default_value_t = get_interfaces().unwr
+        default_values_t = set_default_iface(),
+        required = false,
     )]
     pub interfaces: Vec<String>,
 

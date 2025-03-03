@@ -1,5 +1,6 @@
 use std::net::{IpAddr, Ipv4Addr};
 
+use default_net::interface::get_default_interface_name;
 use dns_lookup::lookup_addr;
 use libc::setrlimit;
 use nflux_common::utils::is_private_ip;
@@ -13,6 +14,13 @@ pub fn check_is_root_user(uid: u32) -> Result<(), String> {
         return Err("This program must be run as root. Try: $ sudo nflux --help".to_string());
     }
     Ok(())
+}
+
+pub fn set_default_iface() -> Vec<String> {
+    let mut default_ifaces: Vec<String> = Vec::new();
+    let default_iface = get_default_interface_name().unwrap();
+    default_ifaces.push(default_iface);
+    default_ifaces
 }
 
 /// set_mem_limit bumps the memlock rlimit to infinity.
