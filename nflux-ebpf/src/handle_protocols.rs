@@ -50,7 +50,6 @@ pub fn handle_tcp_packet(
     is_ether: bool,
 ) -> Result<i32, ()> {
     let protocol = IpProto::Tcp as u8;
-
     let (src_port, dst_port);
 
     if is_ether {

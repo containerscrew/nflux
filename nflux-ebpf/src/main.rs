@@ -2,13 +2,15 @@
 #![no_main]
 #![allow(nonstandard_style, dead_code)]
 
-mod handlers;
+mod handle_ipv6;
+mod handle_packet;
+mod handle_protocols;
 mod logger;
 mod maps;
-pub mod tc;
+mod try_tc;
 
 use aya_ebpf::{bindings::TC_ACT_SHOT, macros::classifier, programs::TcContext};
-use tc::try_tc;
+use try_tc::try_tc;
 
 #[classifier]
 pub fn tc_egress(ctx: TcContext) -> i32 {
@@ -18,7 +20,7 @@ pub fn tc_egress(ctx: TcContext) -> i32 {
 
 #[classifier]
 pub fn tc_ingress(ctx: TcContext) -> i32 {
-    // Pass the ctx and 1 which is the direction of the traffic (1: egress, 0: ingress)
+    // Pass the ctx and 0 which is the direction of the traffic (1: egress, 0: ingress)
     try_tc(ctx, 0).unwrap_or_else(|_| TC_ACT_SHOT)
 }
 

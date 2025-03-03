@@ -32,6 +32,9 @@ async fn main() -> anyhow::Result<()> {
         exit(1);
     }
 
+    // Try to set the default iface even if the provided one is not valid
+    //let iface = get_default_interface_name().unwrap();
+
     // Welcome message
     info!("Starting nflux with pid {}", process::id());
 
