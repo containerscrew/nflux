@@ -34,6 +34,7 @@ pub fn handle_icmp_packet(source: u32, destination: u32, direction: u8) -> Resul
             0,
             IpProto::Icmp as u8,
             direction,
+            "icmp"
         )
     };
 
@@ -48,6 +49,7 @@ pub fn handle_tcp_packet(
     ttl: u8,
     direction: u8,
     is_ether: bool,
+    ip_type: &str,
 ) -> Result<i32, ()> {
     let protocol = IpProto::Tcp as u8;
     let (src_port, dst_port);
@@ -74,6 +76,7 @@ pub fn handle_tcp_packet(
             dst_port,
             protocol,
             direction,
+            ip_type
         );
     }
 
@@ -86,6 +89,7 @@ pub fn handle_udp_packet(
     destination: u32,
     direction: u8,
     is_ether: bool,
+    ip_type: &str,
 ) -> Result<i32, ()> {
     let protocol = IpProto::Udp as u8;
 
@@ -111,6 +115,7 @@ pub fn handle_udp_packet(
             dst_port,
             protocol,
             direction,
+            ip_type
         )
     };
 

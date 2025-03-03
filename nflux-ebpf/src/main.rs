@@ -2,7 +2,6 @@
 #![no_main]
 #![allow(nonstandard_style, dead_code)]
 
-mod handle_ipv6;
 mod handle_packet;
 mod handle_protocols;
 mod logger;

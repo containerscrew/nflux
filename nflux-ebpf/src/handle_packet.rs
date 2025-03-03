@@ -32,10 +32,11 @@ pub fn handle_packet(
                     ttl,
                     direction,
                     is_ether,
+                    "ipv4"
                 ),
                 IpProto::Udp => {
                     if configmap.enable_udp == 1 {
-                        handle_udp_packet(ctx, source, destination, direction, is_ether)
+                        handle_udp_packet(ctx, source, destination, direction, is_ether, "ipv4")
                     } else {
                         // UDP traffic monitoring is disabled
                         Ok(TC_ACT_PIPE)

@@ -12,6 +12,7 @@ pub unsafe fn log_connection(
     dst_port: u16,
     protocol: u8,
     direction: u8, // 0: ingress, 1: egress
+    _proto: &str, // ipv4 or ipv6
 ) {
     let event = TcEvent {
         src_ip: source,
