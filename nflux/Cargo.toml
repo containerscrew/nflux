@@ -20,7 +20,7 @@ prometheus = "0.13.4"
 axum = "0.8.1"
 clap = { version = "4.5.32", features = ["derive"] }
 chrono = "0.4.40"
-reqwest = "0.12.13"
+reqwest = "0.12.14"
 colored = "3.0.0"
 default-net = "0.22.0"
 
