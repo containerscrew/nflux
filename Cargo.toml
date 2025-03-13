@@ -19,7 +19,7 @@ clap = { version = "4.5.32", default-features = false, features = ["std"] }
 env_logger = { version = "0.11.6", default-features = false }
 libc = { version = "0.2.171", default-features = false }
 log = { version = "0.4.26", default-features = false }
-tokio = { version = "1.44.0", default-features = false }
+tokio = { version = "1.44.1", default-features = false }
 which = { version = "6.0.0", default-features = false }
 
 [profile.release.package.nflux-ebpf]
