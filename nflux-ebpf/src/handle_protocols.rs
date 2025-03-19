@@ -23,7 +23,7 @@ fn ptr_at<T>(ctx: &TcContext, offset: usize) -> Result<*const T, ()> {
     Ok((start + offset) as *const T)
 }
 
-pub fn handle_icmp_packet(source: u32, destination: u32, direction: u8) -> Result<i32, ()> {
+pub fn handle_icmp_packet(source: u32, destination: u32, direction: u8, pid: u32) -> Result<i32, ()> {
     unsafe {
         log_connection(
             source,
@@ -34,7 +34,8 @@ pub fn handle_icmp_packet(source: u32, destination: u32, direction: u8) -> Resul
             0,
             IpProto::Icmp as u8,
             direction,
-            "icmp"
+            "icmp",
+            pid,
         )
     };
 
@@ -50,6 +51,7 @@ pub fn handle_tcp_packet(
     direction: u8,
     is_ether: bool,
     ip_type: &str,
+    pid: u32,
 ) -> Result<i32, ()> {
     let protocol = IpProto::Tcp as u8;
     let (src_port, dst_port);
@@ -76,7 +78,8 @@ pub fn handle_tcp_packet(
             dst_port,
             protocol,
             direction,
-            ip_type
+            ip_type,
+            pid,
         );
     }
 
@@ -90,6 +93,7 @@ pub fn handle_udp_packet(
     direction: u8,
     is_ether: bool,
     ip_type: &str,
+    pid: u32,
 ) -> Result<i32, ()> {
     let protocol = IpProto::Udp as u8;
 
@@ -115,7 +119,8 @@ pub fn handle_udp_packet(
             dst_port,
             protocol,
             direction,
-            ip_type
+            ip_type,
+            pid,
         )
     };
 

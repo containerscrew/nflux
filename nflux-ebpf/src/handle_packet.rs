@@ -1,4 +1,4 @@
-use aya_ebpf::{bindings::TC_ACT_PIPE, programs::TcContext};
+use aya_ebpf::{bindings::TC_ACT_PIPE, helpers::bpf_get_current_pid_tgid, programs::TcContext};
 use network_types::ip::{IpProto, Ipv4Hdr, Ipv6Hdr};
 use nflux_common::TcConfig;
 
@@ -23,6 +23,9 @@ pub fn handle_packet(
             let total_len = u16::from_be(ipv4hdr.tot_len);
             let ttl = u8::from_be(ipv4hdr.ttl);
 
+            let tgid = bpf_get_current_pid_tgid();
+            let pid = (tgid >> 32) as u32;
+
             match ipv4hdr.proto {
                 IpProto::Tcp => handle_tcp_packet(
                     ctx,
@@ -32,17 +35,18 @@ pub fn handle_packet(
                     ttl,
                     direction,
                     is_ether,
-                    "ipv4"
+                    "ipv4",
+                    pid,
                 ),
                 IpProto::Udp => {
                     if configmap.enable_udp == 1 {
-                        handle_udp_packet(ctx, source, destination, direction, is_ether, "ipv4")
+                        handle_udp_packet(ctx, source, destination, direction, is_ether, "ipv4", pid)
                     } else {
                         // UDP traffic monitoring is disabled
                         Ok(TC_ACT_PIPE)
                     }
                 }
-                IpProto::Icmp => handle_icmp_packet(source, destination, direction),
+                IpProto::Icmp => handle_icmp_packet(source, destination, direction, pid),
                 _ => Ok(TC_ACT_PIPE),
             }
         }

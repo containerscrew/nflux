@@ -1,4 +1,4 @@
-use std::net::Ipv4Addr;
+use std::{ffi::CString, net::Ipv4Addr};
 
 use anyhow::Context;
 use aya::{
@@ -6,6 +6,7 @@ use aya::{
     programs::{tc, SchedClassifier, TcAttachType},
     Ebpf,
 };
+use libc::{c_char, c_int, getservbyport, ntohs, servent};
 use nflux_common::{convert_protocol, TcConfig, TcEvent};
 use tracing::{debug, error, info};
 
@@ -117,6 +118,21 @@ pub fn attach_tc_program(
     Ok(())
 }
 
+fn get_service_name(port: u16, proto: &'static str) -> Option<String> {
+    let c_proto = CString::new(proto).ok()?;
+    let c_port = ntohs(port);
+
+    unsafe {
+        let serv: *mut servent = getservbyport(c_port as c_int, c_proto.as_ptr() as *const c_char);
+        if serv.is_null() {
+            return None;
+        }
+
+        let name = std::ffi::CStr::from_ptr((*serv).s_name).to_string_lossy().into_owned();
+        Some(name)
+    }
+}
+
 pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow::Error> {
     loop {
         while let Some(event) = ring_buf.next() {
@@ -126,15 +142,32 @@ pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow:
             // Make sure the data is the correct size
             if data.len() == std::mem::size_of::<TcEvent>() {
                 let event: &TcEvent = unsafe { &*(data.as_ptr() as *const TcEvent) };
-                // Log the connection
+                let mut service_name = String::new();
+
+                // Get service by name
+                match get_service_name(event.dst_port, convert_protocol(event.protocol)) {
+                    Some(name) => {
+                        service_name.push_str(name.as_str());
+                    }
+                    None => {
+                        service_name.push_str("unknown");
+                    }
+                }
+
+
+                let direction = if event.direction == 0 {
+                    "ingress"
+                } else {
+                    "egress"
+                };
+
                 info!(
-                    "direction={} protocol={}, total_len={} bytes, ttl={}, src_ip={}, dst_ip={}, src_port={}, dst_port={}, iface=tobedefined",
-                    if event.direction == 0 {
-                        "ingress"
-                    } else {
-                        "egress"
-                    },
+                    "direction={} type={}, pid={}, protocol={}, serv={}, total_len={}B, ttl={}, src_ip={}, dst_ip={}, src_port={}, dst_port={}, iface=nodata",
+                    direction,
+                    event.ip_type.as_str(),
+                    event.pid,
                     convert_protocol(event.protocol),
+                    service_name,
                     event.total_len,
                     event.ttl,
                     Ipv4Addr::from(event.src_ip),

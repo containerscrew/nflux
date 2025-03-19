@@ -13,6 +13,22 @@ pub struct TcConfig {
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum IpType {
+    Ipv4,
+    Ipv6,
+}
+
+impl IpType {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            IpType::Ipv4 => "IPv4",
+            IpType::Ipv6 => "IPv6",
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct TcEvent {
     pub src_ip: u32,
     pub dst_ip: u32,
@@ -22,6 +38,8 @@ pub struct TcEvent {
     pub dst_port: u16,
     pub protocol: u8,
     pub direction: u8, // 0: ingress, 1: egress
+    pub ip_type: IpType,
+    pub pid: u32,
 }
 
 #[cfg(feature = "user")]
