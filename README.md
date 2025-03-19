@@ -1,15 +1,12 @@
-# nflux project
-
 <p align="center">
-    <h3 align="center">nflux</h3>
+    <h1 align="center">nflux project</h1>
     <p align="center">Network monitoring tool using eBPF. Powered by Aya-rs 🐝</p>
     <p align="center">Built with ❤ in Rust</p>
 </p>
 
 <!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
 **Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
-- [nflux project](#nflux-project)
-- [nflux](#nflux)
+- [What is nflux?](#what-is-nflux)
   - [What is ebpf?](#what-is-ebpf)
   - [Traffic control](#traffic-control)
 - [Running `nflux`](#running-nflux)
@@ -48,7 +45,7 @@ Options:
   -V, --version                     Print version
 ```
 
-# nflux
+# What is nflux?
 
 Nflux is... (pending to finish)
 
