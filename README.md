@@ -13,14 +13,16 @@
 <!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
 **Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
 - [nflux](#nflux)
+  - [What is ebpf?](#what-is-ebpf)
+  - [Traffic control](#traffic-control)
 - [Running `nflux`](#running-nflux)
-- [Features](#features)
+- [nflux inside a container](#nflux-inside-a-container)
 - [Local development](#local-development)
+- [TODO](#todo)
 - [Contribution](#contribution)
 - [License](#license)
 <!-- END OF TOC -->
 
-# nflux
 
 ```bash
 $ nflux --help
@@ -48,22 +50,46 @@ Options:
   -V, --version                     Print version
 ```
 
+# nflux
+
+Nflux is... (pending to finish)
+
+## What is ebpf?
+
+Provide basic concepts of `ebpf` (pending to finish)
+
+## Traffic control
+
+Provide some diagrams of TC (pending to finish)
+
 # Running `nflux`
 
 > [!NOTE]
 > Setup [local development](./docs/local_dev.md) before using `nflux`. Is the only way by the moment
 
-```bash
-make local-run INTERFACE=proton0
+```shell
+# clone the repo
+cd nflux/
+# Need privilege permissions
+make local-install # by default installed in /usr/local/bin/nflux. Check your $PATH.
+```
+---
+
+```shell
+nflux --help
 ```
 
-# Features
+# nflux inside a container
 
-Pending to add...
+Pending
 
 # Local development
 
 For local development, I don't use containers since the build process is slow. Visit this custom page for [`local development`](./docs/local_dev.md).
+
+# TODO
+
+If you want to take a look at the features I'll be trying to implement as much as possible, check out this doc [`todo_and_features.md`](./docs/todo_and_features.md).
 
 # Contribution
 

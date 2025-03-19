@@ -1,8 +1,8 @@
-use std::net::{IpAddr, Ipv4Addr};
+use std::{ffi::CString, net::{IpAddr, Ipv4Addr}};
 
 use default_net::interface::get_default_interface_name;
 use dns_lookup::lookup_addr;
-use libc::setrlimit;
+use libc::{c_char, c_int, getservbyport, ntohs, servent, setrlimit};
 use nflux_common::utils::is_private_ip;
 use sysinfo::{Pid, System};
 use tokio::signal;
@@ -57,6 +57,21 @@ pub fn _lookup_address(ip: u32) -> String {
             // Perform the reverse DNS lookup
             lookup_addr(&ip).unwrap_or_else(|_| "Unknown host".to_string())
         }
+    }
+}
+
+pub fn get_service_name(port: u16, proto: &'static str) -> Option<String> {
+    let c_proto = CString::new(proto).ok()?;
+    let c_port = ntohs(port);
+
+    unsafe {
+        let serv: *mut servent = getservbyport(c_port as c_int, c_proto.as_ptr() as *const c_char);
+        if serv.is_null() {
+            return None;
+        }
+
+        let name = std::ffi::CStr::from_ptr((*serv).s_name).to_string_lossy().into_owned();
+        Some(name)
     }
 }
 
