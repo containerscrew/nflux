@@ -11,7 +11,7 @@ use tracing::{info, warn};
 /// is_root_user checks if the current user who runs the program is root.
 pub fn check_is_root_user(uid: u32) -> Result<(), String> {
     if uid != 0 {
-        return Err("This program must be run as root. Try: $ sudo nflux --help".to_string());
+        return Err("This program must be run as root. Try: $ sudo nflux -i iface-name".to_string());
     }
     Ok(())
 }
