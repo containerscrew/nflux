@@ -1,0 +1,40 @@
+images:
+- location: "https://download.fedoraproject.org/pub/fedora/linux/releases/41/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-41-1.4.aarch64.qcow2"
+  arch: "aarch64"
+
+user:
+  name: "fedora"
+
+mounts:
+- location: "$HOME/Documents/Code/Personal/nflux"
+  writable: true
+
+- location: "$HOME/.ssh/lima"
+  writable: false
+
+memory: "2GiB"
+cpus: 2
+disk: "15GiB"
+ssh:
+  localPort: 2222
+  loadDotSSHPubKeys: true
+
+provision:
+  - mode: system
+    script: |
+      #!/bin/bash
+      set -eux -o pipefail
+      dnf update -y
+      dnf install -y vim gcc make libbpf libbpf-devel clang clang-tools-extra bpftool bpftrace
+
+  - mode: user
+    script: |
+      #!/bin/bash
+      set -eux -o pipefail
+      curl https://sh.rustup.rs -sSf | sh -s -- -y
+      source $HOME/.cargo/env
+      rustup install stable && rustup toolchain install nightly --component rust-src
+      rustup default nightly
+      cargo install bpf-linker
+      sudo cat $HOME/.ssh/lima/lima.pub >> /home/fedora.linux/.ssh/authorized_keys
+      sudo chmod 0644 /home/fedora.linux/.ssh/authorized_keys
