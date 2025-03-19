@@ -12,3 +12,4 @@ List of things to improve and comming features:
 - [4] SSL/TLS http(s) sniffing usind uprobes/ureprobes (openssl)
 - [5] Add filters: user can filter by protocol, dest ip ...etc
 - [6] Multiple interface attachment. Early in development, in order to get a simple first version, I implemented nflux so that it could attach programs to multiple system interfaces. For simplicity in the code and log management, I decided to remove it.
+- [7] TESTING!
