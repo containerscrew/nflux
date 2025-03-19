@@ -13,7 +13,7 @@ use crate::utils::get_service_name;
 
 pub fn start_traffic_control(
     bpf: &mut Ebpf,
-    interfaces: Vec<String>,
+    interface: String,
     enable_ingress: bool,
     disable_egress: bool,
     configmap: TcConfig,
@@ -22,7 +22,7 @@ pub fn start_traffic_control(
         attach_tc_program(
             bpf,
             "tc_egress",
-            interfaces.as_slice(),
+            interface.as_str(),
             TcAttachType::Egress,
         )?;
     }
@@ -31,7 +31,7 @@ pub fn start_traffic_control(
         attach_tc_program(
             bpf,
             "tc_ingress",
-            interfaces.as_slice(),
+            interface.as_str(),
             TcAttachType::Ingress,
         )?;
     }
@@ -57,7 +57,7 @@ pub fn populate_egress_config(bpf: &mut Ebpf, config: TcConfig) -> anyhow::Resul
 pub fn attach_tc_program(
     bpf: &mut Ebpf,
     program_name: &str,
-    interfaces: &[String],
+    interface: &str,
     attach_type: TcAttachType,
 ) -> anyhow::Result<()> {
     // Retrieve the eBPF program
@@ -88,32 +88,29 @@ pub fn attach_tc_program(
     }
 
     // Iterate over interfaces and attach the program
-    for interface in interfaces {
-        // Add clsact qdisc to the interface
-        if let Err(e) = tc::qdisc_add_clsact(interface) {
-            debug!(
-                "Failed to add clsact qdisc to interface {}: {:?}",
-                interface, e
-            );
-        }
+    if let Err(e) = tc::qdisc_add_clsact(interface) {
+        debug!(
+            "Failed to add clsact qdisc to interface {}: {:?}",
+            interface, e
+        );
+    }
 
-        // Attach the eBPF program to the egress path of the interface
-        if let Err(e) = program.attach(interface, attach_type) {
-            error!(
-                "Failed to attach {} program to interface {}: {:?}",
-                program_name, interface, e
-            );
-            return Err(anyhow::anyhow!(
-                "Failed to attach {} program to interface {}",
-                program_name,
-                interface
-            ));
-        }
+    // Attach the eBPF program to the egress path of the interface
+    if let Err(e) = program.attach(interface, attach_type) {
+        error!(
+            "Failed to attach {} program to interface {}: {:?}",
+            program_name, interface, e
+        );
+        return Err(anyhow::anyhow!(
+            "Failed to attach {} program to interface {}",
+            program_name,
+            interface
+        ));
     }
 
     info!(
-        "{} program attached to interfaces: {:?}",
-        program_name, interfaces.join(",")
+        "{} program attached to interface {}",
+        program_name, interface
     );
 
     Ok(())
