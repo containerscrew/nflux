@@ -1,11 +1,14 @@
+# nflux project
+
 <p align="center">
     <h3 align="center">nflux</h3>
-    <p align="center">Network monitoring and firewall using EBPF, XDP and TC. Powered by Aya-rs</p>
+    <p align="center">Network monitoring tool using eBPF. Powered by Aya-rs 🐝</p>
     <p align="center">Built with ❤ in Rust</p>
 </p>
 
 <!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
 **Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
+- [nflux project](#nflux-project)
 - [nflux](#nflux)
   - [What is ebpf?](#what-is-ebpf)
   - [Traffic control](#traffic-control)
