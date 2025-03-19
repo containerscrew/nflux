@@ -59,7 +59,7 @@ async fn main() -> anyhow::Result<()> {
     // Attach TC program to interfaces
     start_traffic_control(
         &mut bpf,
-        cli.interfaces,
+        cli.interface,
         cli.enable_ingress,
         cli.disable_egress,
         tc_config,

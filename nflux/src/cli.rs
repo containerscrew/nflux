@@ -24,14 +24,12 @@ pub struct Cli {
 
     #[arg(
         short = 'i',
-        long = "interfaces",
-        help = "List of interfaces to attach the program",
-        value_delimiter = ' ',
-        num_args = 1..,
-        default_values_t = set_default_iface(),
+        long = "interface",
+        help = "Interface to attach the program",
+        default_value_t = set_default_iface(),
         required = false,
     )]
-    pub interfaces: Vec<String>,
+    pub interface: String,
 
     #[arg(
         long = "disable-egress",
