@@ -1,9 +1,3 @@
-> [!WARNING]
-> This tool is under development :)
-
-> [!NOTE]
-> [In this branch](https://github.com/containerscrew/nflux/tree/old-20250206) I tried to implement firewall functions using XDP, which I have now removed due to complexity given my initial knowledge of eBPF and control of TCP states (syn/ack/rst...etc) in ipv4, ipv6, among other problems. I will change the tool to be a simple cli to monitor eggress/ingress traffic using TC. As a first feature to learn how to use eBPF with Aya-rs, it is enough for someone who is learning.
-
 <p align="center">
     <h3 align="center">nflux</h3>
     <p align="center">Network monitoring and firewall using EBPF, XDP and TC. Powered by Aya-rs</p>
@@ -19,6 +13,7 @@
 - [nflux inside a container](#nflux-inside-a-container)
 - [Local development](#local-development)
 - [TODO](#todo)
+- [old nflux](#old-nflux)
 - [Contribution](#contribution)
 - [License](#license)
 <!-- END OF TOC -->
@@ -90,6 +85,11 @@ For local development, I don't use containers since the build process is slow. V
 # TODO
 
 If you want to take a look at the features I'll be trying to implement as much as possible, check out this doc [`todo_and_features.md`](./docs/todo_and_features.md).
+
+# old nflux
+
+> [!NOTE]
+> [In this branch](https://github.com/containerscrew/nflux/tree/old-20250206) I tried to implement firewall functions using XDP, which I have now removed due to complexity given my initial knowledge of eBPF and control of TCP states (syn/ack/rst...etc) in ipv4, ipv6, among other problems. I will change the tool to be a simple cli to monitor eggress/ingress traffic using TC. As a first feature to learn how to use eBPF with Aya-rs, it is enough for someone who is learning.
 
 # Contribution
 
