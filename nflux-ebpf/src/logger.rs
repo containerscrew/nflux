@@ -1,4 +1,4 @@
-use nflux_common::TcEvent;
+use nflux_common::{IpType, TcEvent};
 
 use crate::maps::{ActiveConnectionKey, ACTIVE_CONNECTIONS, TC_EVENT};
 
@@ -12,7 +12,8 @@ pub unsafe fn log_connection(
     dst_port: u16,
     protocol: u8,
     direction: u8, // 0: ingress, 1: egress
-    _proto: &str, // ipv4 or ipv6
+    proto: &str, // ipv4 or ipv6
+    pid: u32,
 ) {
     let event = TcEvent {
         src_ip: source,
@@ -23,6 +24,12 @@ pub unsafe fn log_connection(
         dst_port,
         protocol,
         direction,
+        ip_type: if proto == "ipv4" {
+            IpType::Ipv4
+        } else {
+            IpType::Ipv6
+        },
+        pid,
     };
 
     let key = ActiveConnectionKey {
