@@ -1,7 +1,7 @@
 <p align="center">
     <h1 align="center">nflux project</h1>
     <p align="center">Network monitoring tool using eBPF. Powered by Aya-rs 🐝</p>
-    <p align="center">Built with ❤ in Rust</p>
+    <p align="center">Kernel and user space code written entirely in Rust ❤</p>
 </p>
 
 <!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
