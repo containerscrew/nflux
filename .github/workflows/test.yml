@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - '**.rs'
+      - .github/workflows/test.yml
     branches:
       - '**'
 
