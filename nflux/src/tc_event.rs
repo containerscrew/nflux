@@ -1,4 +1,5 @@
 use std::net::Ipv4Addr;
+use std::hash::{DefaultHasher, Hash, Hasher};
 
 use aya::maps::{MapData, RingBuf};
 use nflux_common::TcEvent;
@@ -34,7 +35,7 @@ pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow:
                 };
 
                 info!(
-                    "direction={} type={}, pid={}, protocol={}, serv={}, total_len={}B, ttl={}, src_ip={}, dst_ip={}, src_port={}, dst_port={}",
+                    "dir={} type={}, pid={}, protocol={}, serv={}, total_len={}B, ttl={}, src_ip={}, dst_ip={}, src_port={}, dst_port={}",
                     direction,
                     event.ip_type.as_str(),
                     event.pid,

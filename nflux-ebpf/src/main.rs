@@ -4,8 +4,8 @@
 
 mod handle_packet;
 mod handle_protocols;
-mod logger;
 mod maps;
+mod tc_event;
 mod try_tc;
 
 use aya_ebpf::{bindings::TC_ACT_SHOT, macros::classifier, programs::TcContext};

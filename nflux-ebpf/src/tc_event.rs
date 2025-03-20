@@ -49,6 +49,6 @@ pub unsafe fn log_connection(
     }
 
     // Store the active connection: (PID, Destination IP) -> 1 (dummy value)
-    let value: u8 = 1;
+    let value: u64 = 1;
     ACTIVE_CONNECTIONS.insert(&key, &value, 0).ok();
 }

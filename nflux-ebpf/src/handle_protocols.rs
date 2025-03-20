@@ -8,7 +8,7 @@ use network_types::{
     udp::UdpHdr,
 };
 
-use crate::logger::log_connection;
+use crate::tc_event::log_connection;
 
 #[inline]
 fn ptr_at<T>(ctx: &TcContext, offset: usize) -> Result<*const T, ()> {
