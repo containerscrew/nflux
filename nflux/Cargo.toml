@@ -16,8 +16,6 @@ tracing = "0.1.40"
 bytes = "1.10.1"
 dns-lookup = "2.0.4"
 sysinfo = "0.33.1"
-prometheus = "0.13.4"
-axum = "0.8.1"
 clap = { version = "4.5.32", features = ["derive"] }
 chrono = "0.4.40"
 reqwest = "0.12.15"
