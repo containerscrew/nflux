@@ -1,4 +1,7 @@
-use std::{ffi::CString, net::{IpAddr, Ipv4Addr}};
+use std::{
+    ffi::CString,
+    net::{IpAddr, Ipv4Addr},
+};
 
 use default_net::interface::get_default_interface_name;
 use dns_lookup::lookup_addr;
@@ -11,7 +14,9 @@ use tracing::{info, warn};
 /// is_root_user checks if the current user who runs the program is root.
 pub fn check_is_root_user(uid: u32) -> Result<(), String> {
     if uid != 0 {
-        return Err("This program must be run as root. Try: $ sudo nflux -i iface-name".to_string());
+        return Err(
+            "This program must be run as root. Try: $ sudo nflux -i iface-name".to_string(),
+        );
     }
     Ok(())
 }
@@ -68,7 +73,9 @@ pub fn get_service_name(port: u16, proto: &'static str) -> Option<String> {
             return None;
         }
 
-        let name = std::ffi::CStr::from_ptr((*serv).s_name).to_string_lossy().into_owned();
+        let name = std::ffi::CStr::from_ptr((*serv).s_name)
+            .to_string_lossy()
+            .into_owned();
         Some(name)
     }
 }

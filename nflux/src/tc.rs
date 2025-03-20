@@ -19,21 +19,11 @@ pub fn start_traffic_control(
     configmap: TcConfig,
 ) -> Result<(), anyhow::Error> {
     if !disable_egress {
-        attach_tc_program(
-            bpf,
-            "tc_egress",
-            interface.as_str(),
-            TcAttachType::Egress,
-        )?;
+        attach_tc_program(bpf, "tc_egress", interface.as_str(), TcAttachType::Egress)?;
     }
 
     if enable_ingress {
-        attach_tc_program(
-            bpf,
-            "tc_ingress",
-            interface.as_str(),
-            TcAttachType::Ingress,
-        )?;
+        attach_tc_program(bpf, "tc_ingress", interface.as_str(), TcAttachType::Ingress)?;
     }
 
     // Populate config
