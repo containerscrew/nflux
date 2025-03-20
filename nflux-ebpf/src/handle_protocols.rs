@@ -23,7 +23,12 @@ fn ptr_at<T>(ctx: &TcContext, offset: usize) -> Result<*const T, ()> {
     Ok((start + offset) as *const T)
 }
 
-pub fn handle_icmp_packet(source: u32, destination: u32, direction: u8, pid: u32) -> Result<i32, ()> {
+pub fn handle_icmp_packet(
+    source: u32,
+    destination: u32,
+    direction: u8,
+    pid: u32,
+) -> Result<i32, ()> {
     unsafe {
         log_connection(
             source,
