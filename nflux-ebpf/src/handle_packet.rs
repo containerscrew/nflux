@@ -27,17 +27,22 @@ pub fn handle_packet(
             let pid = (tgid >> 32) as u32;
 
             match ipv4hdr.proto {
-                IpProto::Tcp => handle_tcp_packet(
-                    ctx,
-                    source,
-                    destination,
-                    total_len,
-                    ttl,
-                    direction,
-                    is_ether,
-                    "ipv4",
-                    pid,
-                ),
+                IpProto::Tcp =>
+                if configmap.enable_tcp == 1 {
+                        handle_tcp_packet(
+                            ctx,
+                            source,
+                            destination,
+                            total_len,
+                            ttl,
+                            direction,
+                            is_ether,
+                            "ipv4",
+                            pid,
+                        )
+                } else {
+                    Ok(TC_ACT_PIPE)
+                }
                 IpProto::Udp => {
                     if configmap.enable_udp == 1 {
                         handle_udp_packet(
@@ -54,7 +59,12 @@ pub fn handle_packet(
                         Ok(TC_ACT_PIPE)
                     }
                 }
-                IpProto::Icmp => handle_icmp_packet(source, destination, direction, pid),
+                IpProto::Icmp =>
+                    if configmap.enable_icmp == 1 {
+                        handle_icmp_packet(source, destination, direction, pid)
+                    } else {
+                        Ok(TC_ACT_PIPE)
+                    }
                 _ => Ok(TC_ACT_PIPE),
             }
         }

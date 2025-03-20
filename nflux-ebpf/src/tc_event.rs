@@ -1,5 +1,5 @@
+use aya_ebpf::helpers::gen::bpf_ktime_get_ns;
 use nflux_common::{IpType, TcEvent};
-
 use crate::maps::{ActiveConnectionKey, ACTIVE_CONNECTIONS, TC_EVENT};
 
 #[inline]
@@ -32,14 +32,20 @@ pub unsafe fn log_connection(
         pid,
     };
 
+    // Get current time
+    let current_time = bpf_ktime_get_ns();
+
     let key = ActiveConnectionKey {
-        src_port: src_port as u32,
-        dst_ip: destination as u32,
+        port:  if direction == 1 { src_port as u32 } else { dst_port as u32},
+        ip:  if direction == 1 { destination } else {source},
     };
 
     // If the connection (src_port, dst_ip) is already tracked, return
-    if ACTIVE_CONNECTIONS.get(&key).is_some() {
-        return;
+    if let Some(last_log_time) = ACTIVE_CONNECTIONS.get(&key) {
+        // Check if the timestamp is less than 10 seconds
+        if current_time - *last_log_time < 10_000_000_000 {
+            return;
+        }
     }
 
     // Log the connection event
@@ -49,6 +55,5 @@ pub unsafe fn log_connection(
     }
 
     // Store the active connection: (PID, Destination IP) -> 1 (dummy value)
-    let value: u64 = 1;
-    ACTIVE_CONNECTIONS.insert(&key, &value, 0).ok();
+    ACTIVE_CONNECTIONS.insert(&key, &current_time, 0).ok();
 }

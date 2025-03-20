@@ -50,8 +50,10 @@ async fn main() -> anyhow::Result<()> {
 
     // Traffic control configuration. This data will be used in a shared ebpf map
     let configmap = Configmap {
-        disable_private_ips: is_true(cli.disable_private_ips), // 0 = no, 1 = yes
+        disable_private_ips: 1, // Not implemented yet
         enable_udp: is_true(cli.enable_udp),                   // 0 = no, 1 = yes
+        enable_icmp: is_true(cli.enable_icmp),
+        enable_tcp: is_true(cli.enable_tcp),
     };
 
     // Attach TC program to the interface
@@ -59,7 +61,7 @@ async fn main() -> anyhow::Result<()> {
         &mut bpf,
         cli.interface,
         cli.enable_ingress,
-        cli.disable_egress,
+        cli.enable_egress,
         configmap,
     )?;
 
