@@ -53,3 +53,6 @@ local-install: local-build ## Install nflux binary locally
 
 test: ## Run tests
 	cargo test --locked
+
+check-unused-deps: ## Check for unused dependencies. $ cargo install cargo-machete
+	cargo machete --with-metadata
