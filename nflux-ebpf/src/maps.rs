@@ -4,7 +4,6 @@ use aya_ebpf::{
 };
 use nflux_common::Configmap;
 
-
 // Define a struct for the key: (pid, destination IP)
 #[repr(C)]
 #[derive(Clone, Copy)]

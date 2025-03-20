@@ -3,8 +3,8 @@ use std::process::{self, exit};
 use aya::{include_bytes_aligned, maps::RingBuf, Ebpf};
 use clap::Parser;
 use cli::Cli;
-use libc::getuid;
 use custom_logger::{setup_logger, LogFormat};
+use libc::getuid;
 use nflux_common::Configmap;
 use tc_event::process_event;
 use tracing::{error, info};
@@ -15,9 +15,9 @@ use crate::utils::check_is_root_user;
 
 mod cli;
 mod custom_logger;
+mod tc_event;
 mod try_tc;
 mod utils;
-mod tc_event;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -25,7 +25,11 @@ async fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
 
     // Enable logging
-    let log_format = if cli.log_format == "json" { LogFormat::Json } else { LogFormat::Text };
+    let log_format = if cli.log_format == "json" {
+        LogFormat::Json
+    } else {
+        LogFormat::Text
+    };
     setup_logger(&cli.log_level, log_format);
 
     // Ensure the program is run as root
