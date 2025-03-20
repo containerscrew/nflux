@@ -9,6 +9,7 @@
 - [What is nflux?](#what-is-nflux)
   - [What is ebpf?](#what-is-ebpf)
   - [Traffic control](#traffic-control)
+- [Compatibility](#compatibility)
 - [Running `nflux`](#running-nflux)
 - [nflux inside a container](#nflux-inside-a-container)
 - [Docs](#docs)
@@ -45,6 +46,7 @@ Options:
   -V, --version                  Print version
 ```
 
+
 # What is nflux?
 
 Nflux is... (pending to finish)
@@ -56,6 +58,15 @@ Provide basic concepts of `ebpf` (pending to finish)
 ## Traffic control
 
 Provide some diagrams of TC (pending to finish)
+
+# Compatibility
+
+|   OS    | ARM64 | AMD64 | Kernel version |
+|---------|------|------|------|
+| fedora linux   | ✅    | ✅  |`6.13.7-200.fc41.x86_64 ` |
+
+> For example, in Debian12 with kernel version `6.1.0-31-amd64` nflux doest not works. Probably for the version of kernel bpf.
+
 
 # Running `nflux`
 
