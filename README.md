@@ -11,9 +11,7 @@
   - [Traffic control](#traffic-control)
 - [Running `nflux`](#running-nflux)
 - [nflux inside a container](#nflux-inside-a-container)
-- [Local development](#local-development)
-- [TODO](#todo)
-- [old nflux](#old-nflux)
+- [Docs](#docs)
 - [Contribution](#contribution)
 - [License](#license)
 <!-- END OF TOC -->
@@ -76,20 +74,19 @@ nflux --help
 
 # nflux inside a container
 
-Pending
+```shell
+podman run --rm -it --name nflux --privileged --net host docker.io/containerscrew/nflux:latest
+```
 
-# Local development
+> By the moment `latest` tag
 
-For local development, I don't use containers since the build process is slow. Visit this custom page for [`local development`](./docs/local_dev.md).
+# Docs
 
-# TODO
+More documentation inside [`docs`](./docs/)) folder:
 
-If you want to take a look at the features I'll be trying to implement as much as possible, check out this doc [`todo_and_features.md`](./docs/todo_and_features.md).
-
-# old nflux
-
-> [!NOTE]
-> [In this branch](https://github.com/containerscrew/nflux/tree/old-20250206) I tried to implement firewall functions using XDP, which I have now removed due to complexity given my initial knowledge of eBPF and control of TCP states (syn/ack/rst...etc) in ipv4, ipv6, among other problems. I will change the tool to be a simple cli to monitor eggress/ingress traffic using TC. As a first feature to learn how to use eBPF with Aya-rs, it is enough for someone who is learning.
+- Todo and features
+- Local development
+- Old nflux
 
 # Contribution
 
