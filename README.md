@@ -30,17 +30,19 @@ $ nflux --help
 
 Network monitoring tool & TLS/SSL sniffer using eBPF. Powered by Aya-rs 🐝
 
-Usage: nflux [OPTIONS] --interfaces <INTERFACES>...
+Usage: nflux [OPTIONS]
 
 Options:
-  -l, --log-level <LOG_LEVEL>       Log level for logging tracing. Possible values: info, warn, trace, debug, error. Default: info [default: info]
-  -i, --interfaces <INTERFACES>...  List of interfaces to attach the program
-      --disable-egress              Disable egress
-      --enable-ingress              Enable ingress traffic monitoring
-      --disable-private-ips         Disable private ips network monitoring
-      --enable-udp                  Enable udp network monitoring
-  -h, --help                        Print help
-  -V, --version                     Print version
+  -l, --log-level <LOG_LEVEL>    Log level for logging tracing. Possible values: info, warn, trace, debug, error. [default: info]
+      --log-format <LOG_FORMAT>  Log format for logging tracing. Possible values: text, json. [default: text]
+  -i, --interface <INTERFACE>    Interface to attach the program. [default: proton0]
+      --enable-egress            Enable egress traffic monitoring. [default: true]
+      --enable-ingress           Enable ingress traffic monitoring. [default: false]
+      --enable-udp               Enable udp protocol network monitoring. [default: false]
+      --enable-icmp              Enable icmp protocol network monitoring. [default: false]
+      --enable-tcp               Enable tcp protocol network monitoring. [default: true]
+  -h, --help                     Print help
+  -V, --version                  Print version
 ```
 
 # What is nflux?

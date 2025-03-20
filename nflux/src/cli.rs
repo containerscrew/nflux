@@ -33,43 +33,51 @@ pub struct Cli {
     #[arg(
         short = 'i',
         long = "interface",
-        help = "Interface to attach the program",
+        help = "Interface to attach the program.",
         default_value_t = set_default_iface(),
         required = false,
     )]
     pub interface: String,
 
     #[arg(
-        long = "disable-egress",
-        help = "Disable egress",
-        default_value_t = false,
+        long = "enable-egress",
+        help = "Enable egress traffic monitoring. [default: true]",
+        default_value_t = true,
         required = false
     )]
-    pub disable_egress: bool,
+    pub enable_egress: bool,
 
     #[arg(
         long = "enable-ingress",
-        help = "Enable ingress traffic monitoring",
+        help = "Enable ingress traffic monitoring. [default: false]",
         default_value_t = false,
         required = false
     )]
     pub enable_ingress: bool,
 
     #[arg(
-        long = "disable-private-ips",
-        help = "Disable private ips network monitoring",
-        default_value_t = true,
-        required = false
-    )]
-    pub disable_private_ips: bool,
-
-    #[arg(
         long = "enable-udp",
-        help = "Enable udp network monitoring",
+        help = "Enable udp protocol network monitoring. [default: false]",
         default_value_t = false,
         required = false
     )]
     pub enable_udp: bool,
+
+    #[arg(
+        long = "enable-icmp",
+        help = "Enable icmp protocol network monitoring. [default: false]",
+        default_value_t = false,
+        required = false
+    )]
+    pub enable_icmp: bool,
+
+    #[arg(
+        long = "enable-tcp",
+        help = "Enable tcp protocol network monitoring. [default: true]",
+        default_value_t = true,
+        required = false
+    )]
+    pub enable_tcp: bool,
 }
 
 fn print_banner() -> String {

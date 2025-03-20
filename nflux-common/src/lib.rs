@@ -7,6 +7,8 @@ pub mod utils;
 pub struct Configmap {
     pub disable_private_ips: u8, // 0 = no, 1 = yes
     pub enable_udp: u8,          // 0 = no, 1 = yes
+    pub enable_icmp: u8,         // 0 = no, 1 = yes
+    pub enable_tcp: u8,          // 0 = no, 1 = yes
 }
 
 #[repr(C)]

@@ -11,10 +11,10 @@ pub fn try_traffic_control(
     bpf: &mut Ebpf,
     interface: String,
     enable_ingress: bool,
-    disable_egress: bool,
+    enable_egress: bool,
     configmap: Configmap,
 ) -> Result<(), anyhow::Error> {
-    if !disable_egress {
+    if enable_egress {
         attach_tc_program(bpf, "tc_egress", interface.as_str(), TcAttachType::Egress)?;
     }
 
@@ -24,6 +24,7 @@ pub fn try_traffic_control(
 
     // Populate config
     populate_configmap(bpf, configmap)?;
+
     Ok(())
 }
 
@@ -98,6 +99,8 @@ pub fn populate_configmap(bpf: &mut Ebpf, config: Configmap) -> anyhow::Result<(
     tc_config
         .set(0, config, 0)
         .context("Failed to set TC_CONFIG")?;
+
+    debug!("eBPF map TC_CONFIG successfully loaded with struct Configmap");
 
     Ok(())
 }
