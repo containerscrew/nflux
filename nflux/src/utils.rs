@@ -114,7 +114,7 @@ mod tests {
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err(),
-            "This program must be run as root. Try: $ sudo nflux --help"
+            "This program must be run as root. Try: $ sudo nflux -i iface-name"
         );
     }
 }
