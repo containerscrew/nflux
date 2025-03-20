@@ -62,6 +62,24 @@ pub fn _lookup_address(ip: u32) -> String {
     }
 }
 
+/// is_true converts a boolean value to a u8. In C terms, 1 is true and 0 is false.
+pub fn is_true(value: bool) -> u8 {
+    if value {
+        return 1;
+    }
+    0
+}
+
+/// convert_protocol converts the protocol number to a string.
+pub fn convert_protocol(protocol: u8) -> &'static str {
+    match protocol {
+        1 => "icmp",
+        6 => "tcp",
+        17 => "udp",
+        _ => "unknown",
+    }
+}
+
 pub fn get_service_name(port: u16, proto: &'static str) -> Option<String> {
     let c_proto = CString::new(proto).ok()?;
     let c_port = ntohs(port);

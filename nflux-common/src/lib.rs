@@ -4,9 +4,7 @@ pub mod utils;
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct TcConfig {
-    pub disable_egress: u8,      // 0 = no, 1 = yes
-    pub enable_ingress: u8,      // 0 = no, 1 = yes
+pub struct Configmap {
     pub disable_private_ips: u8, // 0 = no, 1 = yes
     pub enable_udp: u8,          // 0 = no, 1 = yes
 }
@@ -46,14 +44,5 @@ pub struct TcEvent {
 pub mod user {
     use super::*;
 
-    unsafe impl aya::Pod for TcConfig {}
-}
-
-pub fn convert_protocol(protocol: u8) -> &'static str {
-    match protocol {
-        1 => "icmp",
-        6 => "tcp",
-        17 => "udp",
-        _ => "unknown",
-    }
+    unsafe impl aya::Pod for Configmap {}
 }

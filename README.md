@@ -1,6 +1,6 @@
 <p align="center">
     <h1 align="center">nflux project</h1>
-    <p align="center">Network monitoring tool using eBPF. Powered by Aya-rs 🐝</p>
+    <p align="center">Network monitoring tool and tls/ssl sniffer using eBPF. Powered by Aya-rs 🐝</p>
     <p align="center">Kernel and user space code written entirely in Rust ❤</p>
 </p>
 
@@ -28,7 +28,7 @@ $ nflux --help
     ╚═╝  ╚═══╝╚═╝     ╚══════╝ ╚═════╝ ╚═╝  ╚═╝
 
 
-Network monitoring tool using eBPF. Powered by Aya-rs 🐝
+Network monitoring tool and tls/ssl sniffer using eBPF. Powered by Aya-rs 🐝
 
 Usage: nflux [OPTIONS] --interfaces <INTERFACES>...
 

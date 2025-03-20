@@ -1,6 +1,7 @@
 use aya_ebpf::{bindings::TC_ACT_PIPE, helpers::bpf_get_current_pid_tgid, programs::TcContext};
 use network_types::ip::{IpProto, Ipv4Hdr, Ipv6Hdr};
-use nflux_common::TcConfig;
+use nflux_common::Configmap;
+
 
 use crate::handle_protocols::{handle_icmp_packet, handle_tcp_packet, handle_udp_packet};
 
@@ -12,7 +13,7 @@ pub enum IpHeader {
 pub fn handle_packet(
     ctx: &TcContext,
     direction: u8,
-    configmap: &TcConfig,
+    configmap: &Configmap,
     header: IpHeader,
     is_ether: bool,
 ) -> Result<i32, ()> {
