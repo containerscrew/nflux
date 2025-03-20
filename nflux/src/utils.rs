@@ -22,8 +22,7 @@ pub fn check_is_root_user(uid: u32) -> Result<(), String> {
 }
 
 pub fn set_default_iface() -> String {
-    let default_iface = get_default_interface_name().unwrap();
-    default_iface
+    get_default_interface_name().unwrap()
 }
 
 /// set_mem_limit bumps the memlock rlimit to infinity.
