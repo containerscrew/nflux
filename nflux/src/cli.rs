@@ -8,7 +8,7 @@ use crate::utils::set_default_iface;
     about = "nflux",
     version = env!("CARGO_PKG_VERSION"),
     author = "Containerscrew info@containerscrew.com",
-    about = "Network monitoring tool using eBPF. Powered by Aya-rs 🐝",
+    about = "Network monitoring tool and tls/ssl sniffer using eBPF. Powered by Aya-rs 🐝",
     arg_required_else_help = false,
     before_help = print_banner()
 )]
@@ -21,6 +21,14 @@ pub struct Cli {
         required = false
     )]
     pub log_level: String,
+
+    #[arg(
+        long = "log-format",
+        help = "Log format for logging tracing. Possible values: text, json.",
+        default_value = "text",
+        required = false
+    )]
+    pub log_format: String,
 
     #[arg(
         short = 'i',

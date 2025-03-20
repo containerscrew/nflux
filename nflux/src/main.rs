@@ -4,18 +4,20 @@ use aya::{include_bytes_aligned, maps::RingBuf, Ebpf};
 use clap::Parser;
 use cli::Cli;
 use libc::getuid;
-use logger::{setup_logger, LogFormat};
-use nflux_common::{utils::is_true, TcConfig};
-use tc::{process_event, start_traffic_control};
+use custom_logger::{setup_logger, LogFormat};
+use nflux_common::Configmap;
+use tc_event::process_event;
 use tracing::{error, info};
-use utils::{set_mem_limit, wait_for_shutdown};
+use try_tc::try_traffic_control;
+use utils::{is_true, set_mem_limit, wait_for_shutdown};
 
 use crate::utils::check_is_root_user;
 
 mod cli;
-mod logger;
-mod tc;
+mod custom_logger;
+mod try_tc;
 mod utils;
+mod tc_event;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -23,7 +25,8 @@ async fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
 
     // Enable logging
-    setup_logger(&cli.log_level, LogFormat::Text);
+    let log_format = if cli.log_format == "json" { LogFormat::Json } else { LogFormat::Text };
+    setup_logger(&cli.log_level, log_format);
 
     // Ensure the program is run as root
     let uid = unsafe { getuid() };
@@ -32,37 +35,28 @@ async fn main() -> anyhow::Result<()> {
         exit(1);
     }
 
-    // Try to set the default iface even if the provided one is not valid
-    //let iface = get_default_interface_name().unwrap();
-
     // Welcome message
     info!("Starting nflux with pid {}", process::id());
 
-    // Set memory limit
+    // Set memory limit.
     set_mem_limit();
 
     // Load eBPF program
     let mut bpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/nflux")))?;
 
-    // Necessary to debug something in the ebpf code
-    // if let Err(e) = EbpfLogger::init(&mut bpf) {
-    //     warn!("failed to initialize eBPF logger: {}", e);
-    // }
-
-    let tc_config = TcConfig {
-        disable_egress: is_true(cli.disable_egress),
-        enable_ingress: is_true(cli.enable_ingress),
-        disable_private_ips: is_true(cli.disable_private_ips),
-        enable_udp: is_true(cli.enable_udp),
+    // Traffic control configuration. This data will be used in a shared ebpf map
+    let configmap = Configmap {
+        disable_private_ips: is_true(cli.disable_private_ips), // 0 = no, 1 = yes
+        enable_udp: is_true(cli.enable_udp),                   // 0 = no, 1 = yes
     };
 
-    // Attach TC program to interfaces
-    start_traffic_control(
+    // Attach TC program to the interface
+    try_traffic_control(
         &mut bpf,
         cli.interface,
         cli.enable_ingress,
         cli.disable_egress,
-        tc_config,
+        configmap,
     )?;
 
     // Traffic control event ring buffer
