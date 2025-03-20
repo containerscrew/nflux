@@ -134,7 +134,7 @@ pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow:
                 };
 
                 info!(
-                    "direction={} type={}, pid={}, protocol={}, serv={}, total_len={}B, ttl={}, src_ip={}, dst_ip={}, src_port={}, dst_port={}, iface=nodata",
+                    "direction={} type={}, pid={}, protocol={}, serv={}, total_len={}B, ttl={}, src_ip={}, dst_ip={}, src_port={}, dst_port={}",
                     direction,
                     event.ip_type.as_str(),
                     event.pid,
@@ -147,10 +147,6 @@ pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow:
                     event.src_port,
                     event.dst_port,
                 );
-
-                // if ! is_private_ip(event.dst_ip) {
-                //     get_geolocation(Ipv4Addr::from(event.dst_ip).to_string().as_str()).await;
-                // }
             }
         }
 
