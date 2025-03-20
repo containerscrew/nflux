@@ -82,7 +82,7 @@ podman run --rm -it --name nflux --privileged --net host docker.io/containerscre
 
 # Docs
 
-More documentation inside [`docs`](./docs/)) folder:
+More documentation inside [`docs`](./docs/) folder:
 
 - Todo and features
 - Local development
