@@ -1,5 +1,6 @@
 use aya_ebpf::helpers::gen::bpf_ktime_get_ns;
 use nflux_common::{IpType, TcEvent};
+
 use crate::maps::{ActiveConnectionKey, ACTIVE_CONNECTIONS, TC_EVENT};
 
 #[inline]
@@ -40,13 +41,16 @@ pub unsafe fn log_connection(
             data.submit(0);
         }
     } else {
-
         // Get current time
         let current_time = bpf_ktime_get_ns();
 
         let key = ActiveConnectionKey {
-            port:  if direction == 1 { src_port as u32 } else { dst_port as u32},
-            ip:  if direction == 1 { destination } else {source},
+            port: if direction == 1 {
+                src_port as u32
+            } else {
+                dst_port as u32
+            },
+            ip: if direction == 1 { destination } else { source },
         };
 
         // If the connection (src_port, dst_ip) is already tracked, return

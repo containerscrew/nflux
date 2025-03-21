@@ -92,7 +92,7 @@ pub fn handle_tcp_packet(
             ip_type,
             pid,
             log_interval,
-            full_log
+            full_log,
         );
     }
 
@@ -137,7 +137,7 @@ pub fn handle_udp_packet(
             ip_type,
             pid,
             log_interval,
-            full_log
+            full_log,
         )
     };
 
