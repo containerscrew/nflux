@@ -4,6 +4,17 @@
     <p align="center">Kernel and user space code written entirely in Rust ❤</p>
 </p>
 
+---
+![Crates.io Total Downloads](https://img.shields.io/crates/d/nflux?color=orange)
+[![License - MIT](https://img.shields.io/github/license/containerscrew/nflux)](/LICENSE)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+![Code Size](https://img.shields.io/github/languages/code-size/containerscrew/nflux)
+![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white)
+![Crates.io Version](https://img.shields.io/crates/v/nflux)
+[![Test](https://github.com/containerscrew/nflux/actions/workflows/test.yml/badge.svg)](https://github.com/containerscrew/nflux/actions/workflows/test.yml)
+
+---
+
 <!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
 **Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
 - [What is nflux?](#what-is-nflux)
@@ -25,8 +36,7 @@
 - [License](#license)
 <!-- END OF TOC -->
 
-
-```bash
+```shell
 $ nflux --help
 
     ███╗   ██╗███████╗██╗     ██╗   ██╗██╗  ██╗
@@ -39,17 +49,15 @@ $ nflux --help
 
 Network monitoring tool & TLS/SSL sniffer using eBPF. Powered by Aya-rs 🐝
 
-Usage: nflux [OPTIONS]
+Usage: nflux [OPTIONS] [COMMAND]
+
+Commands:
+  netrace  Start network traffic monitoring using TC (Traffic Control)
+  help     Print this message or the help of the given subcommand(s)
 
 Options:
   -l, --log-level <LOG_LEVEL>    Log level for logging tracing. Possible values: info, warn, trace, debug, error. [default: info]
       --log-format <LOG_FORMAT>  Log format for logging tracing. Possible values: text, json. [default: text]
-  -i, --interface <INTERFACE>    Interface to attach the program. [default: proton0]
-      --enable-egress            Enable egress traffic monitoring. [default: true]
-      --enable-ingress           Enable ingress traffic monitoring. [default: false]
-      --enable-udp               Enable udp protocol network monitoring. [default: false]
-      --enable-icmp              Enable icmp protocol network monitoring. [default: false]
-      --enable-tcp               Enable tcp protocol network monitoring. [default: true]
   -h, --help                     Print help
   -V, --version                  Print version
 ```
