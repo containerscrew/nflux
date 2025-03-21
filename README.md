@@ -153,14 +153,15 @@ sudo nflux netrace --enable-egress --log-inveral 3 # every 3 seconds
 
 ### Available procotols
 
-By default when you set `--enable-egress` or `--enable-ingress`, the flag `--enable-tcp` is also enabled by default.
+`--enable-tcp` is enabled by default.
+
+> TODO: allow disable tcp
 
 To enable protocols like `udp` or `icmp`:
 
 ```shell
 sudo nflux netrace --enable-ingress --enable-icmp --enable-udp
 ```
-
 
 ## tlstrace
 
