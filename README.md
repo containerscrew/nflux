@@ -9,6 +9,16 @@
 - [What is nflux?](#what-is-nflux)
   - [What is ebpf?](#what-is-ebpf)
   - [Traffic control](#traffic-control)
+- [Badges](#badges)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [netrace](#netrace)
+    - [Help](#help)
+    - [Sniffing (only) egress traffic](#sniffing-only-egress-traffic)
+    - [Sniffing (only) ingress traffic](#sniffing-only-ingress-traffic)
+    - [Packet logging](#packet-logging)
+    - [Available procotols](#available-procotols)
+  - [tlstrace](#tlstrace)
 - [Compatibility](#compatibility)
 - [Running `nflux`](#running-nflux)
 - [nflux inside a container](#nflux-inside-a-container)
@@ -58,6 +68,104 @@ Provide basic concepts of `ebpf` (pending to finish)
 ## Traffic control
 
 Provide some diagrams of TC (pending to finish)
+
+# Badges
+
+---
+
+# Installation
+
+```shell
+XXXXXX pending
+```
+
+# Usage
+
+> [!WARNING]
+> By the moment, `nflux netrace` only supports Ipv4 sniffing
+
+Global flags:
+
+```shell
+sudo nflux --help
+sudo nflux --log-level warn
+sudo nflux --log-format json
+```
+
+Then:
+
+```shell
+sudo nflux netrace
+# Or
+sudo nflux tlstrace
+```
+
+## netrace
+
+By default, `egress/ingress` monitoring are disabled.
+
+### Help
+
+```shell
+sudo nflux netrace --help
+```
+
+### Sniffing (only) egress traffic
+
+```shell
+sudo nflux netrace --enable-egress
+```
+
+### Sniffing (only) ingress traffic
+
+```shell
+sudo nflux netrace --enable-ingress
+```
+
+### Packet logging
+
+By default `nflux netrace` will save the active connection in an `eBPF` map and will log the same connection every `5 seconds`. That means, If I run the command:
+
+```shell
+ping 1.1.1.1
+```
+
+Packets of type `icmp` to the ip `1.1.1.1` will be logged in the terminal every `5 seconds` by default.
+
+Or:
+
+```shell
+curl http://external-ip
+```
+
+So, if you want to log every packet, you can should run the command:
+
+```shell
+sudo nlux netrace --enable-egress --full-log
+```
+
+Or you can also change the `log-interval`:
+
+```shell
+sudo nflux netrace --enable-egress --log-inveral 3 # every 3 seconds
+```
+
+### Available procotols
+
+By default when you set `--enable-egress` or `--enable-ingress`, the flag `--enable-tcp` is also enabled by default.
+
+To enable protocols like `udp` or `icmp`:
+
+```shell
+sudo nflux netrace --enable-ingress --enable-icmp --enable-udp
+```
+
+
+## tlstrace
+
+```shell
+sudo nflux tlstrace
+```
 
 # Compatibility
 
