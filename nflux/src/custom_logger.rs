@@ -16,15 +16,15 @@ impl FormatTime for MyTimer {
     }
 }
 
-/// LogFormat represents the format of the logs.
-pub enum LogFormat {
-    #[allow(dead_code)]
-    Json,
-    Text,
-}
+// /// LogFormat represents the format of the logs.
+// pub enum LogFormat {
+//     #[allow(dead_code)]
+//     Json,
+//     Text,
+// }
 
 /// setup_logger initializes the logger with the given log level and format.
-pub fn setup_logger(log_level: &str, log_format: LogFormat) {
+pub fn setup_logger(log_level: &str, log_format: &str) {
     let log_level = match log_level {
         "trace" => Level::TRACE,
         "debug" => Level::DEBUG,
@@ -46,7 +46,7 @@ pub fn setup_logger(log_level: &str, log_format: LogFormat) {
         .with_timer(MyTimer);
 
     match log_format {
-        LogFormat::Json => base_subscriber.json().init(),
-        _ => base_subscriber.init(),
+        "json" => base_subscriber.json().init(),
+        _ => base_subscriber.init(), // Defaults to text
     }
 }
