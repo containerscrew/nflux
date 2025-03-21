@@ -12,6 +12,7 @@ use tokio::signal;
 use tracing::{info, warn};
 
 /// is_root_user checks if the current user who runs the program is root.
+/// Avoid running nflux as uid != 0 (root). Ebpf requires privileges
 pub fn check_is_root_user(uid: u32) -> Result<(), String> {
     if uid != 0 {
         return Err(
