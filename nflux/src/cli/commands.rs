@@ -50,7 +50,7 @@ pub enum Commands {
         #[arg(
             long = "enable-tcp",
             help = "Enable tcp protocol network monitoring. [default: true]",
-            default_value_t = true,
+            default_value_t = false,
             required = false
         )]
         enable_tcp: bool,
