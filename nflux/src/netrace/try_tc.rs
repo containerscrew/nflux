@@ -18,7 +18,7 @@ pub async fn start_netrace(
     configmap: Configmap,
 ) -> anyhow::Result<()> {
     // Load eBPF program
-    let mut ebpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/nflux")))?;
+    let mut ebpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/netrace")))?;
 
     try_traffic_control(
         &mut ebpf,
