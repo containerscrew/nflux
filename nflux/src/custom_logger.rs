@@ -24,7 +24,7 @@ impl FormatTime for MyTimer {
 // }
 
 /// setup_logger initializes the logger with the given log level and format.
-pub fn setup_logger(log_level: &str, log_format: &str) {
+pub fn init_logger(log_level: &str, log_format: &str) {
     let log_level = match log_level {
         "trace" => Level::TRACE,
         "debug" => Level::DEBUG,

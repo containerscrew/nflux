@@ -1,29 +1,48 @@
 use anyhow::Context;
 use aya::{
-    maps::Array,
-    programs::{tc, SchedClassifier, TcAttachType},
-    Ebpf,
+    include_bytes_aligned, maps::Array, programs::{tc, SchedClassifier, TcAttachType}, Ebpf
 };
 use nflux_common::Configmap;
 use tracing::{debug, error, info};
 
-pub fn try_traffic_control(
-    bpf: &mut Ebpf,
-    interface: String,
+
+pub fn start_netrace(
+    interface: &str,
+    enable_egress: bool,
+    enable_ingress: bool,
+    configmap: Configmap,
+) -> anyhow::Result<()> {
+    // Load eBPF program
+    let mut ebpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/nflux")))?;
+
+    try_traffic_control(
+        &mut ebpf,
+        interface,
+        enable_ingress,
+        enable_egress,
+        configmap,
+    )?;
+
+    Ok(())
+}
+
+fn try_traffic_control(
+    ebpf: &mut Ebpf,
+    interface: &str,
     enable_ingress: bool,
     enable_egress: bool,
     configmap: Configmap,
 ) -> Result<(), anyhow::Error> {
     if enable_egress {
-        attach_tc_program(bpf, "tc_egress", interface.as_str(), TcAttachType::Egress)?;
+        attach_tc_program(ebpf, "tc_egress", interface, TcAttachType::Egress)?;
     }
 
     if enable_ingress {
-        attach_tc_program(bpf, "tc_ingress", interface.as_str(), TcAttachType::Ingress)?;
+        attach_tc_program(ebpf, "tc_ingress", interface, TcAttachType::Ingress)?;
     }
 
     // Populate config
-    populate_configmap(bpf, configmap)?;
+    populate_configmap(ebpf, configmap)?;
 
     Ok(())
 }

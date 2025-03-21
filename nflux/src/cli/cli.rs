@@ -3,9 +3,10 @@ use std::process::{self, exit};
 use clap::Parser;
 use colored::Colorize;
 use libc::getuid;
+use nflux_common::Configmap;
 use tracing::{error, info};
 
-use crate::{custom_logger::setup_logger, utils::{check_is_root_user, set_mem_limit}};
+use crate::{custom_logger::init_logger, netrace::start_netrace, utils::{check_is_root_user, is_true, set_mem_limit}};
 
 use super::commands::Commands;
 
@@ -57,7 +58,7 @@ fn print_banner() -> String {
 pub fn start_cli() -> Result<NfluxCli, anyhow::Error> {
     let cli = NfluxCli::parse();
 
-    setup_logger(&cli.log_level, &cli.log_format.as_str());
+    init_logger(&cli.log_level, &cli.log_format.as_str());
 
     let uid = unsafe { getuid() };
     if let Err(e) = check_is_root_user(uid) {
@@ -71,6 +72,15 @@ pub fn start_cli() -> Result<NfluxCli, anyhow::Error> {
         Some(Commands::Netrace { interface, enable_egress, enable_ingress, enable_udp, enable_icmp, enable_tcp }
         )=> {
             info!("Starting nflux netrace with pid {}", process::id());
+            let configmap = Configmap {
+                disable_private_ips: 1, // Not implemented yet
+                enable_udp: is_true(*enable_udp), // 0 = no, 1 = yes
+                enable_icmp: is_true(*enable_icmp),
+                enable_tcp: is_true(*enable_tcp),
+            };
+
+
+            start_netrace(interface.as_str(), *enable_egress, *enable_ingress, configmap)?;
         }
         None => {
         }
