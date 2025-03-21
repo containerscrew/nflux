@@ -723,6 +723,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "netrace-ebpf"
+version = "0.1.0"
+dependencies = [
+ "aya-ebpf",
+ "aya-log-ebpf",
+ "log",
+ "network-types",
+ "nflux-common",
+ "which",
+]
+
+[[package]]
 name = "network-types"
 version = "0.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -744,8 +756,8 @@ dependencies = [
  "default-net",
  "dns-lookup",
  "libc",
+ "netrace-ebpf",
  "nflux-common",
- "nflux-ebpf",
  "sysinfo",
  "tokio",
  "tracing",
@@ -757,18 +769,6 @@ name = "nflux-common"
 version = "0.1.0"
 dependencies = [
  "aya",
-]
-
-[[package]]
-name = "nflux-ebpf"
-version = "0.1.0"
-dependencies = [
- "aya-ebpf",
- "aya-log-ebpf",
- "log",
- "network-types",
- "nflux-common",
- "which",
 ]
 
 [[package]]
