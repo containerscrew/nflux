@@ -1,12 +1,16 @@
 use anyhow::Context;
 use aya::{
-    include_bytes_aligned, maps::Array, programs::{tc, SchedClassifier, TcAttachType}, Ebpf
+    include_bytes_aligned, maps::{Array, RingBuf}, programs::{tc, SchedClassifier, TcAttachType}, Ebpf
 };
 use nflux_common::Configmap;
 use tracing::{debug, error, info};
 
+use crate::utils::wait_for_shutdown;
 
-pub fn start_netrace(
+use super::tc_event::process_event;
+
+
+pub async fn start_netrace(
     interface: &str,
     enable_egress: bool,
     enable_ingress: bool,
@@ -22,6 +26,17 @@ pub fn start_netrace(
         enable_egress,
         configmap,
     )?;
+
+    let tc_event_ring_map = ebpf
+    .take_map("TC_EVENT")
+    .ok_or_else(|| anyhow::anyhow!("Failed to find ring buffer TC_EVENT map"))?;
+
+    let ring_buf = RingBuf::try_from(tc_event_ring_map)?;
+
+    tokio::spawn(async move { process_event(ring_buf).await });
+
+
+    let _ = wait_for_shutdown().await;
 
     Ok(())
 }
@@ -47,7 +62,7 @@ fn try_traffic_control(
     Ok(())
 }
 
-pub fn attach_tc_program(
+fn attach_tc_program(
     bpf: &mut Ebpf,
     program_name: &str,
     interface: &str,
@@ -109,7 +124,7 @@ pub fn attach_tc_program(
     Ok(())
 }
 
-pub fn populate_configmap(bpf: &mut Ebpf, config: Configmap) -> anyhow::Result<()> {
+fn populate_configmap(bpf: &mut Ebpf, config: Configmap) -> anyhow::Result<()> {
     let mut tc_config = Array::<_, Configmap>::try_from(
         bpf.map_mut("TC_CONFIG")
             .context("Failed to find TC_CONFIG map")?,
