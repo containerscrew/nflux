@@ -90,7 +90,7 @@ pub async fn start_cli() -> Result<NfluxCli, anyhow::Error> {
             }
 
             let configmap = Configmap {
-                disable_private_ips: 1,           // Not implemented yet
+                disable_private_ips: 1,             // Not implemented yet
                 disable_udp: is_true(*disable_udp), // 0 = no, 1 = yes
                 disable_icmp: is_true(*disable_icmp),
                 disable_tcp: is_true(*disable_tcp),
