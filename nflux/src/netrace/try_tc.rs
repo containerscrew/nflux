@@ -13,8 +13,8 @@ use crate::utils::wait_for_shutdown;
 
 pub async fn start_netrace(
     interface: &str,
-    enable_egress: bool,
-    enable_ingress: bool,
+    disable_egress: bool,
+    disable_ingress: bool,
     configmap: Configmap,
 ) -> anyhow::Result<()> {
     // Load eBPF program
@@ -23,8 +23,8 @@ pub async fn start_netrace(
     try_traffic_control(
         &mut ebpf,
         interface,
-        enable_ingress,
-        enable_egress,
+        disable_ingress,
+        disable_egress,
         configmap,
     )?;
 
@@ -44,15 +44,15 @@ pub async fn start_netrace(
 fn try_traffic_control(
     ebpf: &mut Ebpf,
     interface: &str,
-    enable_ingress: bool,
-    enable_egress: bool,
+    disable_ingress: bool,
+    disable_egress: bool,
     configmap: Configmap,
 ) -> Result<(), anyhow::Error> {
-    if enable_egress {
+    if !disable_egress {
         attach_tc_program(ebpf, "tc_egress", interface, TcAttachType::Egress)?;
     }
 
-    if enable_ingress {
+    if !disable_ingress {
         attach_tc_program(ebpf, "tc_ingress", interface, TcAttachType::Ingress)?;
     }
 

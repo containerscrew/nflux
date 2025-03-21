@@ -16,59 +16,59 @@ pub enum Commands {
         interface: String,
 
         #[arg(
-            long = "enable-egress",
-            help = "Enable egress traffic monitoring. [default: false]",
+            long = "disable-egress",
+            help = "Disable egress traffic monitoring. [default: false]",
             default_value_t = false,
             required = false
         )]
-        enable_egress: bool,
+        disable_egress: bool,
 
         #[arg(
-            long = "enable-ingress",
-            help = "Enable ingress traffic monitoring. [default: false]",
+            long = "disable-ingress",
+            help = "Disable ingress traffic monitoring. [default: false]",
             default_value_t = false,
             required = false
         )]
-        enable_ingress: bool,
+        disable_ingress: bool,
 
         #[arg(
-            long = "enable-udp",
-            help = "Enable udp protocol network monitoring. [default: false]",
+            long = "disable-udp",
+            help = "Disable udp protocol network monitoring. [default: false]",
             default_value_t = false,
             required = false
         )]
-        enable_udp: bool,
+        disable_udp: bool,
 
         #[arg(
-            long = "enable-icmp",
-            help = "Enable icmp protocol network monitoring. [default: false]",
+            long = "disable-icmp",
+            help = "Disable icmp protocol network monitoring. [default: false]",
             default_value_t = false,
             required = false
         )]
-        enable_icmp: bool,
+        disable_icmp: bool,
 
         #[arg(
-            long = "enable-tcp",
-            help = "Enable tcp protocol network monitoring. [default: true]",
-            default_value_t = true,
+            long = "disable-tcp",
+            help = "Disable tcp protocol network monitoring. [default: false]",
+            default_value_t = false,
             required = false
         )]
-        enable_tcp: bool,
+        disable_tcp: bool,
 
         #[arg(
             long = "log-interval",
-            help = "Enable tcp protocol network monitoring.",
+            help = "Enable tcp protocol network monitoring. This flag is not used if you don't set --disable-full-log. [default: 5(seconds)]",
             default_value_t = 5,
             required = false
         )]
         log_interval: u8,
 
         #[arg(
-            long = "full-log",
-            help = "Log every packet. With this parameter log-interval don't make sense. [default: false]",
+            long = "disable-full-log",
+            help = "Disable log for every packet. Then use the flag --log-interval Xs. [default: false]",
             default_value_t = false,
             required = false
         )]
-        full_log: bool,
+        disable_full_log: bool,
     },
 }

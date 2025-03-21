@@ -16,7 +16,7 @@ pub unsafe fn log_connection(
     proto: &str,   // ipv4 or ipv6
     pid: u32,
     log_interval: u8,
-    full_log: u8,
+    disable_full_log: u8,
 ) {
     let event = TcEvent {
         src_ip: source,
@@ -35,7 +35,7 @@ pub unsafe fn log_connection(
         pid,
     };
 
-    if full_log == 1 {
+    if disable_full_log == 0 {
         if let Some(mut data) = TC_EVENT.reserve::<TcEvent>(0) {
             unsafe { *data.as_mut_ptr() = event }
             data.submit(0);
