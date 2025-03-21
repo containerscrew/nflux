@@ -6,7 +6,7 @@ use libc::getuid;
 use nflux_common::Configmap;
 use tracing::{error, info};
 
-use crate::{custom_logger::init_logger, netrace::start_netrace, utils::{check_is_root_user, is_true, set_mem_limit}};
+use crate::{logger::init_logger, netrace::start_netrace, utils::{check_is_root_user, is_true, set_mem_limit}};
 
 use super::commands::Commands;
 
@@ -55,7 +55,7 @@ fn print_banner() -> String {
 
 
 /// start_cli is the main entrypoint of the entire application
-pub fn start_cli() -> Result<NfluxCli, anyhow::Error> {
+pub async fn start_cli() -> Result<NfluxCli, anyhow::Error> {
     let cli = NfluxCli::parse();
 
     init_logger(&cli.log_level, &cli.log_format.as_str());
@@ -69,7 +69,7 @@ pub fn start_cli() -> Result<NfluxCli, anyhow::Error> {
     set_mem_limit();
 
     match &cli.command {
-        Some(Commands::Netrace { interface, enable_egress, enable_ingress, enable_udp, enable_icmp, enable_tcp }
+        Some(Commands::Netrace { interface, enable_egress, enable_ingress, enable_udp, enable_icmp, enable_tcp, log_interval, full_log }
         )=> {
             info!("Starting nflux netrace with pid {}", process::id());
             let configmap = Configmap {
@@ -77,10 +77,11 @@ pub fn start_cli() -> Result<NfluxCli, anyhow::Error> {
                 enable_udp: is_true(*enable_udp), // 0 = no, 1 = yes
                 enable_icmp: is_true(*enable_icmp),
                 enable_tcp: is_true(*enable_tcp),
+                log_interval: *log_interval,
+                full_log: is_true(*full_log)
             };
 
-
-            start_netrace(interface.as_str(), *enable_egress, *enable_ingress, configmap)?;
+            let _ = start_netrace(interface.as_str(), *enable_egress, *enable_ingress, configmap).await;
         }
         None => {
         }

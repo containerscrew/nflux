@@ -9,6 +9,8 @@ pub struct Configmap {
     pub enable_udp: u8,          // 0 = no, 1 = yes
     pub enable_icmp: u8,         // 0 = no, 1 = yes
     pub enable_tcp: u8,          // 0 = no, 1 = yes
+    pub log_interval: u8,        // Log connection of same ip --> port every X seconds
+    pub full_log: u8,            // Log every packet
 }
 
 #[repr(C)]

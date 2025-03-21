@@ -14,6 +14,8 @@ pub unsafe fn log_connection(
     direction: u8, // 0: ingress, 1: egress
     proto: &str,   // ipv4 or ipv6
     pid: u32,
+    log_interval: u8,
+    full_log: u8,
 ) {
     let event = TcEvent {
         src_ip: source,
@@ -32,28 +34,36 @@ pub unsafe fn log_connection(
         pid,
     };
 
-    // Get current time
-    let current_time = bpf_ktime_get_ns();
-
-    let key = ActiveConnectionKey {
-        port:  if direction == 1 { src_port as u32 } else { dst_port as u32},
-        ip:  if direction == 1 { destination } else {source},
-    };
-
-    // If the connection (src_port, dst_ip) is already tracked, return
-    if let Some(last_log_time) = ACTIVE_CONNECTIONS.get(&key) {
-        // Check if the timestamp is less than 10 seconds
-        if current_time - *last_log_time < 10_000_000_000 {
-            return;
+    if full_log == 1 {
+        if let Some(mut data) = TC_EVENT.reserve::<TcEvent>(0) {
+            unsafe { *data.as_mut_ptr() = event }
+            data.submit(0);
         }
-    }
+    } else {
 
-    // Log the connection event
-    if let Some(mut data) = TC_EVENT.reserve::<TcEvent>(0) {
-        unsafe { *data.as_mut_ptr() = event }
-        data.submit(0);
-    }
+        // Get current time
+        let current_time = bpf_ktime_get_ns();
 
-    // Store the active connection: (PID, Destination IP) -> 1 (dummy value)
-    ACTIVE_CONNECTIONS.insert(&key, &current_time, 0).ok();
+        let key = ActiveConnectionKey {
+            port:  if direction == 1 { src_port as u32 } else { dst_port as u32},
+            ip:  if direction == 1 { destination } else {source},
+        };
+
+        // If the connection (src_port, dst_ip) is already tracked, return
+        if let Some(last_log_time) = ACTIVE_CONNECTIONS.get(&key) {
+            // Check if the timestamp is less than 10 seconds
+            if current_time - *last_log_time < log_interval as u64 * 1_000_000_000 {
+                return;
+            }
+        }
+
+        // Log the connection event
+        if let Some(mut data) = TC_EVENT.reserve::<TcEvent>(0) {
+            unsafe { *data.as_mut_ptr() = event }
+            data.submit(0);
+        }
+
+        // Store the active connection: (PID, Destination IP) -> 1 (dummy value)
+        ACTIVE_CONNECTIONS.insert(&key, &current_time, 0).ok();
+    }
 }

@@ -18,8 +18,8 @@ pub enum Commands {
 
         #[arg(
             long = "enable-egress",
-            help = "Enable egress traffic monitoring. [default: true]",
-            default_value_t = true,
+            help = "Enable egress traffic monitoring. [default: false]",
+            default_value_t = false,
             required = false
         )]
         enable_egress: bool,
@@ -55,5 +55,21 @@ pub enum Commands {
             required = false
         )]
         enable_tcp: bool,
+
+        #[arg(
+            long = "log-interval",
+            help = "Enable tcp protocol network monitoring.",
+            default_value_t = 5,
+            required = false
+        )]
+        log_interval: u8,
+
+        #[arg(
+            long = "full-log",
+            help = "Log every packet. With this parameter log-interval don't make sense. [default: false]",
+            default_value_t = false,
+            required = false
+        )]
+        full_log: bool,
     },
 }
