@@ -20,8 +20,6 @@
     - [Available procotols](#available-procotols)
   - [tlstrace](#tlstrace)
 - [Compatibility](#compatibility)
-- [Running `nflux`](#running-nflux)
-- [nflux inside a container](#nflux-inside-a-container)
 - [Docs](#docs)
 - [Contribution](#contribution)
 - [License](#license)
@@ -96,16 +94,25 @@ sudo nflux --log-format json
 Then:
 
 ```shell
-sudo nflux netrace
+sudo nflux netrace FLAGS
 # Or
-sudo nflux tlstrace
+sudo nflux tlstrace FLAGS
 ```
 
 ## netrace
 
-By default, `egress/ingress` monitoring are disabled.
+By default, everything is enabled. Which means:
+
+- Egress traffic
+- Ingress traffic
+- UDP/TCP/ICMP protocols
+- Full packet logging
+
+Let's see in the following sections how to customize `nflux netrace`.
 
 ### Help
+
+First of all, take a look to the available flags:
 
 ```shell
 sudo nflux netrace --help
@@ -114,24 +121,26 @@ sudo nflux netrace --help
 ### Sniffing (only) egress traffic
 
 ```shell
-sudo nflux netrace --enable-egress
+sudo nflux netrace --disable-ingress
 ```
 
 ### Sniffing (only) ingress traffic
 
 ```shell
-sudo nflux netrace --enable-ingress
+sudo nflux netrace --enable-egress
 ```
 
 ### Packet logging
 
-By default `nflux netrace` will save the active connection in an `eBPF` map and will log the same connection every `5 seconds`. That means, If I run the command:
+By default `nflux netrace` will log **all packets** (egress/ingress) entering the NIC (Network Interface). If you use `--disable-full-log`, you can use `--log-interval` to set the time interval in which the same `ip->port` connection will be logged.
+
+For example:
 
 ```shell
 ping 1.1.1.1
 ```
 
-Packets of type `icmp` to the ip `1.1.1.1` will be logged in the terminal every `5 seconds` by default.
+Every packet of type `icmp` to the ip `1.1.1.1` will be logged in the terminal.
 
 Or:
 
@@ -139,28 +148,26 @@ Or:
 curl http://external-ip
 ```
 
-So, if you want to log every packet, you can should run the command:
+So, if you don't want to log every packet, you can should run the command:
 
 ```shell
-sudo nlux netrace --enable-egress --full-log
+sudo nlux netrace --disable-full-log # default to 5 seconds
 ```
 
-Or you can also change the `log-interval`:
+Or you can also change the `--log-interval`:
 
 ```shell
-sudo nflux netrace --enable-egress --log-inveral 3 # every 3 seconds
+sudo nflux netrace --disable-full-log --log-inveral 3 # every 3 seconds
 ```
 
 ### Available procotols
 
-`--enable-tcp` is enabled by default.
+`UDP/TCP/ICMP` available by default.
 
-> TODO: allow disable tcp
-
-To enable protocols like `udp` or `icmp`:
+To disable protocols like `udp`, `icmp`, `tcp`:
 
 ```shell
-sudo nflux netrace --enable-ingress --enable-icmp --enable-udp
+sudo nflux netrace --disable-udp --disable-icmp --disable-tcp
 ```
 
 ## tlstrace
@@ -176,32 +183,6 @@ sudo nflux tlstrace
 | fedora linux   | ✅    | ✅  |`6.13.7-200.fc41.x86_64 ` |
 
 > For example, in Debian12 with kernel version `6.1.0-31-amd64` nflux doest not works. Probably for the version of kernel bpf.
-
-
-# Running `nflux`
-
-> [!NOTE]
-> Setup [local development](./docs/local_dev.md) before using `nflux`. Is the only way by the moment
-
-```shell
-# clone the repo
-cd nflux/
-# Need privilege permissions
-make local-install # by default installed in /usr/local/bin/nflux. Check your $PATH.
-```
----
-
-```shell
-nflux --help
-```
-
-# nflux inside a container
-
-```shell
-podman run --rm -it --name nflux --privileged --net host docker.io/containerscrew/nflux:latest
-```
-
-> By the moment `latest` tag
 
 # Docs
 
