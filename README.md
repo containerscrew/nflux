@@ -83,6 +83,7 @@ XXXXXX pending
 
 > [!WARNING]
 > By the moment, `nflux netrace` only supports Ipv4 sniffing
+> `nflux tlstrace` is being implemented!
 
 Global flags:
 
