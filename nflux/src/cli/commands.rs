@@ -2,7 +2,6 @@ use clap::Subcommand;
 
 use crate::utils::set_default_iface;
 
-
 #[derive(Debug, Subcommand)]
 pub enum Commands {
     /// Start network traffic monitoring using TC (Traffic Control)

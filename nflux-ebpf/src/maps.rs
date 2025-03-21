@@ -14,7 +14,6 @@ pub struct ActiveConnectionKey {
     pub ip: u32,
 }
 
-
 #[map]
 pub static TC_CONFIG: Array<Configmap> = Array::with_max_entries(1, 0);
 

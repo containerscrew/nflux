@@ -1,4 +1,5 @@
 use std::net::Ipv4Addr;
+
 use aya::maps::{MapData, RingBuf};
 use nflux_common::TcEvent;
 use tracing::info;

@@ -6,9 +6,12 @@ use libc::getuid;
 use nflux_common::Configmap;
 use tracing::{error, info};
 
-use crate::{logger::init_logger, netrace::start_netrace, utils::{check_is_root_user, is_true, set_mem_limit}};
-
 use super::commands::Commands;
+use crate::{
+    logger::init_logger,
+    netrace::start_netrace,
+    utils::{check_is_root_user, is_true, set_mem_limit},
+};
 
 #[derive(Parser, Debug)]
 #[clap(
@@ -53,7 +56,6 @@ fn print_banner() -> String {
     .to_string()
 }
 
-
 /// start_cli is the main entrypoint of the entire application
 pub async fn start_cli() -> Result<NfluxCli, anyhow::Error> {
     let cli = NfluxCli::parse();
@@ -69,24 +71,42 @@ pub async fn start_cli() -> Result<NfluxCli, anyhow::Error> {
     set_mem_limit();
 
     match &cli.command {
-        Some(Commands::Netrace { interface, enable_egress, enable_ingress, enable_udp, enable_icmp, enable_tcp, log_interval, full_log }
-        )=> {
+        Some(Commands::Netrace {
+            interface,
+            enable_egress,
+            enable_ingress,
+            enable_udp,
+            enable_icmp,
+            enable_tcp,
+            log_interval,
+            full_log,
+        }) => {
             info!("Starting nflux netrace with pid {}", process::id());
+
+            // If enable_egress and enable_ingress are both false, the app is doing nothing, exit
+            if !*enable_egress && !*enable_ingress {
+                error!("Enable at least egress/ingress connections. Example: $ sudo nflux netrace --enable-egress");
+                exit(1)
+            }
+
             let configmap = Configmap {
-                disable_private_ips: 1, // Not implemented yet
+                disable_private_ips: 1,           // Not implemented yet
                 enable_udp: is_true(*enable_udp), // 0 = no, 1 = yes
                 enable_icmp: is_true(*enable_icmp),
                 enable_tcp: is_true(*enable_tcp),
                 log_interval: *log_interval,
-                full_log: is_true(*full_log)
+                full_log: is_true(*full_log),
             };
 
-            let _ = start_netrace(interface.as_str(), *enable_egress, *enable_ingress, configmap).await;
+            let _ = start_netrace(
+                interface.as_str(),
+                *enable_egress,
+                *enable_ingress,
+                configmap,
+            )
+            .await;
         }
-        None => {
-        }
-
-
+        None => {}
     }
     Ok(cli)
 }

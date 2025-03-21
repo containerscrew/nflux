@@ -1,14 +1,15 @@
 use anyhow::Context;
 use aya::{
-    include_bytes_aligned, maps::{Array, RingBuf}, programs::{tc, SchedClassifier, TcAttachType}, Ebpf
+    include_bytes_aligned,
+    maps::{Array, RingBuf},
+    programs::{tc, SchedClassifier, TcAttachType},
+    Ebpf,
 };
 use nflux_common::Configmap;
 use tracing::{debug, error, info};
 
-use crate::utils::wait_for_shutdown;
-
 use super::tc_event::process_event;
-
+use crate::utils::wait_for_shutdown;
 
 pub async fn start_netrace(
     interface: &str,
@@ -28,13 +29,12 @@ pub async fn start_netrace(
     )?;
 
     let tc_event_ring_map = ebpf
-    .take_map("TC_EVENT")
-    .ok_or_else(|| anyhow::anyhow!("Failed to find ring buffer TC_EVENT map"))?;
+        .take_map("TC_EVENT")
+        .ok_or_else(|| anyhow::anyhow!("Failed to find ring buffer TC_EVENT map"))?;
 
     let ring_buf = RingBuf::try_from(tc_event_ring_map)?;
 
     tokio::spawn(async move { process_event(ring_buf).await });
-
 
     let _ = wait_for_shutdown().await;
 
