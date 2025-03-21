@@ -12,7 +12,7 @@
 ![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white)
 ![Crates.io Version](https://img.shields.io/crates/v/nflux)
 [![Test](https://github.com/containerscrew/nflux/actions/workflows/test.yml/badge.svg)](https://github.com/containerscrew/nflux/actions/workflows/test.yml)
-
+[![Build](https://github.com/containerscrew/nflux/actions/workflows/build.yml/badge.svg)](https://github.com/containerscrew/nflux/actions/workflows/build.yml)
 ---
 
 <!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
@@ -61,7 +61,6 @@ Options:
   -h, --help                     Print help
   -V, --version                  Print version
 ```
-
 
 # What is nflux?
 
