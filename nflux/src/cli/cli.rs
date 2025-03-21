@@ -73,35 +73,35 @@ pub async fn start_cli() -> Result<NfluxCli, anyhow::Error> {
     match &cli.command {
         Some(Commands::Netrace {
             interface,
-            enable_egress,
-            enable_ingress,
-            enable_udp,
-            enable_icmp,
-            enable_tcp,
+            disable_egress,
+            disable_ingress,
+            disable_udp,
+            disable_icmp,
+            disable_tcp,
             log_interval,
-            full_log,
+            disable_full_log,
         }) => {
             info!("Starting nflux netrace with pid {}", process::id());
 
             // If enable_egress and enable_ingress are both false, the app is doing nothing, exit
-            if !*enable_egress && !*enable_ingress {
-                error!("Enable at least egress/ingress connections. Example: $ sudo nflux netrace --enable-egress");
+            if *disable_egress && *disable_ingress {
+                error!("If you disable both egress and ingress, the app will log anything.");
                 exit(1)
             }
 
             let configmap = Configmap {
                 disable_private_ips: 1,           // Not implemented yet
-                enable_udp: is_true(*enable_udp), // 0 = no, 1 = yes
-                enable_icmp: is_true(*enable_icmp),
-                enable_tcp: is_true(*enable_tcp),
+                disable_udp: is_true(*disable_udp), // 0 = no, 1 = yes
+                disable_icmp: is_true(*disable_icmp),
+                disable_tcp: is_true(*disable_tcp),
                 log_interval: *log_interval,
-                full_log: is_true(*full_log),
+                disable_full_log: is_true(*disable_full_log),
             };
 
             let _ = start_netrace(
                 interface.as_str(),
-                *enable_egress,
-                *enable_ingress,
+                *disable_egress,
+                *disable_ingress,
                 configmap,
             )
             .await;

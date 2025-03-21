@@ -29,7 +29,7 @@ pub fn handle_icmp_packet(
     direction: u8,
     pid: u32,
     log_interval: u8,
-    full_log: u8,
+    disable_full_log: u8,
 ) -> Result<i32, ()> {
     unsafe {
         log_connection(
@@ -44,7 +44,7 @@ pub fn handle_icmp_packet(
             "icmp",
             pid,
             log_interval,
-            full_log,
+            disable_full_log,
         )
     };
 
@@ -62,7 +62,7 @@ pub fn handle_tcp_packet(
     ip_type: &str,
     pid: u32,
     log_interval: u8,
-    full_log: u8,
+    disable_full_log: u8,
 ) -> Result<i32, ()> {
     let protocol = IpProto::Tcp as u8;
     let (src_port, dst_port);
@@ -92,7 +92,7 @@ pub fn handle_tcp_packet(
             ip_type,
             pid,
             log_interval,
-            full_log,
+            disable_full_log,
         );
     }
 
@@ -108,7 +108,7 @@ pub fn handle_udp_packet(
     ip_type: &str,
     pid: u32,
     log_interval: u8,
-    full_log: u8,
+    disable_full_log: u8,
 ) -> Result<i32, ()> {
     let protocol = IpProto::Udp as u8;
 
@@ -137,7 +137,7 @@ pub fn handle_udp_packet(
             ip_type,
             pid,
             log_interval,
-            full_log,
+            disable_full_log,
         )
     };
 

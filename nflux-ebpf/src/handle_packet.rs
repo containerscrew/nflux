@@ -28,7 +28,7 @@ pub fn handle_packet(
 
             match ipv4hdr.proto {
                 IpProto::Tcp => {
-                    if configmap.enable_tcp == 1 {
+                    if configmap.disable_tcp == 0 {
                         handle_tcp_packet(
                             ctx,
                             source,
@@ -40,14 +40,14 @@ pub fn handle_packet(
                             "ipv4",
                             pid,
                             configmap.log_interval,
-                            configmap.full_log,
+                            configmap.disable_full_log,
                         )
                     } else {
                         Ok(TC_ACT_PIPE)
                     }
                 }
                 IpProto::Udp => {
-                    if configmap.enable_udp == 1 {
+                    if configmap.disable_udp == 0 {
                         handle_udp_packet(
                             ctx,
                             source,
@@ -57,7 +57,7 @@ pub fn handle_packet(
                             "ipv4",
                             pid,
                             configmap.log_interval,
-                            configmap.full_log,
+                            configmap.disable_full_log,
                         )
                     } else {
                         // UDP traffic monitoring is disabled
@@ -65,14 +65,14 @@ pub fn handle_packet(
                     }
                 }
                 IpProto::Icmp => {
-                    if configmap.enable_icmp == 1 {
+                    if configmap.disable_icmp == 0 {
                         handle_icmp_packet(
                             source,
                             destination,
                             direction,
                             pid,
                             configmap.log_interval,
-                            configmap.full_log,
+                            configmap.disable_full_log,
                         )
                     } else {
                         Ok(TC_ACT_PIPE)
