@@ -22,11 +22,15 @@ jobs:
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: nightly
-          targets: x86_64-unknown-linux-musl
+          targets: nightly-x86_64-unknown-linux-gnu
+
+      - name: System dependencies
+        run: |
+          sudo apt-get -y install linux-headers-$(uname -r)
 
       - name: Setup dependencies
         run: |
             cargo install bpf-linker
 
       - name: Run build
-        run: cargo build --release --locked --target x86_64-unknown-linux-musl
+        run: cargo build --release --locked --target nightly-x86_64-unknown-linux-gnu
