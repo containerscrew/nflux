@@ -6,9 +6,20 @@ fn main() -> anyhow::Result<()> {
         .no_deps()
         .exec()
         .context("MetadataCommand::exec")?;
-    let ebpf_package = packages
-        .into_iter()
-        .find(|cargo_metadata::Package { name, .. }| name == "netrace-ebpf")
-        .ok_or_else(|| anyhow!("netrace-ebpf package not found"))?;
-    aya_build::build_ebpf([ebpf_package])
+
+    let ebpf_package1 = packages
+        .iter()
+        .find(|pkg| pkg.name == "netrace-ebpf")
+        .ok_or_else(|| anyhow!("netrace-ebpf package not found"))?
+        .clone();
+
+    aya_build::build_ebpf([ebpf_package1])?;
+
+    let ebpf_package2 = packages
+        .iter()
+        .find(|pkg| pkg.name == "tlstrace-ebpf")
+        .ok_or_else(|| anyhow!("tlstrace-ebpf package not found"))?
+        .clone();
+
+    aya_build::build_ebpf([ebpf_package2])
 }
