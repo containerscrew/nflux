@@ -19,18 +19,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: dtolnay/rust-toolchain@v1
-        with:
-          toolchain: nightly
-          targets: nightly-x86_64-unknown-linux-gnu
-
       - name: System dependencies
         run: |
           sudo apt-get -y install linux-headers-$(uname -r)
+
+      - name: Rustup
+        run: |
+          rustup install stable && rustup toolchain install nightly --component rust-src
+          rustup default nightly
 
       - name: Setup dependencies
         run: |
             cargo install bpf-linker
 
       - name: Run build
-        run: cargo build --release --locked --target nightly-x86_64-unknown-linux-gnu
+        run: cargo build --release --locked
