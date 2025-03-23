@@ -1,10 +1,9 @@
 use aya::{include_bytes_aligned, maps::RingBuf, programs::UProbe, Ebpf};
 
+use super::tls_event::process_tls_event;
 use crate::utils::wait_for_shutdown;
 
-use super::tls_event::process_tls_event;
-
-fn attach_program(ebpf: &mut Ebpf, openssl_path : &str, pid: Option<i32>) -> anyhow::Result<()> {
+fn attach_program(ebpf: &mut Ebpf, openssl_path: &str, pid: Option<i32>) -> anyhow::Result<()> {
     let program: &mut UProbe = ebpf.program_mut("ssl_write").unwrap().try_into()?;
     program.load()?;
     program.attach(Some("SSL_write"), 0, openssl_path, pid)?;
@@ -39,7 +38,7 @@ pub async fn start_tlstrace(openssl_path: &str, pid: Option<i32>) -> anyhow::Res
     Ok(())
 }
 
-async fn try_tlstrace(ebpf: &mut Ebpf)-> anyhow::Result<()> {
+async fn try_tlstrace(ebpf: &mut Ebpf) -> anyhow::Result<()> {
     let event_ring_map = ebpf
         .take_map("EVENT")
         .ok_or_else(|| anyhow::anyhow!("Failed to find ring buffer EVENT map"))?;
