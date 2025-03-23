@@ -19,17 +19,19 @@
 **Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
 - [What is nflux?](#what-is-nflux)
   - [What is ebpf?](#what-is-ebpf)
-  - [Traffic control](#traffic-control)
 - [Compatibility](#compatibility)
 - [Installation](#installation)
 - [Usage](#usage)
   - [netrace](#netrace)
     - [Help](#help)
+    - [Changing default interface](#changing-default-interface)
     - [Sniffing (only) egress traffic](#sniffing-only-egress-traffic)
     - [Sniffing (only) ingress traffic](#sniffing-only-ingress-traffic)
     - [Packet logging](#packet-logging)
     - [Available procotols](#available-procotols)
+    - [Example using netrace](#example-using-netrace)
   - [tlstrace](#tlstrace)
+    - [Example using tlstrace](#example-using-tlstrace)
 - [Docs](#docs)
 - [Contribution](#contribution)
 - [License](#license)
@@ -51,8 +53,9 @@ Network monitoring tool & TLS/SSL sniffer using eBPF. Powered by Aya-rs 🐝
 Usage: nflux [OPTIONS] [COMMAND]
 
 Commands:
-  netrace  Start network traffic monitoring using TC (Traffic Control)
-  help     Print this message or the help of the given subcommand(s)
+  netrace   Start network traffic monitoring using TC (Traffic Control)
+  tlstrace
+  help      Print this message or the help of the given subcommand(s)
 
 Options:
   -l, --log-level <LOG_LEVEL>    Log level for logging tracing. Possible values: info, warn, trace, debug, error. [default: info]
@@ -64,6 +67,10 @@ Options:
 # What is nflux?
 
 Nflux is... (pending to finish)
+
+
+> [!NOTE]
+> The code is highly improvable. I'm a rookie of eBPF, Rust, and software engineering in general.
 
 ## What is ebpf?
 
@@ -85,10 +92,6 @@ If you'd like to learn more about eBPF, here are some online resources and favor
 - [Linux Observability with BPF by David Calavera, Lorenzo Fontana (Book)](https://www.oreilly.com/library/view/linux-observability-with/9781492050193/)
 
 > There are many more interesting links and articles on the internet as the community grows.
-
-## Traffic control
-
-Provide some diagrams of TC (pending to finish)
 
 # Compatibility
 
@@ -146,6 +149,14 @@ First of all, take a look to the available flags:
 sudo nflux netrace --help
 ```
 
+### Changing default interface
+
+The program automatically detects your default iface.
+
+```shell
+sudo nflux netrace -i eth0
+```
+
 ### Sniffing (only) egress traffic
 
 ```shell
@@ -198,6 +209,10 @@ To disable protocols like `udp`, `icmp`, `tcp`:
 sudo nflux netrace --disable-udp --disable-icmp --disable-tcp
 ```
 
+### Example using netrace
+
+_TODO: GIF example_
+
 ## tlstrace
 
 > [!WARNING]
@@ -221,6 +236,14 @@ In this previous command, `/lib64/libssl.so.3` is the library that `tlstrace` ne
 sudo nflux tlstrace --openssl-path '/lib64/libssl.so.3'
 ```
 
+### Example using tlstrace
+
+```shell
+curl https://iproxy.containerscrew.com/me --http1.1
+```
+
+_TODO: GIF example_
+
 # Docs
 
 More documentation inside [`docs`](./docs/) folder:
@@ -228,6 +251,7 @@ More documentation inside [`docs`](./docs/) folder:
 - Todo and features
 - Local development
 - Old nflux
+- Traffic control and SSL/TLS sniffing (theory with images)(Pending)
 
 # Contribution
 
