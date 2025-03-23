@@ -62,8 +62,7 @@ pub async fn process_tls_event(mut ring_buf: RingBuf<MapData>) -> Result<(), any
 
                 info!(
                     "comm={}, kind={}, len={}, buf=\n{}",
-                    String::from_utf8_lossy(&event.comm)
-                        .trim_end_matches(char::from(0)),
+                    String::from_utf8_lossy(&event.comm).trim_end_matches(char::from(0)),
                     match event.kind {
                         Kind::Read => "read",
                         Kind::Write => "write",
