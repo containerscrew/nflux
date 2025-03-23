@@ -77,8 +77,8 @@ pub enum Commands {
             long = "openssl-path",
             help = "Path to libssl path",
             default_value = "/lib64/libssl.so.3",
-            required = false,
+            required = false
         )]
         openssl_path: String,
-    }
+    },
 }

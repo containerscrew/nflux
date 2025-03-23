@@ -110,7 +110,7 @@ pub async fn start_cli() -> Result<NfluxCli, anyhow::Error> {
                 configmap,
             )
             .await;
-        },
+        }
         Some(Commands::Tlstrace { openssl_path: _ }) => {
             info!("Starting nflux tlstrace with pid {}", process::id())
         }
