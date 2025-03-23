@@ -48,7 +48,8 @@ $ nflux --help
     ╚═╝  ╚═══╝╚═╝     ╚══════╝ ╚═════╝ ╚═╝  ╚═╝
 
 
-Network monitoring tool & TLS/SSL sniffer using eBPF. Powered by Aya-rs 🐝. Author: github.com/containerscrew
+Network monitoring tool & TLS/SSL sniffer using eBPF. Powered by Aya-rs 🐝.
+Author: github.com/containerscrew
 
 Usage: nflux [OPTIONS] [COMMAND]
 
@@ -62,6 +63,7 @@ Options:
       --log-format <LOG_FORMAT>  Log format for logging tracing. Possible values: text, json. [default: text]
   -h, --help                     Print help
   -V, --version                  Print version
+
 ```
 # Introduction
 
