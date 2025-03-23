@@ -48,7 +48,7 @@ $ nflux --help
     ╚═╝  ╚═══╝╚═╝     ╚══════╝ ╚═════╝ ╚═╝  ╚═╝
 
 
-Network monitoring tool & TLS/SSL sniffer using eBPF. Powered by Aya-rs 🐝
+Network monitoring tool & TLS/SSL sniffer using eBPF. Powered by Aya-rs 🐝. Author: github.com/containerscrew
 
 Usage: nflux [OPTIONS] [COMMAND]
 
