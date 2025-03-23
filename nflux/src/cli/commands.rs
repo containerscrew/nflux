@@ -80,5 +80,12 @@ pub enum Commands {
             required = false
         )]
         openssl_path: String,
+        #[arg(
+            short = 'p',
+            long = "pid",
+            help = "Process id",
+            required = false
+        )]
+        pid: Option<i32>,
     },
 }

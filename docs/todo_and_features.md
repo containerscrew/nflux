@@ -14,3 +14,4 @@ List of things to improve and comming features:
 - [6] Multiple interface attachment. Early in development, in order to get a simple first version, I implemented nflux so that it could attach programs to multiple system interfaces. For simplicity in the code and log management, I decided to remove it.
 - [7] TESTING!
 - [8] Ipv6 traffic
+- [9] Autodetect openssl nss libraries in `nflux tlstrace`

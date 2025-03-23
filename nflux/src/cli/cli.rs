@@ -8,9 +8,7 @@ use tracing::{error, info};
 
 use super::commands::Commands;
 use crate::{
-    logger::init_logger,
-    netrace::start_netrace,
-    utils::{check_is_root_user, is_true, set_mem_limit},
+    logger::init_logger, netrace::start_netrace, tlstrace::start_tlstrace, utils::{check_is_root_user, is_true, set_mem_limit}
 };
 
 #[derive(Parser, Debug)]
@@ -111,8 +109,9 @@ pub async fn start_cli() -> Result<NfluxCli, anyhow::Error> {
             )
             .await;
         }
-        Some(Commands::Tlstrace { openssl_path: _ }) => {
-            info!("Starting nflux tlstrace with pid {}", process::id())
+        Some(Commands::Tlstrace { openssl_path, pid }) => {
+            info!("Starting nflux tlstrace with pid {}", process::id());
+            let _ = start_tlstrace(openssl_path, *pid).await;
         }
         None => {}
     }
