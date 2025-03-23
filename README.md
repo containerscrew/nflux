@@ -20,7 +20,7 @@
 - [What is nflux?](#what-is-nflux)
   - [What is ebpf?](#what-is-ebpf)
   - [Traffic control](#traffic-control)
-- [Badges](#badges)
+- [Compatibility](#compatibility)
 - [Installation](#installation)
 - [Usage](#usage)
   - [netrace](#netrace)
@@ -30,7 +30,6 @@
     - [Packet logging](#packet-logging)
     - [Available procotols](#available-procotols)
   - [tlstrace](#tlstrace)
-- [Compatibility](#compatibility)
 - [Docs](#docs)
 - [Contribution](#contribution)
 - [License](#license)
@@ -68,15 +67,38 @@ Nflux is... (pending to finish)
 
 ## What is ebpf?
 
-Provide basic concepts of `ebpf` (pending to finish)
+_(Small intro)_
+
+eBPF, which stands for [`Extended Berkeley Packet Filter`](https://ebpf.io/), is a revolutionary technology that allows for the dynamic insertion of small programs into various points in the kernel without requiring recompilation or modification of the kernel itself. These programs are executed in a restricted virtual machine (VM) environment directly within the kernel, providing the ability to intercept and modify data as it traverses the system. eBPF is utilized for tracing network packets, implementing firewall and network filtering programs, security software, and facilitating system monitoring.
+
+![ebpf-overview](./img/ebpf-overview.png)
+
+*Source: [ebpf.io](https://ebpf.io/what-is-ebpf/)*
+
+If you'd like to learn more about eBPF, here are some online resources and favorite books to help you continue learning:
+
+- [ebpf.io](https://ebpf.io/)
+- [eBPF official documentary](https://www.youtube.com/watch?v=Wb_vD3XZYOA&t=294s)
+- [Interesting tutorials by eunomia-bpf](https://eunomia.dev/)
+- [Learning eBPF by Liz Rice (Book)](https://isovalent.com/books/learning-ebpf/)
+- [BCC project with a lot of useful tools and examples](https://github.com/iovisor/bcc)
+- [Linux Observability with BPF by David Calavera, Lorenzo Fontana (Book)](https://www.oreilly.com/library/view/linux-observability-with/9781492050193/)
+
+> There are many more interesting links and articles on the internet as the community grows.
 
 ## Traffic control
 
 Provide some diagrams of TC (pending to finish)
 
-# Badges
+# Compatibility
 
----
+**Nflux has been created and tested in:**
+
+|   OS    | ARM64 | AMD64 | Kernel version |
+|---------|------|------|------|
+| fedora linux   | ✅    | ✅  |`6.13.7-200.fc41.x86_64 ` |
+
+> For example, in Debian12 with kernel version `6.1.0-31-amd64` nflux doest not works. Probably for the version of kernel bpf implementation.
 
 # Installation
 
@@ -85,10 +107,6 @@ XXXXXX pending
 ```
 
 # Usage
-
-> [!WARNING]
-> By the moment, `nflux netrace` only supports Ipv4 sniffing
-> `nflux tlstrace` is being implemented!
 
 Global flags:
 
@@ -107,6 +125,9 @@ sudo nflux tlstrace FLAGS
 ```
 
 ## netrace
+
+> [!WARNING]
+> By the moment, `nflux netrace` only supports Ipv4 sniffing
 
 By default, everything is enabled. Which means:
 
@@ -179,17 +200,26 @@ sudo nflux netrace --disable-udp --disable-icmp --disable-tcp
 
 ## tlstrace
 
+> [!WARNING]
+> By the moment, `nflux tlstrace` only supports SSL/TLS sniffing for protocol HTTP1.1
+> `HTTP2` is being implemented, trying to decrypt HPACK compression.
+
+Before running `tlstrace` run the following command:
+
 ```shell
-sudo nflux tlstrace
+$ ldconfig -p | grep libssl
+        libssl3.so (libc6,x86-64) => /lib64/libssl3.so
+        libssl3.so (libc6) => /lib/libssl3.so
+        libssl.so.3 (libc6,x86-64) => /lib64/libssl.so.3
+        libssl.so.3 (libc6) => /lib/libssl.so.3
+        libssl.so (libc6,x86-64) => /lib64/libssl.so
 ```
 
-# Compatibility
+In this previous command, `/lib64/libssl.so.3` is the library that `tlstrace` needs.
 
-|   OS    | ARM64 | AMD64 | Kernel version |
-|---------|------|------|------|
-| fedora linux   | ✅    | ✅  |`6.13.7-200.fc41.x86_64 ` |
-
-> For example, in Debian12 with kernel version `6.1.0-31-amd64` nflux doest not works. Probably for the version of kernel bpf.
+```shell
+sudo nflux tlstrace --openssl-path '/lib64/libssl.so.3'
+```
 
 # Docs
 
