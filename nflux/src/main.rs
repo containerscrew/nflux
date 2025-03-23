@@ -3,6 +3,7 @@ use tracing::error;
 mod cli;
 mod logger;
 mod netrace;
+mod tlstrace;
 mod utils;
 
 #[tokio::main]
@@ -14,12 +15,6 @@ async fn main() -> anyhow::Result<()> {
             error!("Error starting the cli {}", err)
         }
     }
-
-    // // Spawn a task to process events
-    // tokio::spawn(async move { process_event(ring_buf).await });
-
-    // // Wait for shutdown
-    // let _ = wait_for_shutdown().await;
 
     Ok(())
 }

@@ -71,4 +71,14 @@ pub enum Commands {
         )]
         disable_full_log: bool,
     },
+    Tlstrace {
+        /// Sniffing TLS/SSL traffic using uprobes/uretprobes. Supports openssl and nss
+        #[arg(
+            long = "openssl-path",
+            help = "Path to libssl path",
+            default_value = "/lib64/libssl.so.3",
+            required = false,
+        )]
+        openssl_path: String,
+    }
 }
