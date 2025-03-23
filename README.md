@@ -19,12 +19,11 @@
 **Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
 - [Introduction](#introduction)
   - [What is nflux?](#what-is-nflux)
-    - [What is ebpf?](#what-is-ebpf)
+  - [What is ebpf?](#what-is-ebpf)
 - [Compatibility](#compatibility)
 - [Installation](#installation)
 - [Usage](#usage)
   - [netrace](#netrace)
-    - [Help](#help)
     - [Changing default interface](#changing-default-interface)
     - [Sniffing (only) egress traffic](#sniffing-only-egress-traffic)
     - [Sniffing (only) ingress traffic](#sniffing-only-ingress-traffic)
@@ -74,7 +73,7 @@ Nflux is... (pending to finish)
 > [!NOTE]
 > The code is highly improvable. I'm a rookie of eBPF, Rust, and software engineering in general.
 
-### What is ebpf?
+## What is ebpf?
 
 _(Small intro)_
 
@@ -119,6 +118,8 @@ Global flags:
 sudo nflux --help
 sudo nflux --log-level warn
 sudo nflux --log-format json
+sudo nflux netrace --help
+sudo nflux tlstrace --help
 ```
 
 Then:
@@ -142,14 +143,6 @@ By default, everything is enabled. Which means:
 - Full packet logging
 
 Let's see in the following sections how to customize `nflux netrace`.
-
-### Help
-
-First of all, take a look to the available flags:
-
-```shell
-sudo nflux netrace --help
-```
 
 ### Changing default interface
 
@@ -232,7 +225,7 @@ $ ldconfig -p | grep libssl
         libssl.so (libc6,x86-64) => /lib64/libssl.so
 ```
 
-In this previous command, `/lib64/libssl.so.3` is the library that `tlstrace` needs.
+In this previous command, `/lib64/libssl.so.3` is the library that `tlstrace` needs for my fedora machine. The path changes depending on your distro.
 
 ```shell
 sudo nflux tlstrace --openssl-path '/lib64/libssl.so.3'
@@ -240,9 +233,24 @@ sudo nflux tlstrace --openssl-path '/lib64/libssl.so.3'
 
 ### Example using tlstrace
 
+`curl` uses openssl by default to encrypt/decrypt the data it sends.
+
+```shell
+$ curl -V
+
+curl 8.9.1 (x86_64-redhat-linux-gnu) libcurl/8.9.1 OpenSSL/3.2.4 zlib/1.3.1.zlib-ng libidn2/2.3.8 nghttp2/1.62.1
+Release-Date: 2024-07-31
+Protocols: file ftp ftps http https ipfs ipns
+Features: alt-svc AsynchDNS GSS-API HSTS HTTP2 HTTPS-proxy IDN IPv6 Kerberos Largefile libz SPNEGO SSL threadsafe UnixSockets
+```
+
+Run the following command:
+
 ```shell
 curl https://iproxy.containerscrew.com/me --http1.1
 ```
+
+> curl without specifying --http1.1 uses http2. In the log you will see data encrypted with the HPACK algorithm.
 
 _TODO: GIF example_
 
