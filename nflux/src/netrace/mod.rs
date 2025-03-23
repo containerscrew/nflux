@@ -1,4 +1,4 @@
 mod tc_event;
-mod try_tc;
+mod try_netrace;
 
-pub use try_tc::start_netrace;
+pub use try_netrace::start_netrace;

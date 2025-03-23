@@ -85,7 +85,12 @@ pub async fn start_cli() -> Result<NfluxCli, anyhow::Error> {
 
             // If enable_egress and enable_ingress are both false, the app is doing nothing, exit
             if *disable_egress && *disable_ingress {
-                error!("If you disable both egress and ingress, the app will log anything.");
+                error!("You disabled egress and ingress traffic, noting to display :)");
+                exit(1)
+            }
+
+            if *disable_icmp && *disable_tcp && *disable_udp {
+                error!("You disabled all the procotols, nothing to display :)");
                 exit(1)
             }
 
@@ -105,6 +110,9 @@ pub async fn start_cli() -> Result<NfluxCli, anyhow::Error> {
                 configmap,
             )
             .await;
+        },
+        Some(Commands::Tlstrace { openssl_path: _ }) => {
+            info!("Starting nflux tlstrace with pid {}", process::id())
         }
         None => {}
     }
