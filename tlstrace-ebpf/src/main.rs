@@ -2,11 +2,12 @@
 #![no_main]
 
 use aya_ebpf::{
-
-    helpers::{bpf_get_current_comm, bpf_get_current_pid_tgid, bpf_probe_read_buf}, macros::{map, uprobe, uretprobe}, maps::{HashMap, PerCpuArray, RingBuf}, programs::{ProbeContext, RetProbeContext}
+    helpers::{bpf_get_current_comm, bpf_get_current_pid_tgid, bpf_probe_read_buf},
+    macros::{map, uprobe, uretprobe},
+    maps::{HashMap, PerCpuArray, RingBuf},
+    programs::{ProbeContext, RetProbeContext},
 };
 use nflux_common::{Kind, TLSData};
-
 
 #[map]
 static mut STORAGE: PerCpuArray<TLSData> = PerCpuArray::with_max_entries(1, 0);
@@ -90,7 +91,9 @@ fn try_ssl(ctx: ProbeContext) -> Result<u32, u32> {
     let buf_p: *const u8 = ctx.arg(1).ok_or(0_u32)?;
 
     // Insert the buffer pointer into the `BUFFERS` map for the current process/thread group.
-    unsafe { BUFFERS.insert(&tgid, &buf_p, 0).ok(); }
+    unsafe {
+        BUFFERS.insert(&tgid, &buf_p, 0).ok();
+    }
 
     Ok(0)
 }
@@ -130,8 +133,7 @@ fn try_ssl_ret(ctx: RetProbeContext, kind: Kind) -> Result<u32, u32> {
         let ret = bpf_probe_read_buf(buf_p, event.buf.as_mut());
 
         match ret {
-            Ok(_) => {
-            }
+            Ok(_) => {}
             Err(ret) => {
                 return Err(0);
             }
@@ -142,7 +144,6 @@ fn try_ssl_ret(ctx: RetProbeContext, kind: Kind) -> Result<u32, u32> {
         if let Some(mut data) = EVENT.reserve::<TLSData>(0) {
             *data.as_mut_ptr() = *event;
             data.submit(0);
-
         } else {
             return Err(0);
         }
