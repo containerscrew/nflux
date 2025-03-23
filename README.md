@@ -17,8 +17,9 @@
 
 <!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
 **Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
-- [What is nflux?](#what-is-nflux)
-  - [What is ebpf?](#what-is-ebpf)
+- [Introduction](#introduction)
+  - [What is nflux?](#what-is-nflux)
+    - [What is ebpf?](#what-is-ebpf)
 - [Compatibility](#compatibility)
 - [Installation](#installation)
 - [Usage](#usage)
@@ -63,8 +64,9 @@ Options:
   -h, --help                     Print help
   -V, --version                  Print version
 ```
+# Introduction
 
-# What is nflux?
+## What is nflux?
 
 Nflux is... (pending to finish)
 
@@ -72,7 +74,7 @@ Nflux is... (pending to finish)
 > [!NOTE]
 > The code is highly improvable. I'm a rookie of eBPF, Rust, and software engineering in general.
 
-## What is ebpf?
+### What is ebpf?
 
 _(Small intro)_
 
