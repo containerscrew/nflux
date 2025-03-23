@@ -55,7 +55,7 @@ Usage: nflux [OPTIONS] [COMMAND]
 
 Commands:
   netrace   Start network traffic monitoring using TC (Traffic Control)
-  tlstrace
+  tlstrace  Sniffing TLS/SSL traffic using uprobes/uretprobes. Supports openssl
   help      Print this message or the help of the given subcommand(s)
 
 Options:
@@ -63,8 +63,8 @@ Options:
       --log-format <LOG_FORMAT>  Log format for logging tracing. Possible values: text, json. [default: text]
   -h, --help                     Print help
   -V, --version                  Print version
-
 ```
+
 # Introduction
 
 ## What is nflux?
