@@ -19,7 +19,7 @@ use crate::{
     about = "nflux",
     version = env!("CARGO_PKG_VERSION"),
     author = "Containerscrew info@containerscrew.com",
-    about = "Network monitoring tool & TLS/SSL sniffer using eBPF. Powered by Aya-rs 🐝",
+    about = "Network monitoring tool & TLS/SSL sniffer using eBPF. Powered by Aya-rs 🐝. Author: github.com/containerscrew",
     arg_required_else_help = true,
     before_help = print_banner()
 )]
