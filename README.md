@@ -122,6 +122,9 @@ If you'd like to learn more about eBPF, here are some online resources and favor
 
 # Installation
 
+> [!IMPORTANT]
+> I haven't uploaded any releases to Github or crates.io yet.
+
 ## Supported Platforms
 
 | Arch    | arm64 | x86_64 |
