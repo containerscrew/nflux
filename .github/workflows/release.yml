@@ -20,16 +20,16 @@ env:
 jobs:
   release:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    name: Release - ${{ matrix.platform.release_for }}
+    name: Releas for ${{ matrix.platform.release_for }}
     strategy:
       matrix:
         platform:
           - release_for: linux-arm64
-            os: ubuntu-latest
+            os: ubuntu-24.04-arm
             target: aarch64-unknown-linux-gnu
 
           - release_for: linux-amd64
-            os: ubuntu-latest
+            os: ubuntu-24.04
             target: x86_64-unknown-linux-gnu
 
     runs-on: ${{ matrix.platform.os }}
@@ -47,14 +47,12 @@ jobs:
 
       - name: System dependencies
         run: |
-          sudo apt-get -y install linux-headers-$(uname -r)
+          sudo apt-get -y install linux-headers-$(uname -r) make
 
       - name: Rustup
         run: |
           rustup install stable && rustup toolchain install nightly --component rust-src
           rustup default nightly
-          rustup target add aarch64-unknown-linux-gnu --toolchain nightly
-          rustup target add x86_64-unknown-linux-gnu --toolchain nightly
 
       - name: Setup cargo dependencies
         run: |
@@ -62,8 +60,7 @@ jobs:
 
       - name: Run build
         run: |
-          cargo +nightly build --release --locked --target x86_64-unknown-linux-gnu
-          cargo +nightly build --release --locked --target aarch64-unknown-linux-gnu
+          cargo +nightly build --release --locked
 
       - name: Package zip
         run: |
