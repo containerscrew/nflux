@@ -122,9 +122,6 @@ If you'd like to learn more about eBPF, here are some online resources and favor
 
 # Installation
 
-> [!IMPORTANT]
-> I haven't uploaded any releases to Github or crates.io yet.
-
 ## Supported Platforms
 
 | Arch    | arm64 | x86_64 |
@@ -146,6 +143,9 @@ curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containe
 ```
 
 ## Using cargo
+
+> [!WARNING]
+> I haven't uploaded any releases to crates.io yet. I'm having some problems pushing a crate with multiple workspaces.
 
 _Remember to install `cargo` with rustup_
 
