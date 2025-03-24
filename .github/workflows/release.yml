@@ -64,7 +64,7 @@ jobs:
 
       - name: Package zip
         run: |
-          make package PLATFORM=${{ matrix.platform.release_for }} TARGET=${{ matrix.platform.target }}
+          make package PLATFORM=${{ matrix.platform.release_for }}
 
       - name: Release
         uses: softprops/action-gh-release@v2
