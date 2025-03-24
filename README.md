@@ -123,7 +123,7 @@ If you'd like to learn more about eBPF, here are some online resources and favor
 
 ## Supported Platforms
 
-| Arch    | ARM64 | x86_64 |
+| Arch    | arm64 | x86_64 |
 |---------|------|------|
 | linux   | ✅    | ✅  |
 
@@ -205,7 +205,7 @@ Look at what level XDP and TC work:
 
 ### Changing default interface
 
-The program automatically detects your default iface.
+_The program automatically detects your default iface._
 
 ```shell
 sudo nflux netrace -i eth0
