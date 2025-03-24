@@ -13,6 +13,7 @@
 ![Crates.io Version](https://img.shields.io/crates/v/nflux)
 [![Test](https://github.com/containerscrew/nflux/actions/workflows/test.yml/badge.svg)](https://github.com/containerscrew/nflux/actions/workflows/test.yml)
 [![Build](https://github.com/containerscrew/nflux/actions/workflows/build.yml/badge.svg)](https://github.com/containerscrew/nflux/actions/workflows/build.yml)
+[![Release](https://github.com/containerscrew/nflux/actions/workflows/release.yml/badge.svg)](https://github.com/containerscrew/nflux/actions/workflows/release.yml)
 ---
 
 <!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
