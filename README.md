@@ -55,8 +55,8 @@ Author: github.com/containerscrew
 Usage: nflux [OPTIONS] [COMMAND]
 
 Commands:
-  netrace   Start network traffic monitoring using TC (Traffic Control)
-  tlstrace  Sniffing TLS/SSL traffic using uprobes/uretprobes. Supports openssl
+  netrace   Start network traffic monitoring using eBPF & TC (Traffic Control)
+  tlstrace  Sniffing TLS/SSL traffic using eBPF uprobes/uretprobes
   help      Print this message or the help of the given subcommand(s)
 
 Options:
@@ -105,9 +105,9 @@ If you'd like to learn more about eBPF, here are some online resources and favor
 
 **Nflux has been created and tested in:**
 
-|   OS    | ARM64 | AMD64 | Kernel version |
+|   OS    | ARM64 | x86_64 | Kernel version |
 |---------|------|------|------|
-| fedora linux   | ✅    | ✅  |`6.13.7-200.fc41.x86_64 ` |
+| fedora linux   | ? (not tested)    | ✅  |`6.13.7-200.fc41.x86_64 ` |
 
 > For example, in Debian12 with kernel version `6.1.0-31-amd64` nflux doest not works. Probably for the version of kernel bpf implementation.
 
@@ -268,10 +268,20 @@ $ ldconfig -p | grep libssl
         libssl.so (libc6,x86-64) => /lib64/libssl.so
 ```
 
-In this previous command, `/lib64/libssl.so.3` is the library that `tlstrace` needs for my fedora machine. The path changes depending on your distro.
+In this previous command, `/lib64/libssl.so` is the library that `tlstrace` needs for my fedora machine. The path changes depending on your distro.
+
+> **/lib64/libssl.so** is the default path. Not necessary to specify `--openssl-path` flag.
+
+Specifying other path:
 
 ```shell
-sudo nflux tlstrace --openssl-path '/lib64/libssl.so.3'
+sudo nflux tlstrace --openssl-path '/other/path'
+```
+
+Verify `SSL_read` and `SSL_write` exists:
+
+```shell
+nm -D /lib64/libssl.so | grep SSL_write
 ```
 
 ### Example using tlstrace
@@ -295,8 +305,7 @@ curl https://iproxy.containerscrew.com/me --http1.1
 
 > curl without specifying --http1.1 uses http2. In the log you will see data encrypted with the HPACK algorithm.
 
-
-_TODO: GIF example_
+![tlstrace-example](./img/tlstrace-example.png)
 
 # Docs
 

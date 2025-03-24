@@ -4,7 +4,7 @@ use crate::utils::set_default_iface;
 
 #[derive(Debug, Subcommand)]
 pub enum Commands {
-    /// Start network traffic monitoring using TC (Traffic Control)
+    /// Start network traffic monitoring using eBPF & TC (Traffic Control)
     Netrace {
         #[arg(
             short = 'i',
@@ -71,12 +71,12 @@ pub enum Commands {
         )]
         disable_full_log: bool,
     },
-    /// Sniffing TLS/SSL traffic using uprobes/uretprobes. Supports openssl
+    /// Sniffing TLS/SSL traffic using eBPF uprobes/uretprobes.
     Tlstrace {
         #[arg(
             long = "openssl-path",
             help = "Path to libssl path",
-            default_value = "/lib64/libssl.so.3",
+            default_value = "/lib64/libssl.so",
             required = false
         )]
         openssl_path: String,
