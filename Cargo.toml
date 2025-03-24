@@ -25,3 +25,6 @@ which = { version = "6.0.0", default-features = false }
 [profile.release.package.netrace-ebpf]
 debug = 2
 codegen-units = 1
+
+[profile.release]
+strip = true

@@ -6,10 +6,6 @@ permissions:
   pull-requests: write
 
 on:
-  workflow_run:
-    workflows: ["Build 🪛"]
-    types:
-      - completed
   push:
     tags:
       - 'v*.*.*'
@@ -19,7 +15,6 @@ env:
 
 jobs:
   release:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     name: Release for ${{ matrix.platform.release_for }}
     strategy:
       matrix:
@@ -62,6 +57,7 @@ jobs:
         run: |
           cargo +nightly build --release --locked
 
+
       - name: Package zip
         run: |
           make package PLATFORM=${{ matrix.platform.release_for }}
@@ -78,6 +74,7 @@ jobs:
           token: ${{ secrets.CI_TOKEN }}
           generate_release_notes: true
           append_body: true
+          TAG_NAME:
 
   publish-crate:
     name: Publish crate to creates.io
