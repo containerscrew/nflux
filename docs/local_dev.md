@@ -47,10 +47,27 @@ cargo check
 cargo build --release
 ```
 
-
 ## Debugging
 
 ```shell
 sudo bpftool prog list # show ebpf running programs
 ip link show dev wlo1 # xdp attached to your interface
+```
+
+# Using Mac OSX?
+
+For development in a Mac OSX (Apple Silicon) environment, you can use [**lima**](https://github.com/lima-vm/lima) (VM using qemu).
+
+Take a look at the fedora.yml configuration file. Change the relevant directories to your local path where the nflux code is located. Creating an SSH key is optional if you're working locally.
+
+Deploy the machine:
+
+```shell
+limactl start --name fedora fedora.yml
+limactl shell fedora
+cd /your/mapped/directory/with/your/code
+# Example
+cd /Users/dcr/Documents/Code/Personal/nflux # this is my mapped path from OSX local to the fedora VM machine
+
+# Now you can run the commands from above
 ```
