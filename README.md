@@ -146,6 +146,10 @@ By default, everything is enabled. Which means:
 
 Let's see in the following sections how to customize `nflux netrace`.
 
+Look at what level XDP and TC work:
+
+![tc-example](./img/tc-example.png)
+
 ### Changing default interface
 
 The program automatically detects your default iface.
@@ -216,6 +220,35 @@ _TODO: GIF example_
 > By the moment, `nflux tlstrace` only supports SSL/TLS sniffing for protocol HTTP1.1
 > `HTTP2` is being implemented, trying to decrypt HPACK compression.
 
+```shell
++-----------------------------------------------+
+|                 Application                   |
+|      (e.g. Web Browser, Client Software)      |
++--------------------+--------------------------+
+|      write()      |         read()            |
+|        ↓          |          ↑                |
++--------------------+--------------------------+
+|                TLS Library                    |
+|       (e.g., libssl.so, OpenSSL)              |
++--------------------+--------------------------+
+|     SSL_write()   |       SSL_read()          |
+|        ↓          |          ↑                |
++--------------------+--------------------------+
+|              Linux Kernel                     |
++--------------------+--------------------------+
+|      send()       |         recv()            |
+|        ↓          |          ↑                |
++-----------------------------------------------+
+```
+
+`tlstrace` implementations:
+
+- Openssl ✅
+- NSS ❌
+- Boring SSL ❌
+
+### Openssl
+
 Before running `tlstrace` run the following command:
 
 ```shell
@@ -254,6 +287,7 @@ curl https://iproxy.containerscrew.com/me --http1.1
 
 > curl without specifying --http1.1 uses http2. In the log you will see data encrypted with the HPACK algorithm.
 
+
 _TODO: GIF example_
 
 # Docs
@@ -263,7 +297,6 @@ More documentation inside [`docs`](./docs/) folder:
 - Todo and features
 - Local development
 - Old nflux
-- Traffic control and SSL/TLS sniffing (theory with images)(Pending)
 
 # Contribution
 
