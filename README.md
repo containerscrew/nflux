@@ -31,6 +31,7 @@
     - [Available procotols](#available-procotols)
     - [Example using netrace](#example-using-netrace)
   - [tlstrace](#tlstrace)
+    - [Openssl](#openssl)
     - [Example using tlstrace](#example-using-tlstrace)
 - [Docs](#docs)
 - [Contribution](#contribution)
@@ -105,6 +106,9 @@ If you'd like to learn more about eBPF, here are some online resources and favor
 | fedora linux   | ✅    | ✅  |`6.13.7-200.fc41.x86_64 ` |
 
 > For example, in Debian12 with kernel version `6.1.0-31-amd64` nflux doest not works. Probably for the version of kernel bpf implementation.
+
+> [!TIP]
+> If you want to try nflux on your Mac OSX, check out the [local dev](./docs/local_dev.md) documentation.
 
 # Installation
 

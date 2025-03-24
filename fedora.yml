@@ -6,10 +6,10 @@ user:
   name: "fedora"
 
 mounts:
-- location: "$HOME/Documents/Code/Personal/nflux"
+- location: "~/Documents/Code/Personal/nflux"
   writable: true
 
-- location: "$HOME/.ssh/lima"
+- location: "~/.ssh/lima"
   writable: false
 
 memory: "2GiB"

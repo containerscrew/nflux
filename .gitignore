@@ -17,3 +17,6 @@ target/
 # Debian builds
 deb-build/
 *.deb
+
+# Lima VM machines
+lima.REJECTED.yaml
