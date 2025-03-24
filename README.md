@@ -70,7 +70,11 @@ Options:
 
 ## What is nflux?
 
-Nflux is... (pending to finish)
+Nflux is a tool that currently serves two purposes:
+
+- **netrace:** monitors `incoming/outgoing` traffic on a Linux system by attaching a TC (Traffic Control) program using eBPF technology. It can be attached to both physical and virtual interfaces, allowing us to obtain networking data at a very low level.
+
+- **tlstrace:** sniffs `read/write` traffic before it is encrypted by libraries such as OpenSSL. In other words, it allows reading data from the buffer of libraries like OpenSSL. (A simple curl command, for example, uses this library to encrypt its data before sending it to the destination).
 
 
 > [!NOTE]

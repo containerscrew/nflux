@@ -1,4 +1,5 @@
-SHELL:=/bin/bash
+SHELL:=/bin/sh
+
 .PHONY: all
 
 app_name="nflux"
@@ -24,25 +25,11 @@ generate-changelog: ## Generate changelog
 init-gitmoji: ## Init gitmoji (sudo npm i -g gitmoji-cli)
 	gitmoji --init
 
-DOCKER_COMPOSE := $(shell which docker-compose 2>/dev/null || echo podman-compose)
-
-compose-build: ## Run docker-compose build
-	$(DOCKER_COMPOSE) -f compose.yml build
-
-compose-up: ## Run docker-compose up
-	$(DOCKER_COMPOSE) -f compose.yml up -d --force-recreate
-
-compose-up-build: ## Run docker-compose and build
-	$(DOCKER_COMPOSE) -f compose.yml up --build -d
-
-compose-down: ## Run docker-compose down
-	$(DOCKER_COMPOSE) -f compose.yml down
-
 remote-sync: ## Sync this repository to remote machine using rsync.
 	rsync -avzh --exclude='.git/' --exclude='target/' --exclude='.idea/' $(shell pwd)/ $(USER)@$(IP):/home/$(USER)/nflux
 
 local-run: ## Run nflux locally
-	cargo run --release --config 'target."cfg(all())".runner="sudo -E"' -- -i $(INTERFACE)
+	cargo run --release --config 'target."cfg(all())".runner="sudo -E"' --
 
 local-build: ## Build nflux locally
 	cargo build --release
