@@ -13,3 +13,4 @@ List of things to improve and comming features:
 - [X] TESTING!
 - [X] Ipv6 traffic
 - [X] Autodetect openssl/nss libraries in `nflux tlstrace`
+- [X] Running nflux in a container

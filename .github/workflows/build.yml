@@ -8,6 +8,8 @@ on:
       - '.github/workflows/build.yml'
     branches:
       - '**'
+    tags:
+      - 'v*.*.*'
 
 env:
     CARGO_TERM_COLOR: always
