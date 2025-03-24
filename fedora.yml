@@ -1,6 +1,20 @@
+# arch: "x86_64"
+# arch: "aarch64"
+
 images:
 - location: "https://download.fedoraproject.org/pub/fedora/linux/releases/41/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-41-1.4.aarch64.qcow2"
   arch: "aarch64"
+- location: "https://download.fedoraproject.org/pub/fedora/linux/releases/41/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-41-1.4.x86_64.qcow2"
+  arch: "x86_64"
+
+vmType: "vz"
+
+rosetta:
+  # Enable Rosetta for Linux.
+  # Hint: try `softwareupdate --install-rosetta` if Lima gets stuck at `Installing rosetta...`
+  enabled: true
+  # Register rosetta to /proc/sys/fs/binfmt_misc
+  binfmt: true
 
 user:
   name: "fedora"
@@ -25,7 +39,7 @@ provision:
       #!/bin/bash
       set -eux -o pipefail
       dnf update -y
-      dnf install -y vim gcc make libbpf libbpf-devel clang clang-tools-extra bpftool bpftrace
+      dnf install -y vim gcc make libbpf libbpf-devel clang clang-tools-extra bpftool bpftrace linux-headers-$(uname -r) libssl-devel
 
   - mode: user
     script: |
