@@ -13,7 +13,7 @@ use nflux_common::{Kind, TLSData};
 static mut STORAGE: PerCpuArray<TLSData> = PerCpuArray::with_max_entries(1, 0);
 
 #[map]
-pub static EVENT: RingBuf = RingBuf::with_byte_size(1024, 0);
+static EVENT: RingBuf = RingBuf::with_byte_size(1024, 0);
 
 #[map]
 static mut BUFFERS: HashMap<u32, *const u8> = HashMap::with_max_entries(1024, 0);
