@@ -15,17 +15,8 @@ pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow:
             // Make sure the data is the correct size
             if data.len() == std::mem::size_of::<TcEvent>() {
                 let event: &TcEvent = unsafe { &*(data.as_ptr() as *const TcEvent) };
-                let mut service_name = String::new();
-
-                // Get service by name
-                match get_service_name(event.dst_port, convert_protocol(event.protocol)) {
-                    Some(name) => {
-                        service_name.push_str(name.as_str());
-                    }
-                    None => {
-                        service_name.push_str("unknown");
-                    }
-                }
+                let src_service_name = get_service_name(event.src_port, convert_protocol(event.protocol));
+                let dest_service_name = get_service_name(event.dst_port, convert_protocol(event.protocol));
 
                 let direction = if event.direction == 0 {
                     "ingress"
@@ -34,12 +25,13 @@ pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow:
                 };
 
                 info!(
-                    "dir={} type={}, pid={}, protocol={}, serv={}, total_len={}B, ttl={}, src_ip={}, dst_ip={}, src_port={}, dst_port={}",
+                    "dir={} type={}, pid={}, protocol={}, src_service={}, dest_service={}, total_len={}B, ttl={}, src_ip={}, dst_ip={}, src_port={}, dst_port={}",
                     direction,
                     event.ip_type.as_str(),
                     event.pid,
                     convert_protocol(event.protocol),
-                    service_name,
+                    src_service_name,
+                    dest_service_name,
                     event.total_len,
                     event.ttl,
                     Ipv4Addr::from(event.src_ip),
