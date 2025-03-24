@@ -10,6 +10,9 @@ help: ## this help
 mtoc: ## Create table of contents with mtoc
 	mtoc
 
+package: ## Package binary with zip
+	zip -j ${BINARY_NAME}-$(PLATFORM).zip target/$(TARGET)/release/${BINARY_NAME}
+
 pre-commit-install: ## Install pre-commit
 	pre-commit install
 

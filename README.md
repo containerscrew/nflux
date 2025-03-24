@@ -22,6 +22,11 @@
   - [What is ebpf?](#what-is-ebpf)
 - [Compatibility](#compatibility)
 - [Installation](#installation)
+  - [Supported Platforms](#supported-platforms)
+  - [Install latest version](#install-latest-version)
+  - [Install specific version](#install-specific-version)
+  - [Using cargo](#using-cargo)
+  - [Uninstall](#uninstall)
 - [Usage](#usage)
   - [netrace](#netrace)
     - [Changing default interface](#changing-default-interface)
@@ -116,8 +121,48 @@ If you'd like to learn more about eBPF, here are some online resources and favor
 
 # Installation
 
+## Supported Platforms
+
+| Arch    | ARM64 | x86_64 |
+|---------|------|------|
+| linux   | ✅    | ✅  |
+
+> Remember: `eBPF` is native for Linux.
+
+## Install latest version
+
 ```shell
-XXXXXX pending
+curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/nflux/main/install.sh | sh
+```
+
+## Install specific version
+
+```shell
+curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/nflux/main/install.sh | sh -s -- -v "v0.2.0"
+```
+
+## Using cargo
+
+_Remember to install `cargo` with rustup_
+
+```shell
+cargo install nflux
+```
+
+> If you want to update the tool to a new version, just the run the same command `cargo install nflux` or `cargo install nflux@vX.X.X`.
+
+## Uninstall
+
+Binary:
+
+```shell
+sudo rm /usr/local/bin/nflux
+```
+
+With cargo:
+
+```shell
+cargo uninstall nflux
 ```
 
 # Usage
