@@ -88,7 +88,7 @@ pub fn get_service_name(port: u16, proto: &'static str) -> String {
     unsafe {
         let serv: *mut servent = getservbyport(c_port as c_int, c_proto.as_ptr() as *const c_char);
         if serv.is_null() {
-            return "unknown".to_string();
+            return "{}".to_string();
         }
 
         let name = std::ffi::CStr::from_ptr((*serv).s_name)
