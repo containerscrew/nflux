@@ -4,6 +4,7 @@
   - [Requirements](#requirements)
   - [Running nflux](#running-nflux)
   - [Debugging](#debugging)
+- [Using Mac OSX?](#using-mac-osx)
 <!-- END OF TOC -->
 
 # Local development
