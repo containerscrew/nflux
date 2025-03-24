@@ -220,7 +220,7 @@ sudo nflux netrace --disable-udp --disable-icmp --disable-tcp
 
 ### Example using netrace
 
-_TODO: GIF example_
+![netrace-example](./img/netrace-example.png)
 
 ## tlstrace
 
