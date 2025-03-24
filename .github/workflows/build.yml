@@ -16,21 +16,33 @@ env:
 
 jobs:
   build:
-    name: Build the binary
-    runs-on: ubuntu-latest
+    name: Builf for ${{ matrix.platform.release_for }}
+    strategy:
+      matrix:
+        platform:
+          - release_for: linux-arm64
+            os: ubuntu-latest-arm
+            target: aarch64-unknown-linux-gnu
+
+          - release_for: linux-amd64
+            os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+
+    runs-on: ${{ matrix.platform.os }}
+
     steps:
       - uses: actions/checkout@v4
 
       - name: System dependencies
         run: |
-          sudo apt-get -y install linux-headers-$(uname -r) gcc-aarch64-linux-gnu
+          sudo apt-get -y install linux-headers-$(uname -r) gcc-aarch64-linux-gnu musl-dev musl-tools pkg-config make
 
       - name: Rustup
         run: |
           rustup install stable && rustup toolchain install nightly --component rust-src
           rustup default nightly
-          rustup target add aarch64-unknown-linux-gnu --toolchain nightly
-          rustup target add x86_64-unknown-linux-gnu --toolchain nightly
+          # rustup target add aarch64-unknown-linux-gnu --toolchain nightly
+          # rustup target add x86_64-unknown-linux-gnu --toolchain nightly
 
       - name: Setup cargo dependencies
         run: |
@@ -38,5 +50,5 @@ jobs:
 
       - name: Run build
         run: |
-          cargo +nightly build --release --locked --target x86_64-unknown-linux-gnu
-          cargo +nightly build --release --locked --target aarch64-unknown-linux-gnu
+          cargo +nightly build --release --locked
+          # cargo +nightly build --release --locked --target aarch64-unknown-linux-gnu
