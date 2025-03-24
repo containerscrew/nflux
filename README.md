@@ -112,7 +112,7 @@ If you'd like to learn more about eBPF, here are some online resources and favor
 > For example, in Debian12 with kernel version `6.1.0-31-amd64` nflux doest not works. Probably for the version of kernel bpf implementation.
 
 > [!TIP]
-> If you want to try nflux on your Mac OSX, check out the [local dev](./docs/local_dev.md) documentation.
+> If you want to try nflux on your Mac OSX, check out the ['Using Mac OSX section' in local dev doc](./docs/local_dev.md).
 
 # Installation
 
