@@ -2,6 +2,9 @@
 name = "nflux"
 version = "0.1.0"
 edition = "2021"
+license-file = "LICENSE"
+authors = ["containerscrew info@containerscrew.com"]
+repository = "https://github.com/containerscrew/nflux"
 
 [dependencies]
 nflux-common = { path = "../nflux-common", features = ["user"] }
