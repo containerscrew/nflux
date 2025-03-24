@@ -23,16 +23,20 @@ jobs:
 
       - name: System dependencies
         run: |
-          sudo apt-get -y install linux-headers-$(uname -r)
+          sudo apt-get -y install linux-headers-$(uname -r) gcc-aarch64-linux-gnu
 
       - name: Rustup
         run: |
           rustup install stable && rustup toolchain install nightly --component rust-src
           rustup default nightly
+          rustup target add aarch64-unknown-linux-gnu --toolchain nightly
+          rustup target add x86_64-unknown-linux-gnu --toolchain nightly
 
-      - name: Setup dependencies
+      - name: Setup cargo dependencies
         run: |
             cargo install bpf-linker
 
       - name: Run build
-        run: cargo build --release --locked
+        run: |
+          cargo +nightly build --release --locked --target x86_64-unknown-linux-gnu
+          cargo +nightly build --release --locked --target aarch64-unknown-linux-gnu
