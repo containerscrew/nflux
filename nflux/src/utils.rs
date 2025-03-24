@@ -81,20 +81,20 @@ pub fn convert_protocol(protocol: u8) -> &'static str {
     }
 }
 
-pub fn get_service_name(port: u16, proto: &'static str) -> Option<String> {
-    let c_proto = CString::new(proto).ok()?;
+pub fn get_service_name(port: u16, proto: &'static str) -> String {
+    let c_proto = CString::new(proto).unwrap_or_else(|_| CString::new("").unwrap());
     let c_port = ntohs(port);
 
     unsafe {
         let serv: *mut servent = getservbyport(c_port as c_int, c_proto.as_ptr() as *const c_char);
         if serv.is_null() {
-            return None;
+            return "unknown".to_string();
         }
 
         let name = std::ffi::CStr::from_ptr((*serv).s_name)
             .to_string_lossy()
             .into_owned();
-        Some(name)
+        name
     }
 }
 
