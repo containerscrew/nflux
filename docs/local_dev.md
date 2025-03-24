@@ -71,3 +71,10 @@ cd /Users/dcr/Documents/Code/Personal/nflux # this is my mapped path from OSX lo
 
 # Now you can run the commands from above
 ```
+
+Cleanup:
+
+```shell
+limactl stop fedora
+limactl delete fedora
+```
