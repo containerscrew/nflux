@@ -1,3 +1,8 @@
+<!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
+**Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
+- [Changelog](#changelog)
+  - [[0.1.0] - 2025-03-24](#010---2025-03-24)
+<!-- END OF TOC -->
 # Changelog
 
 All notable changes to this project will be documented in this file.
