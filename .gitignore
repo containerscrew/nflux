@@ -20,3 +20,7 @@ deb-build/
 
 # Lima VM machines
 lima.REJECTED.yaml
+
+
+# Zip packages
+*.zip
