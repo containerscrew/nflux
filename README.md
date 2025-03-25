@@ -16,14 +16,14 @@
 [![Release](https://github.com/containerscrew/nflux/actions/workflows/release.yml/badge.svg)](https://github.com/containerscrew/nflux/actions/workflows/release.yml)
 ---
 <p align="center">
-    <h3 align="center">netrace</h3>
+    <h3 align="center">$ nflux netrace</h3>
     <img src="./img/netrace-example.png" alt="netrace-example"/>
 </p>
 
 ---
 
 <p align="center">
-    <h3 align="center">tlstrace</h3>
+    <h3 align="center">$ nflux tlstrace</h3>
     <img src="./img/tlstrace-example.png" alt="tlstrace-example"/>
 </p>
 
