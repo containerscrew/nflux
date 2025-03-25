@@ -1,7 +1,7 @@
 use aya_ebpf::helpers::gen::bpf_ktime_get_ns;
 use nflux_common::{IpType, TcEvent};
 
-use crate::maps::{ActiveConnectionKey, ACTIVE_CONNECTIONS, TC_EVENT};
+use crate::maps::{ActiveConnectionKey, ACTIVE_CONNECTIONS, PACKET_COUNT, TC_EVENT};
 
 #[inline]
 pub unsafe fn log_connection(
@@ -34,6 +34,12 @@ pub unsafe fn log_connection(
         },
         pid,
     };
+
+    // let key = 0;
+
+    // let mut packet_count = PACKET_COUNT.get(key).unwrap_or(&0);
+
+    // packet_count += 1;
 
     if disable_full_log == 0 {
         if let Some(mut data) = TC_EVENT.reserve::<TcEvent>(0) {

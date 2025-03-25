@@ -1,6 +1,6 @@
 use aya_ebpf::{
     macros::map,
-    maps::{Array, LruHashMap, RingBuf},
+    maps::{Array, LruHashMap, PerCpuArray, RingBuf},
 };
 use nflux_common::Configmap;
 
@@ -23,3 +23,6 @@ pub static TC_EVENT: RingBuf = RingBuf::with_byte_size(4096, 0);
 #[map]
 pub static ACTIVE_CONNECTIONS: LruHashMap<ActiveConnectionKey, u64> =
     LruHashMap::with_max_entries(4096, 0);
+
+#[map]
+pub static PACKET_COUNT: Array<u32> = Array::with_max_entries(1, 0);

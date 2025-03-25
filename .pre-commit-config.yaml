@@ -13,11 +13,11 @@ repos:
     rev: v8.18.0
     hooks:
       - id: gitleaks
-  - repo: https://github.com/containerscrew/mtoc
-    rev: v0.4.1
-    hooks:
-      - id: mtoc
-        args: [ "-e", ".target/" ]
+  # - repo: https://github.com/containerscrew/mtoc
+  #   rev: v0.4.1
+  #   hooks:
+  #     - id: mtoc
+  #       args: [ "-e", ".target/", "-e", "README.md" ]
   # - repo: https://github.com/doublify/pre-commit-rust
   #   rev: v1.0
   #   hooks:
