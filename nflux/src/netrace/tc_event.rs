@@ -20,7 +20,11 @@ pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow:
                 let dest_service_name =
                     get_service_name(event.dst_port, convert_protocol(event.protocol));
 
-                let direction = if event.direction == 0 { "ingress" } else { "egress" };
+                let direction = if event.direction == 0 {
+                    "ingress"
+                } else {
+                    "egress"
+                };
 
                 info!(
                     "dir={} type={}, pid={}, comm={}, protocol={}, src_service={}, dest_service={}, total_len={}B, ttl={}, src_ip={}, dst_ip={}, src_port={}, dst_port={}",
