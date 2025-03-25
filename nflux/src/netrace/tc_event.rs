@@ -4,7 +4,7 @@ use aya::maps::{MapData, RingBuf};
 use nflux_common::TcEvent;
 use tracing::info;
 
-use crate::utils::{convert_protocol, get_service_name};
+use crate::utils::{convert_protocol, get_process_name, get_service_name};
 
 pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow::Error> {
     loop {
@@ -20,17 +20,14 @@ pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow:
                 let dest_service_name =
                     get_service_name(event.dst_port, convert_protocol(event.protocol));
 
-                let direction = if event.direction == 0 {
-                    "ingress"
-                } else {
-                    "egress"
-                };
+                let direction = if event.direction == 0 { "ingress" } else { "egress" };
 
                 info!(
-                    "dir={} type={}, pid={}, protocol={}, src_service={}, dest_service={}, total_len={}B, ttl={}, src_ip={}, dst_ip={}, src_port={}, dst_port={}",
+                    "dir={} type={}, pid={}, comm={}, protocol={}, src_service={}, dest_service={}, total_len={}B, ttl={}, src_ip={}, dst_ip={}, src_port={}, dst_port={}",
                     direction,
                     event.ip_type.as_str(),
                     event.pid,
+                    get_process_name(event.pid),
                     convert_protocol(event.protocol),
                     src_service_name,
                     dest_service_name,
