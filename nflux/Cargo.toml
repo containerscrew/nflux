@@ -27,7 +27,6 @@ default-net = "0.22.0"
 [build-dependencies]
 anyhow = { workspace = true }
 aya-build = { workspace = true }
-nflux-common = { workspace = true}
 
 cargo_metadata = { workspace = true }
 # TODO(https://github.com/rust-lang/cargo/issues/12375): this should be an artifact dependency, but
@@ -42,8 +41,8 @@ cargo_metadata = { workspace = true }
 # Finally note that *any* usage of `artifact = ...` in *any* Cargo.toml in the workspace breaks
 # workflows with stable cargo; stable cargo outright refuses to load manifests that use unstable
 # features.
-netrace-ebpf = { path = "../netrace-ebpf", version = "0.1.0" }
-tlstrace-ebpf = { path = "../tlstrace-ebpf", version = "0.1.0" }
+# netrace-ebpf = { path = "../netrace-ebpf", version = "0.1.0" }
+# tlstrace-ebpf = { path = "../tlstrace-ebpf", version = "0.1.0" }
 
 [[bin]]
 name = "nflux"
