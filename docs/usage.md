@@ -42,10 +42,6 @@ By default, everything is enabled. Which means:
 
 Let's see in the following sections how to customize `nflux netrace`.
 
-Look at what level XDP and TC work:
-
-![tc-example](../img/tc-example.png)
-
 ### Changing default interface
 
 _The program automatically detects your default iface._
