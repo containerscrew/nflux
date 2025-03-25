@@ -2,6 +2,7 @@
 name = "netrace-ebpf"
 version = "0.1.0"
 edition = "2021"
+publish = false
 
 [dependencies]
 nflux-common = { path = "../nflux-common", version = "0.1.0"}
