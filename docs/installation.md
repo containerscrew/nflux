@@ -6,6 +6,7 @@
   - [Install latest version](#install-latest-version)
   - [Install specific version](#install-specific-version)
   - [Uninstall](#uninstall)
+  - [From source](#from-source)
 <!-- END OF TOC -->
 # Compatibility
 
@@ -48,4 +49,13 @@ Binary:
 
 ```shell
 sudo rm /usr/local/bin/nflux
+```
+
+## From source
+
+> First of all [setup your local environment](./local_dev.md)
+
+```shell
+git clone https://github.com/containerscrew/nflux.git && cd nflux/
+make local-install
 ```
