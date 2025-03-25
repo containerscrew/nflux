@@ -34,9 +34,6 @@ Nflux is a **`eBPF`** tool that currently serves two purposes:
 
 - **tlstrace:** sniffs `read/write` traffic before it is encrypted by libraries such as OpenSSL. In other words, it allows reading data from the buffer of libraries like OpenSSL. (A simple curl command, for example, uses this library to encrypt its data before sending it to the destination). _Supports only HTTP1.1 (HTTPS2 HPACK decompression is being implemented)_
 
-> [!NOTE]
-> The code is highly improvable. I'm a rookie of eBPF, Rust, and software engineering in general.
-
 > [!TIP]
 > [`What is eBPF?`](./docs/what_is_ebpf.md)
 
