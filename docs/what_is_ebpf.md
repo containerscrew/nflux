@@ -12,6 +12,10 @@ eBPF, which stands for [`Extended Berkeley Packet Filter`](https://ebpf.io/), is
 
 *Source: [ebpf.io](https://ebpf.io/what-is-ebpf/)*
 
+Look at what level XDP and TC work:
+
+![tc-example](../img/tc-example.png)
+
 If you'd like to learn more about eBPF, here are some online resources and favorite books to help you continue learning:
 
 - [ebpf.io](https://ebpf.io/)
