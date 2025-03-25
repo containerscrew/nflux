@@ -37,6 +37,9 @@ Nflux is a **`eBPF`** tool that currently serves two purposes:
 > [!NOTE]
 > The code is highly improvable. I'm a rookie of eBPF, Rust, and software engineering in general.
 
+> [!TIP]
+> [`What is eBPF?`](./docs/what_is_ebpf.md)
+
 # Installation
 
 Read the [installation](./docs/installation.md) doc.

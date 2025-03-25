@@ -8,7 +8,7 @@ _(Small intro)_
 
 eBPF, which stands for [`Extended Berkeley Packet Filter`](https://ebpf.io/), is a revolutionary technology that allows for the dynamic insertion of small programs into various points in the kernel without requiring recompilation or modification of the kernel itself. These programs are executed in a restricted virtual machine (VM) environment directly within the kernel, providing the ability to intercept and modify data as it traverses the system. eBPF is utilized for tracing network packets, implementing firewall and network filtering programs, security software, and facilitating system monitoring.
 
-![ebpf-overview](./img/ebpf-overview.png)
+![ebpf-overview](../img/ebpf-overview.png)
 
 *Source: [ebpf.io](https://ebpf.io/what-is-ebpf/)*
 
