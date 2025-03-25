@@ -2,7 +2,7 @@
 name = "nflux-common"
 version = "0.1.0"
 edition = "2021"
-publish = false
+
 
 [features]
 default = []
