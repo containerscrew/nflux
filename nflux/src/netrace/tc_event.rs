@@ -15,8 +15,10 @@ pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow:
             // Make sure the data is the correct size
             if data.len() == std::mem::size_of::<TcEvent>() {
                 let event: &TcEvent = unsafe { &*(data.as_ptr() as *const TcEvent) };
-                let src_service_name = get_service_name(event.src_port, convert_protocol(event.protocol));
-                let dest_service_name = get_service_name(event.dst_port, convert_protocol(event.protocol));
+                let src_service_name =
+                    get_service_name(event.src_port, convert_protocol(event.protocol));
+                let dest_service_name =
+                    get_service_name(event.dst_port, convert_protocol(event.protocol));
 
                 let direction = if event.direction == 0 {
                     "ingress"
