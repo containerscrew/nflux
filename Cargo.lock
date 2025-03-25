@@ -756,7 +756,6 @@ dependencies = [
  "default-net",
  "dns-lookup",
  "libc",
- "netrace-ebpf",
  "nflux-common",
  "sysinfo",
  "tokio",
