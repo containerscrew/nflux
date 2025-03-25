@@ -60,4 +60,4 @@ jobs:
           components: clippy
 
       - name: Check formatting
-        run: cargo clippy --all-features -- -D warnings
+        run: cargo +nightly clippy --all-features -- -D warnings
