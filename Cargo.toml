@@ -31,5 +31,5 @@ codegen-units = 1
 debug = 2
 codegen-units = 1
 
-[profile.release]
+[profile.release.package.nflux]
 strip = true
