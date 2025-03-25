@@ -5,8 +5,8 @@
   - [Supported Platforms](#supported-platforms)
   - [Install latest version](#install-latest-version)
   - [Install specific version](#install-specific-version)
-  - [Uninstall](#uninstall)
   - [From source](#from-source)
+  - [Uninstall](#uninstall)
 <!-- END OF TOC -->
 # Compatibility
 
@@ -43,14 +43,6 @@ curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containe
 curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/nflux/main/install.sh | sh -s -- -v "v0.2.0"
 ```
 
-## Uninstall
-
-Binary:
-
-```shell
-sudo rm /usr/local/bin/nflux
-```
-
 ## From source
 
 > First of all [setup your local environment](./local_dev.md)
@@ -58,4 +50,12 @@ sudo rm /usr/local/bin/nflux
 ```shell
 git clone https://github.com/containerscrew/nflux.git && cd nflux/
 make local-install
+```
+
+## Uninstall
+
+Binary:
+
+```shell
+sudo rm /usr/local/bin/nflux
 ```
