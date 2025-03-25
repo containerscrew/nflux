@@ -1,11 +1,64 @@
-<!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
-**Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
-- [Changelog](#changelog)
-  - [[0.1.0] - 2025-03-24](#010---2025-03-24)
-<!-- END OF TOC -->
 # Changelog
 
 All notable changes to this project will be documented in this file.
+
+## [0.2.0] - 2025-03-25
+
+- Update CHANGELOG.md for release v0.1.0
+
+- Add cargo.toml metadata
+
+- Add versioning to Cargo.toml
+
+- Fix LICENSE file
+
+- Add lib.rs in netrace-ebpf
+
+- Update doc
+
+- Bump log from 0.4.26 to 0.4.27
+
+Bumps [log](https://github.com/rust-lang/log) from 0.4.26 to 0.4.27.
+- [Release notes](https://github.com/rust-lang/log/releases)
+- [Changelog](https://github.com/rust-lang/log/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/rust-lang/log/compare/0.4.26...0.4.27)
+
+---
+updated-dependencies:
+- dependency-name: log
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+- Merge pull request #42 from containerscrew/dependabot/cargo/log-0.4.27
+
+Bump log from 0.4.26 to 0.4.27
+
+- Updating doc structure
+
+- Update badges
+
+- Update rustfmt
+
+- Change test pipeline
+
+- Add comm in netrace logger
+
+- Comment cargo publish in release.yml pipeline
+
+- Update nflux/Cargo.toml
+
+- Update Cargo.toml
+
+- Strip nflux release
+
+- Delete workspace dependency for nflux-common
+
+- Delete crates.io references
+
+- Update installation.md
 
 ## [0.1.0] - 2025-03-24
 
