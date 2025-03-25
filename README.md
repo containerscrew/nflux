@@ -35,9 +35,9 @@
 
 Nflux is an [`eBPF`](./docs/what_is_ebpf.md)-based tool that currently serves two purposes:
 
-- **netrace:** monitors `incoming/outgoing` traffic on a Linux system by attaching a TC (Traffic Control) program using eBPF technology. It can be attached to both physical and virtual interfaces (wireguard), allowing us to obtain networking data at a very low level. _Supports only Ipv4 packet sniffing (Ipv6 is being implemented)_
+- **netrace:** monitors `incoming/outgoing` traffic on a Linux system by attaching a TC (Traffic Control) program using eBPF technology. It can be attached to both physical and virtual interfaces (wireguard), allowing us to obtain networking data at a very low level. _Supports only Ipv4 packet sniffing (Ipv6 is being implemented)_.
 
-- **tlstrace:** sniffs `read/write` traffic before it is encrypted by libraries such as OpenSSL. In other words, it allows reading data from the buffer of libraries like OpenSSL. (A simple curl command, for example, uses this library to encrypt its data before sending it to the destination). _Supports only HTTP1.1 (HTTPS2 HPACK decompression is being implemented)_
+- **tlstrace:** sniffs `read/write` traffic before it is encrypted by libraries such as OpenSSL. In other words, it allows reading data from the buffer of libraries like OpenSSL. (A simple curl command, for example, uses this library to encrypt its data before sending it to the destination). _Supports only HTTP1.1 (HTTPS2 HPACK decompression is being implemented)_.
 
 # Installation
 

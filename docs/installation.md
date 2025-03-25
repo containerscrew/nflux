@@ -16,10 +16,10 @@
 |---------|------|------|------|
 | fedora linux   | ? (not tested)    | ✅  |`6.13.7-200.fc41.x86_64 ` |
 
-> For example, in Debian12 with kernel version `6.1.0-31-amd64` nflux doest not works. Probably for the version of kernel bpf implementation.
+> For example, in Debian12 with kernel version `6.1.0-31-amd64` nflux doest not works. Probably for the version of kernel bpf implementation. Missing some bpf helper functions.
 
 > [!TIP]
-> If you want to try nflux on your Mac OSX, check out the ['Using Mac OSX section' in local dev doc](./docs/local_dev.md).
+> If you want to try nflux on your Mac OSX, check out the ['Using Mac OSX section' in local dev doc](./local_dev.md).
 
 # Installation
 
