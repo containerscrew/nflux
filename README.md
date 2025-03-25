@@ -15,18 +15,21 @@
 [![Build](https://github.com/containerscrew/nflux/actions/workflows/build.yml/badge.svg)](https://github.com/containerscrew/nflux/actions/workflows/build.yml)
 [![Release](https://github.com/containerscrew/nflux/actions/workflows/release.yml/badge.svg)](https://github.com/containerscrew/nflux/actions/workflows/release.yml)
 ---
+<p align="center">
+    <h3 align="center">netrace</h3>
+    <img src="./img/netrace-example.png" alt="netrace-example"/>
+</p>
 
-![netrace](./img/netrace-example.png)
-_netrace example_
 ---
 
-![tlstrace](./img/tlstrace-example.png)
-_tlstrace example_
+<p align="center">
+    <h3 align="center">tlstrace</h3>
+    <img src="./img/tlstrace-example.png" alt="tlstrace-example"/>
+</p>
+
 ---
 
-# Introduction
-
-## What is nflux?
+# What is nflux?
 
 Nflux is an [`eBPF`](./docs/what_is_ebpf.md)-based tool that currently serves two purposes:
 
