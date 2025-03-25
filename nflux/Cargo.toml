@@ -27,6 +27,7 @@ default-net = "0.22.0"
 [build-dependencies]
 anyhow = { workspace = true }
 aya-build = { workspace = true }
+nflux-common = { workspace = true}
 
 cargo_metadata = { workspace = true }
 # TODO(https://github.com/rust-lang/cargo/issues/12375): this should be an artifact dependency, but
