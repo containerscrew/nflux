@@ -5,12 +5,10 @@
 </p>
 
 ---
-![Crates.io Total Downloads](https://img.shields.io/crates/d/nflux?color=orange)
 [![License - MIT](https://img.shields.io/github/license/containerscrew/nflux)](/LICENSE)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 ![Code Size](https://img.shields.io/github/languages/code-size/containerscrew/nflux)
 ![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white)
-![Crates.io Version](https://img.shields.io/crates/v/nflux)
 [![Test Pipeline](https://github.com/containerscrew/nflux/actions/workflows/test.yml/badge.svg)](https://github.com/containerscrew/nflux/actions/workflows/test.yml)
 [![Build Pipeline](https://github.com/containerscrew/nflux/actions/workflows/build.yml/badge.svg)](https://github.com/containerscrew/nflux/actions/workflows/build.yml)
 [![Release Pipeline](https://github.com/containerscrew/nflux/actions/workflows/release.yml/badge.svg)](https://github.com/containerscrew/nflux/actions/workflows/release.yml)
