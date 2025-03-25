@@ -88,7 +88,7 @@ pub fn get_service_name(port: u16, proto: &'static str) -> String {
     unsafe {
         let serv: *mut servent = getservbyport(c_port as c_int, c_proto.as_ptr() as *const c_char);
         if serv.is_null() {
-            return "{}".to_string();
+            return "nodata".to_string();
         }
 
         let name = std::ffi::CStr::from_ptr((*serv).s_name)
@@ -98,7 +98,7 @@ pub fn get_service_name(port: u16, proto: &'static str) -> String {
     }
 }
 
-pub fn _get_process_name(pid: u32) -> String {
+pub fn get_process_name(pid: u32) -> String {
     let mut s = System::new_all();
 
     // Is this causing overhead?
@@ -112,7 +112,7 @@ pub fn _get_process_name(pid: u32) -> String {
                 .trim_matches('"')
                 .to_string()
         }
-        None => "unknown".to_string(),
+        None => "nodata".to_string(),
     }
 }
 
