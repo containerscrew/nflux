@@ -6,11 +6,11 @@
 
 List of things to improve and comming features:
 
-- [X] Prometheus metrics?
-- [X] Monitor networking in cgroups (for containers, like podman, docker...)
-- [X] Add filters: user can filter by protocol, dest ip ...etc
-- [X] Multiple interface attachment. Early in development, in order to get a simple first version, I implemented nflux so that it could attach programs to multiple system interfaces. For simplicity in the code and log management, I decided to remove it.
-- [X] TESTING!
-- [X] Ipv6 traffic
-- [X] Autodetect openssl/nss libraries in `nflux tlstrace`
-- [X] Running nflux in a container
+- [-] Prometheus metrics?
+- [-] Monitor networking in cgroups (for containers, like podman, docker...)
+- [-] Add filters: user can filter by protocol, dest ip ...etc
+- [-] Multiple interface attachment. Early in development, in order to get a simple first version, I implemented nflux so that it could attach programs to multiple system interfaces. For simplicity in the code and log management, I decided to remove it.
+- [-] TESTING!
+- [-] Ipv6 traffic
+- [-] Autodetect openssl/nss libraries in `nflux tlstrace`
+- [-] Running nflux in a container
