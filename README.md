@@ -45,10 +45,6 @@ Read the [installation](./docs/installation.md) doc.
 
 Read the [usage](./docs/usage.md) doc.
 
-# Contribution
-
-Any improvement is welcome! If you want to help me improve in Rust and eBPF, I'd be delighted!
-
 # License
 
 **`nflux`** is distributed under the terms of the [AGPL3](./LICENSE) license.
