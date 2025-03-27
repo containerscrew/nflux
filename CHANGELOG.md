@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.1] - 2025-03-27
+
+- Update CHANGELOG.md for release v0.2.0
+
+- Bump clap from 4.5.32 to 4.5.33
+
+Bumps [clap](https://github.com/clap-rs/clap) from 4.5.32 to 4.5.33.
+- [Release notes](https://github.com/clap-rs/clap/releases)
+- [Changelog](https://github.com/clap-rs/clap/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/clap-rs/clap/compare/clap_complete-v4.5.32...clap_complete-v4.5.33)
+
+---
+updated-dependencies:
+- dependency-name: clap
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+- Merge pull request #43 from containerscrew/dependabot/cargo/clap-4.5.33
+
+Bump clap from 4.5.32 to 4.5.33
+
+- Fix: error when no default iface (no connectivity)
+
 ## [0.2.0] - 2025-03-25
 
 - Update CHANGELOG.md for release v0.1.0
