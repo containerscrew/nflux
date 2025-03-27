@@ -23,7 +23,14 @@ pub fn check_is_root_user(uid: u32) -> Result<(), String> {
 }
 
 pub fn set_default_iface() -> String {
-    get_default_interface_name().unwrap()
+    match get_default_interface_name() {
+        Some(iface) => {
+            return iface
+        },
+        None => {
+            return "No default interface found. Are you connected? Try: $ nflux netrace -i iface-name".to_string()
+        }
+    }
 }
 
 /// set_mem_limit bumps the memlock rlimit to infinity.
