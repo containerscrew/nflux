@@ -4,7 +4,24 @@ version = "0.2.0"
 edition = "2021"
 license-file = "../LICENSE"
 authors = ["containerscrew info@containerscrew.com"]
+description = "Network monitoring tool & TLS/SSL sniffer using eBPF. Powered by Aya-rs 🐝."
 repository = "https://github.com/containerscrew/nflux"
+
+
+[package.metadata.deb]
+maintainer = "containerscrew <info@containerscrew.com"
+copyright = "2025, containerscrew <info@containerscrew.com>"
+license-file = ["../LICENSE", "4"]
+extended-description = """\
+Network monitoring tool & TLS/SSL sniffer using eBPF. Powered by Aya-rs 🐝."""
+depends = "$auto"
+section = "utility"
+priority = "optional"
+assets = [
+    # both syntaxes are equivalent:
+    ["target/release/nflux", "/usr/local/bin/", "755"],
+    { source = "../docs/usage.md", dest = "usr/share/doc/nflux/README", mode = "644"},
+]
 
 [dependencies]
 nflux-common = { path = "../nflux-common/", features = ["user"] }
