@@ -17,14 +17,14 @@
 ---
 <p align="center">
     <h3 align="center">$ nflux netrace</h3>
-    <img src="./img/netrace-example.png" alt="netrace-example"/>
+    <img src="./examples/netrace-example.png" alt="netrace-example"/>
 </p>
 
 ---
 
 <p align="center">
     <h3 align="center">$ nflux tlstrace</h3>
-    <img src="./img/tlstrace-example.png" alt="tlstrace-example"/>
+    <img src="./examples/tlstrace-example.png" alt="tlstrace-example"/>
 </p>
 
 ---

@@ -1,0 +1,7 @@
+Package: nflux
+Version: 0.2.1
+Section: utils
+Priority: optional
+Architecture: amd64
+Maintainer: Daniels <info@containerscrew.com>
+Description: Network monitoring tool & TLS/SSL sniffer using eBPF. Powered by Aya-rs 🐝
