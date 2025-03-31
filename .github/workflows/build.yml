@@ -48,4 +48,4 @@ jobs:
 
       - name: Run build
         run: |
-          cargo +nightly build --release --locked
+          cargo +nightly build --release --package nflux --locked

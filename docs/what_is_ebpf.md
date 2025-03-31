@@ -8,13 +8,36 @@ _(Small intro)_
 
 eBPF, which stands for [`Extended Berkeley Packet Filter`](https://ebpf.io/), is a revolutionary technology that allows for the dynamic insertion of small programs into various points in the kernel without requiring recompilation or modification of the kernel itself. These programs are executed in a restricted virtual machine (VM) environment directly within the kernel, providing the ability to intercept and modify data as it traverses the system. eBPF is utilized for tracing network packets, implementing firewall and network filtering programs, security software, and facilitating system monitoring.
 
-![ebpf-overview](../img/ebpf-overview.png)
+![ebpf-overview](../examples/ebpf-overview.png)
 
 *Source: [ebpf.io](https://ebpf.io/what-is-ebpf/)*
 
-Look at what level XDP and TC work:
+Look at what level XDP and TC work (`netrace`):
 
-![tc-example](../img/tc-example.png)
+![tc-example](../examples/tc-example.png)
+
+How `tlstrace` works:
+
+```shell
++-----------------------------------------------+
+|                 Application                   |
+|      (e.g. Web Browser, Client Software)      |
++--------------------+--------------------------+
+|      write()      |         read()            |
+|        ↓          |          ↑                |
++--------------------+--------------------------+
+|                TLS Library                    |
+|       (e.g., libssl.so, OpenSSL)              |
++--------------------+--------------------------+
+|     SSL_write()   |       SSL_read()          |
+|        ↓          |          ↑                |
++--------------------+--------------------------+
+|              Linux Kernel                     |
++--------------------+--------------------------+
+|      send()       |         recv()            |
+|        ↓          |          ↑                |
++-----------------------------------------------+
+```
 
 If you'd like to learn more about eBPF, here are some online resources and favorite books to help you continue learning:
 

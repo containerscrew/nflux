@@ -5,6 +5,8 @@
   - [Running nflux](#running-nflux)
   - [Debugging](#debugging)
 - [Using Mac OSX?](#using-mac-osx)
+  - [Fedora](#fedora)
+  - [Ubuntu](#ubuntu)
 <!-- END OF TOC -->
 
 # Local development
@@ -57,9 +59,11 @@ ip link show dev wlo1 # xdp attached to your interface
 
 # Using Mac OSX?
 
-For development in a Mac OSX (Apple Silicon) environment, you can use [**lima**](https://github.com/lima-vm/lima) (VM using qemu).
+For development in a Mac OSX (Apple Silicon) environment, you can use [**lima**](https://github.com/lima-vm/lima) (VM using qemu or Apple silicion virtualization).
 
-Take a look at the fedora.yml configuration file. Change the relevant directories to your local path where the nflux code is located. Creating an SSH key is optional if you're working locally.
+## Fedora
+
+Take a look at the `fedora.yml` configuration file. Change the relevant directories to your local path where the nflux code is located. Creating an SSH key is optional if you're working locally.
 
 Deploy the machine:
 
@@ -78,4 +82,14 @@ Cleanup:
 ```shell
 limactl stop fedora
 limactl delete fedora
+```
+
+## Ubuntu
+
+Using `ubuntu` (debian based):
+
+```shell
+limactl start --name ubuntu ubuntu.yml
+limactl shell ubuntu
+# Reproduce same commands from above, like in fedora ...
 ```

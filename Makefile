@@ -35,7 +35,7 @@ local-run: ## Run nflux locally
 	cargo run --release --config 'target."cfg(all())".runner="sudo -E"' --
 
 local-build: ## Build nflux locally
-	cargo build --release
+	cargo build --release --package nflux
 
 local-install: local-build ## Install nflux binary locally
 	sudo cp target/release/$(app_name) /usr/local/bin/$(app_name) ;
