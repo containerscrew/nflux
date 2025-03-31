@@ -1,6 +1,3 @@
-# arch: "x86_64"
-# arch: "aarch64"
-
 images:
 - location: "https://download.fedoraproject.org/pub/fedora/linux/releases/41/Cloud/aarch64/images/Fedora-Cloud-Base-Generic-41-1.4.aarch64.qcow2"
   arch: "aarch64"
@@ -9,21 +6,22 @@ images:
 
 vmType: "vz"
 
+# Enable Rosetta for Linux.
+# Hint: try `softwareupdate --install-rosetta` if Lima gets stuck at `Installing rosetta...`
+# Register rosetta to /proc/sys/fs/binfmt_misc
 rosetta:
-  # Enable Rosetta for Linux.
-  # Hint: try `softwareupdate --install-rosetta` if Lima gets stuck at `Installing rosetta...`
   enabled: true
-  # Register rosetta to /proc/sys/fs/binfmt_misc
   binfmt: true
 
 user:
-  name: "fedora"
+  name: "ebpf"
 
 mounts:
 - location: "~/Documents/Code/Personal/nflux"
   writable: true
 
 - location: "~/.ssh/lima"
+  mountPoint: "/tmp/lima"
   writable: false
 
 memory: "2GiB"
@@ -39,7 +37,7 @@ provision:
       #!/bin/bash
       set -eux -o pipefail
       dnf update -y
-      dnf install -y vim gcc make libbpf libbpf-devel clang clang-tools-extra bpftool bpftrace linux-headers-$(uname -r) libssl-devel
+      dnf install -y vim gcc make clang bpftool bpftrace linux-headers-$(uname -r)
 
   - mode: user
     script: |
@@ -50,5 +48,5 @@ provision:
       rustup install stable && rustup toolchain install nightly --component rust-src
       rustup default nightly
       cargo install bpf-linker
-      sudo cat $HOME/.ssh/lima/lima.pub >> /home/fedora.linux/.ssh/authorized_keys
-      sudo chmod 0644 /home/fedora.linux/.ssh/authorized_keys
+      sudo cat /tmp/lima/lima.pub >> $HOME/.ssh/authorized_keys
+      sudo chmod 0644 $HOME/.ssh/authorized_keys
