@@ -10,7 +10,7 @@ mkdir -p deb-build/nflux/usr/local/bin
 cp build/debian/control deb-build/nflux/DEBIAN/
 cp docs/usage.md deb-build/nflux/usr/share/doc/nflux/
 cp LICENSE deb-build/nflux/usr/share/doc/nflux/
-cp README deb-build/nflux/usr/share/doc/nflux/
+cp build/debian/README deb-build/nflux/usr/share/doc/nflux/
 
 # Build the Rust binary and place it in the package structure
 cargo build --release
