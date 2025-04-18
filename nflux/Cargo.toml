@@ -20,7 +20,7 @@ tracing = "0.1.40"
 bytes = "1.10.1"
 dns-lookup = "2.0.4"
 sysinfo = "0.34.2"
-clap = { version = "4.5.36", features = ["derive"] }
+clap = { version = "4.5.37", features = ["derive"] }
 chrono = "0.4.40"
 colored = "3.0.0"
 default-net = "0.22.0"
