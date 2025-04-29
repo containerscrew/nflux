@@ -1,5 +1,5 @@
 <p align="center">
-    <h1 align="center">nflux project</h1>
+    <h1 align="center">The nflux project</h1>
     <p align="center">Network monitoring tool & TLS/SSL sniffer using eBPF. Powered by Aya-rs 🐝</p>
     <p align="center">Kernel and user space code written entirely in Rust ❤</p>
 </p>
