@@ -19,7 +19,7 @@ tracing-subscriber = { version = "0.3.18", features = ["json"] }
 tracing = "0.1.40"
 bytes = "1.10.1"
 dns-lookup = "2.0.4"
-sysinfo = "0.34.2"
+sysinfo = "0.35.0"
 clap = { version = "4.5.37", features = ["derive"] }
 chrono = "0.4.41"
 colored = "3.0.0"
