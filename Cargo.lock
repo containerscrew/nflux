@@ -1104,16 +1104,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tlstrace-ebpf"
-version = "0.1.0"
-dependencies = [
- "aya-ebpf",
- "aya-log-ebpf",
- "nflux-common",
- "which",
-]
-
-[[package]]
 name = "tokio"
 version = "1.44.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"

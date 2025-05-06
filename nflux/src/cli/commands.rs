@@ -5,7 +5,7 @@ use crate::utils::set_default_iface;
 #[derive(Debug, Subcommand)]
 pub enum Commands {
     /// Start network traffic monitoring using eBPF & TC (Traffic Control)
-    Netrace {
+    Sniff {
         #[arg(
             short = 'i',
             long = "interface",
@@ -70,17 +70,5 @@ pub enum Commands {
             required = false
         )]
         disable_full_log: bool,
-    },
-    /// Sniffing TLS/SSL traffic using eBPF uprobes/uretprobes.
-    Tlstrace {
-        #[arg(
-            long = "openssl-path",
-            help = "Path to libssl path",
-            default_value = "/lib64/libssl.so",
-            required = false
-        )]
-        openssl_path: String,
-        #[arg(short = 'p', long = "pid", help = "Process id", required = false)]
-        pid: Option<i32>,
     },
 }

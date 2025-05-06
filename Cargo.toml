@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["nflux", "nflux-common", "netrace-ebpf", "tlstrace-ebpf"]
+members = ["nflux", "nflux-common", "nflux-ebpf"]
 default-members = ["nflux", "nflux-common"]
 
 [workspace.dependencies]
