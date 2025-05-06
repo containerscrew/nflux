@@ -72,7 +72,7 @@ pub async fn start_cli() -> Result<NfluxCli, anyhow::Error> {
     set_mem_limit();
 
     match &cli.command {
-        Some(Commands::Netrace {
+        Some(Commands::Sniff {
             interface,
             disable_egress,
             disable_ingress,
@@ -111,10 +111,6 @@ pub async fn start_cli() -> Result<NfluxCli, anyhow::Error> {
                 configmap,
             )
             .await;
-        }
-        Some(Commands::Tlstrace { openssl_path, pid }) => {
-            info!("Starting nflux tlstrace with pid {}", process::id());
-            let _ = start_tlstrace(openssl_path, *pid).await;
         }
         None => {}
     }
