@@ -116,12 +116,12 @@ pub fn handle_udp_packet(
 
     if is_ether {
         let udphdr: *const UdpHdr = ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)?;
-        src_port = u16::from_be((unsafe { *udphdr }).source);
-        dst_port = u16::from_be((unsafe { *udphdr }).dest);
+        src_port = u16::from_be_bytes((unsafe { *udphdr }).source);
+        dst_port = u16::from_be_bytes((unsafe { *udphdr }).dest);
     } else {
         let udphdr: UdpHdr = ctx.load(20).map_err(|_| ())?;
-        src_port = u16::from_be(udphdr.source);
-        dst_port = u16::from_be(udphdr.dest);
+        src_port = u16::from_be_bytes(udphdr.source);
+        dst_port = u16::from_be_bytes(udphdr.dest);
     }
 
     unsafe {

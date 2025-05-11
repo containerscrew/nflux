@@ -9,9 +9,8 @@ use tracing::{error, info};
 use super::commands::Commands;
 use crate::{
     logger::init_logger,
-    netrace::start_netrace,
-    tlstrace::start_tlstrace,
     utils::{check_is_root_user, is_true, set_mem_limit},
+    try_netrace::start_netrace,
 };
 
 #[derive(Parser, Debug)]
