@@ -38,7 +38,6 @@ pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
             handle_packet(&ctx, direction, tc_config, IpHeader::V6(ipv6hdr), true)
         }
         EtherType::Arp => {
-            // ARP
             Ok(TC_ACT_PIPE)
         }
         _ => {
