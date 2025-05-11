@@ -1,7 +1,7 @@
 use aya_ebpf::helpers::gen::bpf_ktime_get_ns;
 use nflux_common::{IpType, TcEvent};
 
-use crate::maps::{ActiveConnectionKey, ACTIVE_CONNECTIONS, PACKET_COUNT, TC_EVENT};
+use crate::maps::{ActiveConnectionKey, ACTIVE_CONNECTIONS, TC_EVENT};
 
 #[inline]
 pub unsafe fn log_connection(
