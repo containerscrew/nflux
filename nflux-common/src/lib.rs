@@ -41,7 +41,6 @@ pub struct TcEvent {
     pub protocol: u8,
     pub direction: u8, // 0: ingress, 1: egress
     pub ip_type: IpType,
-    pub pid: u32,
 }
 
 pub const MAX_BUF_SIZE: usize = 2048;

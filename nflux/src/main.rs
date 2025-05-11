@@ -2,9 +2,9 @@ use tracing::error;
 
 mod cli;
 mod logger;
-mod utils;
 mod tc_event;
 mod try_netrace;
+mod utils;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {

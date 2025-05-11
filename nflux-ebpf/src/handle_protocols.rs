@@ -27,7 +27,6 @@ pub fn handle_icmp_packet(
     source: u32,
     destination: u32,
     direction: u8,
-    pid: u32,
     log_interval: u8,
     disable_full_log: u8,
 ) -> Result<i32, ()> {
@@ -42,7 +41,6 @@ pub fn handle_icmp_packet(
             IpProto::Icmp as u8,
             direction,
             "icmp",
-            pid,
             log_interval,
             disable_full_log,
         )
@@ -60,7 +58,6 @@ pub fn handle_tcp_packet(
     direction: u8,
     is_ether: bool,
     ip_type: &str,
-    pid: u32,
     log_interval: u8,
     disable_full_log: u8,
 ) -> Result<i32, ()> {
@@ -90,7 +87,6 @@ pub fn handle_tcp_packet(
             protocol,
             direction,
             ip_type,
-            pid,
             log_interval,
             disable_full_log,
         );
@@ -106,7 +102,6 @@ pub fn handle_udp_packet(
     direction: u8,
     is_ether: bool,
     ip_type: &str,
-    pid: u32,
     log_interval: u8,
     disable_full_log: u8,
 ) -> Result<i32, ()> {
@@ -135,7 +130,6 @@ pub fn handle_udp_packet(
             protocol,
             direction,
             ip_type,
-            pid,
             log_interval,
             disable_full_log,
         )

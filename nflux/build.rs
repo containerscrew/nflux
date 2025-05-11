@@ -9,8 +9,8 @@ fn main() -> anyhow::Result<()> {
 
     let ebpf_package = packages
         .iter()
-        .find(|pkg| pkg.name == "netrace-ebpf")
-        .ok_or_else(|| anyhow!("netrace-ebpf package not found"))?
+        .find(|pkg| pkg.name == "nflux-ebpf")
+        .ok_or_else(|| anyhow!("nflux-ebpf   package not found"))?
         .clone();
 
     aya_build::build_ebpf([ebpf_package])
