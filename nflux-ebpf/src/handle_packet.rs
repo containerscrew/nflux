@@ -1,4 +1,4 @@
-use aya_ebpf::{bindings::TC_ACT_PIPE, helpers::bpf_get_current_pid_tgid, programs::TcContext};
+use aya_ebpf::{bindings::TC_ACT_PIPE, programs::TcContext};
 use network_types::ip::{IpProto, Ipv4Hdr, Ipv6Hdr};
 use nflux_common::Configmap;
 
@@ -23,9 +23,6 @@ pub fn handle_packet(
             let total_len = u16::from_be_bytes(ipv4hdr.tot_len);
             let ttl = u8::from_be(ipv4hdr.ttl);
 
-            let tgid = bpf_get_current_pid_tgid();
-            let pid = (tgid >> 32) as u32;
-
             match ipv4hdr.proto {
                 IpProto::Tcp => {
                     if configmap.disable_tcp == 0 {
@@ -38,7 +35,6 @@ pub fn handle_packet(
                             direction,
                             is_ether,
                             "ipv4",
-                            pid,
                             configmap.log_interval,
                             configmap.disable_full_log,
                         )
@@ -55,7 +51,6 @@ pub fn handle_packet(
                             direction,
                             is_ether,
                             "ipv4",
-                            pid,
                             configmap.log_interval,
                             configmap.disable_full_log,
                         )
@@ -70,7 +65,6 @@ pub fn handle_packet(
                             source,
                             destination,
                             direction,
-                            pid,
                             configmap.log_interval,
                             configmap.disable_full_log,
                         )

@@ -14,7 +14,6 @@ pub unsafe fn log_connection(
     protocol: u8,
     direction: u8, // 0: ingress, 1: egress
     proto: &str,   // ipv4 or ipv6
-    pid: u32,
     log_interval: u8,
     disable_full_log: u8,
 ) {
@@ -32,7 +31,6 @@ pub unsafe fn log_connection(
         } else {
             IpType::Ipv6
         },
-        pid,
     };
 
     // let key = 0;

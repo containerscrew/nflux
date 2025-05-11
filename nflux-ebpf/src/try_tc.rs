@@ -42,12 +42,14 @@ pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
             Ok(TC_ACT_PIPE)
         }
         _ => {
-            // Ipv4 under a tunnel? (wireguard)
+            // Not EtherType::Ipv4 or EtherType::Ipv6?
+            // Using vpn or other tunneling protocol?
             let ipv4hdr: Option<Ipv4Hdr> = ctx.load(0).ok();
             if let Some(ipv4hdr) = ipv4hdr {
                 handle_packet(&ctx, direction, tc_config, IpHeader::V4(ipv4hdr), false)
             } else {
                 // Is ipv6? Not implemented :(
+                // Return TC_ACT_PIPE to pass the packet to the next classifier
                 Ok(TC_ACT_PIPE)
             }
         }
