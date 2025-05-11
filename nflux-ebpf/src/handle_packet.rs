@@ -75,7 +75,7 @@ pub fn handle_packet(
                 _ => Ok(TC_ACT_PIPE),
             }
         }
-        IpHeader::V6(ipv6hdr) => {
+        IpHeader::V6(_ipv6hdr) => {
             // let proto = ipv6hdr.next_hdr;
             // match proto {
             //     IpProto::Tcp => {
