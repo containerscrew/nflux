@@ -28,6 +28,8 @@ pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
     // Parse Ethernet Header from the very start of the packet (offset 0)
     // Ethernet header is 14 bytes (6 dst MAC + 6 src MAC + 2 EtherType)
     let ethhdr: EthHdr = ctx.load(0).map_err(|_| ())?;
+    // let src_mac = ethhdr.src_addr;
+    // let dst_mac = ethhdr.dst_addr;
 
     // Load runtime config from eBPF map
     let tc_config = TC_CONFIG.get(0).ok_or(())?;
