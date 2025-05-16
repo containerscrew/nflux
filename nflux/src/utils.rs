@@ -88,7 +88,7 @@ pub fn convert_protocol(protocol: u8) -> &'static str {
     }
 }
 
-pub fn get_service_name(port: u16, proto: &'static str) -> String {
+pub fn _get_service_name(port: u16, proto: &'static str) -> String {
     let c_proto = CString::new(proto).unwrap_or_else(|_| CString::new("").unwrap());
     let c_port = ntohs(port);
 
@@ -141,5 +141,11 @@ mod tests {
             result.unwrap_err(),
             "This program must be run as root. Try: $ sudo nflux -i iface-name"
         );
+    }
+
+    #[test]
+    fn test_is_true() {
+        assert_eq!(is_true(true), 1);
+        assert_eq!(is_true(false), 0);
     }
 }
