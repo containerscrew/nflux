@@ -4,7 +4,7 @@ use aya::maps::{MapData, RingBuf};
 use nflux_common::TcEvent;
 use tracing::info;
 
-use crate::utils::{convert_protocol, get_service_name};
+use crate::utils::{convert_protocol};
 
 pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow::Error> {
     loop {
@@ -15,10 +15,6 @@ pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow:
             // Make sure the data is the correct size
             if data.len() == std::mem::size_of::<TcEvent>() {
                 let event: &TcEvent = unsafe { &*(data.as_ptr() as *const TcEvent) };
-                let src_service_name =
-                    get_service_name(event.src_port, convert_protocol(event.protocol));
-                let dest_service_name =
-                    get_service_name(event.dst_port, convert_protocol(event.protocol));
 
                 let direction = if event.direction == 0 {
                     "ingress"
@@ -27,12 +23,10 @@ pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow:
                 };
 
                 info!(
-                    "dir={} type={}, protocol={}, src_service={}, dest_service={}, total_len={}B, ttl={}, src_ip={}, dst_ip={}, src_port={}, dst_port={}",
+                    "dir={} type={} protocol={} total_len={}B ttl={} src_ip={} dst_ip={} src_port={} dst_port={}",
                     direction,
                     event.ip_type.as_str(),
                     convert_protocol(event.protocol),
-                    src_service_name,
-                    dest_service_name,
                     event.total_len,
                     event.ttl,
                     Ipv4Addr::from(event.src_ip),

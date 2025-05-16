@@ -11,7 +11,7 @@ use tracing::{debug, error, info};
 use super::tc_event::process_event;
 use crate::utils::wait_for_shutdown;
 
-pub async fn start_netrace(
+pub async fn start_nflux(
     interface: &str,
     disable_egress: bool,
     disable_ingress: bool,
