@@ -9,6 +9,14 @@ pub enum IpHeader {
     V6(Ipv6Hdr),
 }
 
+struct ProtocolData {
+    src_ip: u32,
+    dst_ip: u32,
+    total_len: u16,
+    ttl: u8,
+    proto: IpProto,
+}
+
 pub fn handle_packet(
     ctx: &TcContext,
     direction: u8,
@@ -22,6 +30,15 @@ pub fn handle_packet(
             let destination = u32::from_be_bytes(ipv4hdr.dst_addr);
             let total_len = u16::from_be_bytes(ipv4hdr.tot_len);
             let ttl = u8::from_be(ipv4hdr.ttl);
+            let proto = ipv4hdr.proto;
+
+            let proto_data = ProtocolData {
+                src_ip: source,
+                dst_ip: destination,
+                total_len,
+                ttl,
+                proto,
+            };
 
             match ipv4hdr.proto {
                 IpProto::Tcp => {
