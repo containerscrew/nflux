@@ -1,6 +1,7 @@
 use core::mem;
 
 use aya_ebpf::{bindings::TC_ACT_PIPE, programs::TcContext};
+use aya_log_ebpf::info;
 use network_types::{
     eth::{EthHdr, EtherType},
     ip::{Ipv4Hdr, Ipv6Hdr},
@@ -60,14 +61,16 @@ pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
 
         // Unknown EtherType, maybe the real IP header is already at offset 0 (e.g. in a tunnel)
         _ => {
-            // Try to interpret the packet as if it *started* directly with an IPv4 header
+            // Try to interpret the packet as if it *started* directly with an IPv4/IPv6 header
             // This might happen with certain VPNs or encapsulated traffic
-            let ipv4hdr: Option<Ipv4Hdr> = ctx.load(0).ok();
-            if let Some(ipv4hdr) = ipv4hdr {
-                // Treat this as a special case (false = not from classic Ethernet)
+            if let Ok(ipv4hdr) = ctx.load::<Ipv4Hdr>(0) {
                 handle_packet(&ctx, direction, tc_config, IpHeader::V4(ipv4hdr), false)
+            }
+            // If we can't load IPv4, try IPv6
+            else if let Ok(ipv6hdr) = ctx.load::<Ipv6Hdr>(0) {
+                info!(&ctx, "ipv6 packet!");
+                handle_packet(&ctx, direction, tc_config, IpHeader::V6(ipv6hdr), false)
             } else {
-                // Still not understood → pass packet along
                 Ok(TC_ACT_PIPE)
             }
         }
