@@ -4,13 +4,13 @@ use aya::maps::{MapData, RingBuf};
 use nflux_common::TcEvent;
 use tracing::info;
 
-use crate::utils::{convert_protocol};
+use crate::utils::convert_protocol;
 
 fn format_mac(mac: &[u8; 6]) -> String {
     mac.iter()
-       .map(|b| format!("{:02x}", b))
-       .collect::<Vec<_>>()
-       .join(":")
+        .map(|b| format!("{:02x}", b))
+        .collect::<Vec<_>>()
+        .join(":")
 }
 
 pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow::Error> {
@@ -50,7 +50,6 @@ pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow:
         tokio::time::sleep(std::time::Duration::from_millis(100)).await;
     }
 }
-
 
 #[cfg(test)]
 mod tests {

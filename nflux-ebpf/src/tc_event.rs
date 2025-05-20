@@ -1,7 +1,10 @@
 use aya_ebpf::helpers::gen::bpf_ktime_get_ns;
 use nflux_common::TcEvent;
 
-use crate::{handle_packet::PacketData, maps::{ActiveConnectionKey, ACTIVE_CONNECTIONS, TC_EVENT}};
+use crate::{
+    handle_packet::PacketData,
+    maps::{ActiveConnectionKey, ACTIVE_CONNECTIONS, TC_EVENT},
+};
 
 #[inline]
 pub unsafe fn log_connection(
@@ -40,7 +43,11 @@ pub unsafe fn log_connection(
             } else {
                 packet_data.dst_port as u32
             },
-            ip: if packet_data.direction == 1 { packet_data.dst_ip } else { packet_data.src_ip },
+            ip: if packet_data.direction == 1 {
+                packet_data.dst_ip
+            } else {
+                packet_data.src_ip
+            },
         };
 
         // If the connection (src_port, dst_ip) is already tracked, return

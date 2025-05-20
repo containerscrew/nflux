@@ -1,14 +1,16 @@
 use core::mem;
 
 use aya_ebpf::{bindings::TC_ACT_PIPE, programs::TcContext};
-use aya_log_ebpf::info;
 use network_types::{
     eth::{EthHdr, EtherType},
     ip::{Ipv4Hdr, Ipv6Hdr},
 };
 
-use crate::{handle_packet::{handle_packet, IpHeader}, maps::TC_CONFIG, tc_event::log_connection};
-
+use crate::{
+    handle_packet::{handle_packet, IpHeader},
+    maps::TC_CONFIG,
+    tc_event::log_connection,
+};
 
 #[inline]
 fn ptr_at<T>(ctx: &TcContext, offset: usize) -> Result<*const T, ()> {
@@ -22,7 +24,6 @@ fn ptr_at<T>(ctx: &TcContext, offset: usize) -> Result<*const T, ()> {
 
     Ok((start + offset) as *const T)
 }
-
 
 // Offset 0:    Ethernet header (14 bytes)
 // Offset 14:   IPv4 header (20 bytes min)
@@ -51,7 +52,8 @@ pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
                 let ipv4hdr: Ipv4Hdr = ctx.load(EthHdr::LEN).map_err(|_| ())?;
 
                 // Now we can process the packet, marking that it was a regular L2 IPv4 frame (true)
-                let packet_data = handle_packet(&ctx, direction, IpHeader::V4(ipv4hdr), true).map_err(|_| ())?;
+                let packet_data =
+                    handle_packet(&ctx, direction, IpHeader::V4(ipv4hdr), true).map_err(|_| ())?;
 
                 unsafe {
                     log_connection(
@@ -93,7 +95,8 @@ pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
 
     if let Ok(ipv4hdr) = ctx.load::<Ipv4Hdr>(0) {
         let tc_config = TC_CONFIG.get(0).ok_or(())?;
-        let packet_data = handle_packet(&ctx, direction, IpHeader::V4(ipv4hdr), false).map_err(|_| ())?;
+        let packet_data =
+            handle_packet(&ctx, direction, IpHeader::V4(ipv4hdr), false).map_err(|_| ())?;
 
         unsafe {
             log_connection(
@@ -106,7 +109,7 @@ pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
         }
 
         return Ok(TC_ACT_PIPE);
-    } else if let Ok(ipv6hdr) = ctx.load::<Ipv6Hdr>(0) {
+    } else if let Ok(_ipv6hdr) = ctx.load::<Ipv6Hdr>(0) {
         // We got a raw IPv6 packet, possibly from a tunnel
         return Ok(TC_ACT_PIPE);
 
