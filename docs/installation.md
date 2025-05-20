@@ -14,7 +14,8 @@
 
 |   OS    | ARM64 | x86_64 | Kernel version |
 |---------|------|------|------|
-| fedora linux   | ? (not tested)    | ✅  |`6.13.7-200.fc41.x86_64 ` |
+| linux fedora 41    | ✅    | ✅  | `6.13.7-200.fc41.x86_64 ` |
+| linux ubuntu 24.10-server   | ✅    | ✅  | `6.11.0-19-generic ` |
 
 > For example, in Debian12 with kernel version `6.1.0-31-amd64` nflux doest not works. Probably for the version of kernel bpf implementation. Missing some bpf helper functions.
 
@@ -29,7 +30,7 @@
 |---------|------|------|
 | linux   | ✅    | ✅  |
 
-> Remember: `eBPF` is native for Linux.
+> Remember: `eBPF` is native for Linux (I think they are implementing it in Windows)
 
 ## Install latest version
 
