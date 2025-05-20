@@ -33,8 +33,24 @@ jobs:
           toolchain: nightly
           targets: ${{ matrix.target }}
 
+      - name: Cache cargo registry + nextest
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/nextest
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: nextest-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install cargo-nextest if missing
+        run: |
+          if ! command -v cargo-nextest &> /dev/null; then
+            cargo install cargo-nextest --locked
+          fi
+
       - name: Run cargo test
-        run: cargo test --locked --target ${{ matrix.target }} --no-default-features
+        run: cargo nextest run --no-default-features #--locked --target ${{ matrix.target }} --no-default-features
 
   rusfmt:
      runs-on: ubuntu-latest

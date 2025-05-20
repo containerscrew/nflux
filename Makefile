@@ -42,7 +42,7 @@ local-install: local-build ## Install nflux binary locally
 	sudo chmod +x /usr/local/bin/$(app_name)
 
 test: ## Run tests
-	cargo test --locked
+	cargo nextest run
 
 check-unused-deps: ## Check for unused dependencies. $ cargo install cargo-machete
 	cargo machete --with-metadata
