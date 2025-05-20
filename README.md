@@ -24,7 +24,7 @@
 
 # What is nflux?
 
-Nflux is an [`eBPF`](./docs/what_is_ebpf.md)-based tool that monitors `incoming/outgoing` traffic on a Linux system by attaching a `TC (Traffic Control)` program using eBPF technology. It can be attached to both physical and virtual interfaces (wireguard), allowing us to obtain networking data at a very low level.
+Nflux is an [`eBPF`](./docs/what_is_ebpf.md)-based tool that monitors `incoming/outgoing` traffic on a Linux system by attaching a `TC (Traffic Control)` program using eBPF technology. It can be attached to both physical and virtual interfaces, allowing us to obtain networking data at a very low level.
 
 > Supports only ethernet interfaces
 > _Supports only Ipv4 packet sniffing (Ipv6 is being implemented)_.
