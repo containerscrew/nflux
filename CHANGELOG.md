@@ -1,13 +1,351 @@
-<!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
-**Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
-- [Changelog](#changelog)
-  - [[0.2.1] - 2025-03-27](#021---2025-03-27)
-  - [[0.2.0] - 2025-03-25](#020---2025-03-25)
-  - [[0.1.0] - 2025-03-24](#010---2025-03-24)
-<!-- END OF TOC -->
 # Changelog
 
 All notable changes to this project will be documented in this file.
+
+## [unreleased]
+
+- Update CHANGELOG.md for release v0.2.1
+
+- Pre-commit & CHANGELOG.md
+
+- Bump clap from 4.5.33 to 4.5.34
+
+Bumps [clap](https://github.com/clap-rs/clap) from 4.5.33 to 4.5.34.
+- [Release notes](https://github.com/clap-rs/clap/releases)
+- [Changelog](https://github.com/clap-rs/clap/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/clap-rs/clap/compare/clap_complete-v4.5.33...clap_complete-v4.5.34)
+
+---
+updated-dependencies:
+- dependency-name: clap
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+- Merge pull request #44 from containerscrew/dependabot/cargo/clap-4.5.34
+
+Bump clap from 4.5.33 to 4.5.34
+
+- Bump sysinfo from 0.33.1 to 0.34.1
+
+Bumps [sysinfo](https://github.com/GuillaumeGomez/sysinfo) from 0.33.1 to 0.34.1.
+- [Changelog](https://github.com/GuillaumeGomez/sysinfo/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/GuillaumeGomez/sysinfo/commits)
+
+---
+updated-dependencies:
+- dependency-name: sysinfo
+  dependency-type: direct:production
+  update-type: version-update:semver-minor
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+- Merge pull request #45 from containerscrew/dependabot/cargo/sysinfo-0.34.1
+
+Bump sysinfo from 0.33.1 to 0.34.1
+
+- Setting up cargo deb
+
+- Setup ubuntu machine using lima
+
+- Setup debian dpkg package & refactor doc
+
+- Wip: dpkg package
+
+- Modify fedora.yml lima vm
+
+- Change package description and delete package.metadata.deb
+
+- Wip: rpm package
+
+- Update readme
+
+- Bump clap from 4.5.34 to 4.5.35
+
+Bumps [clap](https://github.com/clap-rs/clap) from 4.5.34 to 4.5.35.
+- [Release notes](https://github.com/clap-rs/clap/releases)
+- [Changelog](https://github.com/clap-rs/clap/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/clap-rs/clap/compare/clap_complete-v4.5.34...clap_complete-v4.5.35)
+
+---
+updated-dependencies:
+- dependency-name: clap
+  dependency-version: 4.5.35
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+- Merge pull request #46 from containerscrew/dependabot/cargo/clap-4.5.35
+
+Bump clap from 4.5.34 to 4.5.35
+
+- Fix build_deb.sh
+
+- Bump sysinfo from 0.34.1 to 0.34.2
+
+Bumps [sysinfo](https://github.com/GuillaumeGomez/sysinfo) from 0.34.1 to 0.34.2.
+- [Changelog](https://github.com/GuillaumeGomez/sysinfo/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/GuillaumeGomez/sysinfo/commits)
+
+---
+updated-dependencies:
+- dependency-name: sysinfo
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+- Merge pull request #47 from containerscrew/dependabot/cargo/sysinfo-0.34.2
+
+Bump sysinfo from 0.34.1 to 0.34.2
+
+- Bump tokio from 1.44.1 to 1.44.2
+
+Bumps [tokio](https://github.com/tokio-rs/tokio) from 1.44.1 to 1.44.2.
+- [Release notes](https://github.com/tokio-rs/tokio/releases)
+- [Commits](https://github.com/tokio-rs/tokio/compare/tokio-1.44.1...tokio-1.44.2)
+
+---
+updated-dependencies:
+- dependency-name: tokio
+  dependency-version: 1.44.2
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+- Merge pull request #48 from containerscrew/dependabot/cargo/tokio-1.44.2
+
+Bump tokio from 1.44.1 to 1.44.2
+
+- Bump clap from 4.5.35 to 4.5.36
+
+Bumps [clap](https://github.com/clap-rs/clap) from 4.5.35 to 4.5.36.
+- [Release notes](https://github.com/clap-rs/clap/releases)
+- [Changelog](https://github.com/clap-rs/clap/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/clap-rs/clap/compare/clap_complete-v4.5.35...clap_complete-v4.5.36)
+
+---
+updated-dependencies:
+- dependency-name: clap
+  dependency-version: 4.5.36
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+- Merge pull request #49 from containerscrew/dependabot/cargo/clap-4.5.36
+
+Bump clap from 4.5.35 to 4.5.36
+
+- Bump anyhow from 1.0.97 to 1.0.98
+
+Bumps [anyhow](https://github.com/dtolnay/anyhow) from 1.0.97 to 1.0.98.
+- [Release notes](https://github.com/dtolnay/anyhow/releases)
+- [Commits](https://github.com/dtolnay/anyhow/compare/1.0.97...1.0.98)
+
+---
+updated-dependencies:
+- dependency-name: anyhow
+  dependency-version: 1.0.98
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+- Merge pull request #50 from containerscrew/dependabot/cargo/anyhow-1.0.98
+
+Bump anyhow from 1.0.97 to 1.0.98
+
+- Bump libc from 0.2.171 to 0.2.172
+
+Bumps [libc](https://github.com/rust-lang/libc) from 0.2.171 to 0.2.172.
+- [Release notes](https://github.com/rust-lang/libc/releases)
+- [Changelog](https://github.com/rust-lang/libc/blob/0.2.172/CHANGELOG.md)
+- [Commits](https://github.com/rust-lang/libc/compare/0.2.171...0.2.172)
+
+---
+updated-dependencies:
+- dependency-name: libc
+  dependency-version: 0.2.172
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+- Merge pull request #51 from containerscrew/dependabot/cargo/libc-0.2.172
+
+Bump libc from 0.2.171 to 0.2.172
+
+- Bump network-types from 0.0.7 to 0.0.8
+
+Bumps [network-types](https://github.com/vadorovsky/network-types) from 0.0.7 to 0.0.8.
+- [Release notes](https://github.com/vadorovsky/network-types/releases)
+- [Changelog](https://github.com/vadorovsky/network-types/blob/main/CHANGELOG.md)
+- [Commits](https://github.com/vadorovsky/network-types/compare/v0.0.7...v0.0.8)
+
+---
+updated-dependencies:
+- dependency-name: network-types
+  dependency-version: 0.0.8
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+- Merge pull request #52 from containerscrew/dependabot/cargo/network-types-0.0.8
+
+Bump network-types from 0.0.7 to 0.0.8
+
+- Bump clap from 4.5.36 to 4.5.37
+
+Bumps [clap](https://github.com/clap-rs/clap) from 4.5.36 to 4.5.37.
+- [Release notes](https://github.com/clap-rs/clap/releases)
+- [Changelog](https://github.com/clap-rs/clap/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/clap-rs/clap/compare/clap_complete-v4.5.36...clap_complete-v4.5.37)
+
+---
+updated-dependencies:
+- dependency-name: clap
+  dependency-version: 4.5.37
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+- Merge pull request #53 from containerscrew/dependabot/cargo/clap-4.5.37
+
+Bump clap from 4.5.36 to 4.5.37
+
+- Update doc and Cargo.toml version
+
+- Bump chrono from 0.4.40 to 0.4.41
+
+Bumps [chrono](https://github.com/chronotope/chrono) from 0.4.40 to 0.4.41.
+- [Release notes](https://github.com/chronotope/chrono/releases)
+- [Changelog](https://github.com/chronotope/chrono/blob/main/CHANGELOG.md)
+- [Commits](https://github.com/chronotope/chrono/compare/v0.4.40...v0.4.41)
+
+---
+updated-dependencies:
+- dependency-name: chrono
+  dependency-version: 0.4.41
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+- Merge pull request #54 from containerscrew/dependabot/cargo/chrono-0.4.41
+
+Bump chrono from 0.4.40 to 0.4.41
+
+- Bump sysinfo from 0.34.2 to 0.35.0
+
+Bumps [sysinfo](https://github.com/GuillaumeGomez/sysinfo) from 0.34.2 to 0.35.0.
+- [Changelog](https://github.com/GuillaumeGomez/sysinfo/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/GuillaumeGomez/sysinfo/commits/v0.35.0)
+
+---
+updated-dependencies:
+- dependency-name: sysinfo
+  dependency-version: 0.35.0
+  dependency-type: direct:production
+  update-type: version-update:semver-minor
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+- Merge pull request #55 from containerscrew/dependabot/cargo/sysinfo-0.35.0
+
+Bump sysinfo from 0.34.2 to 0.35.0
+
+- Bump tokio from 1.44.2 to 1.45.0
+
+Bumps [tokio](https://github.com/tokio-rs/tokio) from 1.44.2 to 1.45.0.
+- [Release notes](https://github.com/tokio-rs/tokio/releases)
+- [Commits](https://github.com/tokio-rs/tokio/compare/tokio-1.44.2...tokio-1.45.0)
+
+---
+updated-dependencies:
+- dependency-name: tokio
+  dependency-version: 1.45.0
+  dependency-type: direct:production
+  update-type: version-update:semver-minor
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+- Merge pull request #56 from containerscrew/dependabot/cargo/tokio-1.45.0
+
+Bump tokio from 1.44.2 to 1.45.0
+
+- Bump clap from 4.5.37 to 4.5.38
+
+Bumps [clap](https://github.com/clap-rs/clap) from 4.5.37 to 4.5.38.
+- [Release notes](https://github.com/clap-rs/clap/releases)
+- [Changelog](https://github.com/clap-rs/clap/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/clap-rs/clap/compare/clap_complete-v4.5.37...clap_complete-v4.5.38)
+
+---
+updated-dependencies:
+- dependency-name: clap
+  dependency-version: 4.5.38
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+- Merge pull request #57 from containerscrew/dependabot/cargo/clap-4.5.38
+
+Bump clap from 4.5.37 to 4.5.38
+
+- Removing tlstrace code
+
+- Wip
+
+- Removing tlstrace
+
+- Add some useful comments
+
+- Add src and dest mac
+
+- Refactor nflux/ package
+
+- Add cargo nextest
+
+- Rollback cargo nextest
+
+- Refactor: handle_packet function
+
+- Add format_mac unit test
+
+- Cargo fmt & update doc
+
+- Merge branch 'refactor/remove-tlstrace-feature'
+
+- Update Cargo.toml version
+
+- Change license to GPL3
+
+- Fix proto & update doc
+
+- Update doc
+
+- Update install script
 
 ## [0.2.1] - 2025-03-27
 
