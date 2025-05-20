@@ -15,16 +15,16 @@ pub struct Configmap {
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum IpType {
+pub enum IpFamily {
     Ipv4,
     Ipv6,
 }
 
-impl IpType {
+impl IpFamily {
     pub fn as_str(&self) -> &'static str {
         match self {
-            IpType::Ipv4 => "IPv4",
-            IpType::Ipv6 => "IPv6",
+            IpFamily::Ipv4 => "IPv4",
+            IpFamily::Ipv6 => "IPv6",
         }
     }
 }
@@ -32,6 +32,8 @@ impl IpType {
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct TcEvent {
+    pub src_mac: [u8; 6],
+    pub dst_mac: [u8; 6],
     pub src_ip: u32,
     pub dst_ip: u32,
     pub total_len: u16,
@@ -40,8 +42,17 @@ pub struct TcEvent {
     pub dst_port: u16,
     pub protocol: u8,
     pub direction: u8, // 0: ingress, 1: egress
-    pub ip_type: IpType,
+    pub ip_family: IpFamily,
 }
+
+// #[repr(C)]
+// pub struct ArpEvent {
+//     pub op: u16,              // Request o reply
+//     pub sender_ip: [u8; 4],
+//     pub target_ip: [u8; 4],
+//     pub sender_mac: [u8; 6],
+//     pub target_mac: [u8; 6],
+// }
 
 pub const MAX_BUF_SIZE: usize = 2048;
 pub const TASK_COMM_LEN: usize = 16;
