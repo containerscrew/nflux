@@ -12,7 +12,7 @@ happyexit(){
   echo ""
   echo "Now run: $ $BINARY_NAME --help"
   echo ""
-  echo "Or directly: sudo $BINARY_NAME"
+  echo "Or directly: $ sudo $BINARY_NAME"
   echo ""
   exit 0
 }
