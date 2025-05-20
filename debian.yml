@@ -1,0 +1,53 @@
+images:
+- location: https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2
+  arch: x86_64
+
+- location: https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-arm64.qcow2
+  arch: aarch64
+
+vmType: "vz"
+
+# Enable Rosetta for Linux.
+# Hint: try `softwareupdate --install-rosetta` if Lima gets stuck at `Installing rosetta...`
+# Register rosetta to /proc/sys/fs/binfmt_misc
+rosetta:
+  enabled: true
+  binfmt: true
+
+user:
+  name: "ebpf"
+
+mounts:
+- location: "~/Documents/Code/Personal/nflux"
+  writable: true
+
+- location: "~/.ssh/lima"
+  mountPoint: "/tmp/lima"
+  writable: false
+
+memory: "2GiB"
+cpus: 2
+disk: "15GiB"
+ssh:
+  localPort: 2222
+  loadDotSSHPubKeys: true
+
+provision:
+  - mode: system
+    script: |
+      #!/bin/bash
+      set -eux -o pipefail
+      apt update -y
+      apt install -y vim gcc make clang bpftool bpftrace linux-headers-$(uname -r)
+
+  - mode: user
+    script: |
+      #!/bin/bash
+      set -eux -o pipefail
+      curl https://sh.rustup.rs -sSf | sh -s -- -y
+      source $HOME/.cargo/env
+      rustup install stable && rustup toolchain install nightly --component rust-src
+      rustup default nightly
+      cargo install bpf-linker
+      sudo cat /tmp/lima/lima.pub >> $HOME/.ssh/authorized_keys
+      sudo chmod 0644 $HOME/.ssh/authorized_keys
