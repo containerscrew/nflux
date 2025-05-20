@@ -98,7 +98,7 @@ pub fn handle_packet(
                 dst_ip: destination,
                 total_len,
                 ttl,
-                proto: IpProto::Tcp as u8,
+                proto: proto as u8,
                 src_port,
                 dst_port,
                 ip_family: IpFamily::Ipv4,
