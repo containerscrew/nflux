@@ -7,10 +7,8 @@ use network_types::{
     ip::{Ipv4Hdr, Ipv6Hdr},
 };
 
-use crate::{
-    handle_packet::{handle_packet, IpHeader},
-    maps::TC_CONFIG,
-};
+use crate::{handle_packet::{handle_packet, IpHeader}, maps::TC_CONFIG, tc_event::log_connection};
+
 
 #[inline]
 fn ptr_at<T>(ctx: &TcContext, offset: usize) -> Result<*const T, ()> {
@@ -25,59 +23,96 @@ fn ptr_at<T>(ctx: &TcContext, offset: usize) -> Result<*const T, ()> {
     Ok((start + offset) as *const T)
 }
 
-pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
-    // Parse Ethernet Header from the very start of the packet (offset 0)
-    // Ethernet header is 14 bytes (6 dst MAC + 6 src MAC + 2 EtherType)
-    let ethhdr: EthHdr = ctx.load(0).map_err(|_| ())?;
-    // let src_mac = ethhdr.src_addr;
-    // let dst_mac = ethhdr.dst_addr;
-
-    // Load runtime config from eBPF map
-    let tc_config = TC_CONFIG.get(0).ok_or(())?;
-
-    // Inspect EtherType to know what protocol comes next
-    match ethhdr.ether_type {
-        // If EtherType is 0x0800 → IPv4
-        EtherType::Ipv4 => {
-            // Parse IPv4 header, which starts right after Ethernet (offset 14)
-            let ipv4hdr: Ipv4Hdr = ctx.load(EthHdr::LEN).map_err(|_| ())?;
-            // Ipv4Hdr gives us access to protocol (TCP/UDP), src/dst IPs, etc.
-
-            // Now we can process the packet, marking that it was a regular L2 IPv4 frame (true)
-            handle_packet(&ctx, direction, tc_config, IpHeader::V4(ipv4hdr), true)
-        }
-
-        // If EtherType is 0x86DD → IPv6
-        EtherType::Ipv6 => {
-            // STEP 3b: Parse IPv6 header (starts at same place: offset 14)
-            let ipv6hdr: Ipv6Hdr = ctx.load(EthHdr::LEN).map_err(|_| ())?;
-            // IPv6 header is always 40 bytes, and has src/dst IPs, next-header, etc.
-
-            handle_packet(&ctx, direction, tc_config, IpHeader::V6(ipv6hdr), true)
-        }
-
-        // If it's ARP (EtherType 0x0806), just let it pass
-        EtherType::Arp => Ok(TC_ACT_PIPE),
-
-        // Unknown EtherType, maybe the real IP header is already at offset 0 (e.g. in a tunnel)
-        _ => {
-            // Try to interpret the packet as if it *started* directly with an IPv4/IPv6 header
-            // This might happen with certain VPNs or encapsulated traffic
-            if let Ok(ipv4hdr) = ctx.load::<Ipv4Hdr>(0) {
-                handle_packet(&ctx, direction, tc_config, IpHeader::V4(ipv4hdr), false)
-            }
-            // If we can't load IPv4, try IPv6
-            else if let Ok(ipv6hdr) = ctx.load::<Ipv6Hdr>(0) {
-                info!(&ctx, "ipv6 packet!");
-                handle_packet(&ctx, direction, tc_config, IpHeader::V6(ipv6hdr), false)
-            } else {
-                Ok(TC_ACT_PIPE)
-            }
-        }
-    }
-}
 
 // Offset 0:    Ethernet header (14 bytes)
 // Offset 14:   IPv4 header (20 bytes min)
 // Offset 34:   TCP/UDP header
 // Offset 54+:  Payload (e.g. HTTP, DNS, etc.)
+
+/// This function is called from the eBPF program to process packets
+/// It tries to parse the packet as an Ethernet frame first, then as a raw IP packet
+/// It returns a result indicating whether the packet should be dropped or allowed to pass
+pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
+    // Try to parse Ethernet header from offset 0 (standard L2 packet)
+    if let Ok(ethhdr) = ctx.load::<EthHdr>(0) {
+        // Ethernet header is 14 bytes (6 dst MAC + 6 src MAC + 2 EtherType)
+        let src_mac = ethhdr.src_addr;
+        let dst_mac = ethhdr.dst_addr;
+
+        // Load runtime config from eBPF map
+        let tc_config = TC_CONFIG.get(0).ok_or(())?;
+
+        // Inspect EtherType to know what protocol comes next
+        match ethhdr.ether_type {
+            // If EtherType is 0x0800 → IPv4
+            EtherType::Ipv4 => {
+                // Parse IPv4 header, which starts right after Ethernet (offset 14)
+                // Ipv4Hdr gives us access to protocol (TCP/UDP), src/dst IPs, etc.
+                let ipv4hdr: Ipv4Hdr = ctx.load(EthHdr::LEN).map_err(|_| ())?;
+
+                // Now we can process the packet, marking that it was a regular L2 IPv4 frame (true)
+                let packet_data = handle_packet(&ctx, direction, IpHeader::V4(ipv4hdr), true).map_err(|_| ())?;
+
+                unsafe {
+                    log_connection(
+                        &packet_data,
+                        src_mac,
+                        dst_mac,
+                        tc_config.log_interval,
+                        tc_config.disable_full_log,
+                    );
+                }
+
+                // Default case: just let the packet pass through
+                return Ok(TC_ACT_PIPE);
+            }
+
+            // If EtherType is 0x86DD → IPv6
+            EtherType::Ipv6 => {
+                // STEP 3b: Parse IPv6 header (starts at same place: offset 14)
+                let _ipv6hdr: Ipv6Hdr = ctx.load(EthHdr::LEN).map_err(|_| ())?;
+                // IPv6 header is always 40 bytes, and has src/dst IPs, next-header, etc.
+                return Ok(TC_ACT_PIPE);
+
+                //handle_packet(&ctx, direction, tc_config, IpHeader::V6(ipv6hdr), true)
+            }
+
+            // If it's ARP (EtherType 0x0806), just let it pass
+            EtherType::Arp => return Ok(TC_ACT_PIPE),
+
+            // Unknown EtherType, maybe the real IP header is already at offset 0 (e.g. in a tunnel)
+            _ => {
+                // Fall through to the logic below to try to decode raw IP
+            }
+        }
+    }
+
+    // 🛑 If Ethernet header is missing or invalid:
+    // Some VPNs or virtual interfaces (e.g., tun0, wg0) deliver raw IP packets
+    // Try to interpret the packet as starting directly with IPv4 or IPv6
+
+    if let Ok(ipv4hdr) = ctx.load::<Ipv4Hdr>(0) {
+        let tc_config = TC_CONFIG.get(0).ok_or(())?;
+        let packet_data = handle_packet(&ctx, direction, IpHeader::V4(ipv4hdr), false).map_err(|_| ())?;
+
+        unsafe {
+            log_connection(
+                &packet_data,
+                [0; 6], // src_mac is not available in raw IP packets
+                [0; 6], // dst_mac is not available in raw IP packets
+                tc_config.log_interval,
+                tc_config.disable_full_log,
+            );
+        }
+
+        return Ok(TC_ACT_PIPE);
+    } else if let Ok(ipv6hdr) = ctx.load::<Ipv6Hdr>(0) {
+        // We got a raw IPv6 packet, possibly from a tunnel
+        return Ok(TC_ACT_PIPE);
+
+        //handle_packet(&ctx, direction, tc_config, IpHeader::V6(ipv6hdr), false)
+    }
+
+    // If nothing matches, just let the packet go through
+    Ok(TC_ACT_PIPE)
+}
