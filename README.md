@@ -39,6 +39,10 @@ Read the [installation](./docs/installation.md) doc.
 
 # Usage
 
+```shell
+sudo nflux --disable-full-log # avoid logging every packet
+```
+
 Read the [usage](./docs/usage.md) doc.
 
 # License
