@@ -1,5 +1,5 @@
 [package]
-name = "netrace-ebpf"
+name = "nflux-ebpf"
 version = "0.1.0"
 edition = "2021"
 
@@ -16,5 +16,5 @@ which = { workspace = true }
 
 
 [[bin]]
-name = "netrace"
+name = "nflux"
 path = "src/main.rs"

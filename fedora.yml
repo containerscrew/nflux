@@ -36,8 +36,8 @@ provision:
     script: |
       #!/bin/bash
       set -eux -o pipefail
-      dnf update -y
-      dnf install -y vim gcc make clang bpftool bpftrace linux-headers-$(uname -r)
+      #dnf update -y
+      dnf install -y vim gcc make clang
 
   - mode: user
     script: |

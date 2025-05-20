@@ -12,32 +12,9 @@ eBPF, which stands for [`Extended Berkeley Packet Filter`](https://ebpf.io/), is
 
 *Source: [ebpf.io](https://ebpf.io/what-is-ebpf/)*
 
-Look at what level XDP and TC work (`netrace`):
+Look at what level XDP and TC work:
 
 ![tc-example](../examples/tc-example.png)
-
-How `tlstrace` works:
-
-```shell
-+-----------------------------------------------+
-|                 Application                   |
-|      (e.g. Web Browser, Client Software)      |
-+--------------------+--------------------------+
-|      write()      |         read()            |
-|        ↓          |          ↑                |
-+--------------------+--------------------------+
-|                TLS Library                    |
-|       (e.g., libssl.so, OpenSSL)              |
-+--------------------+--------------------------+
-|     SSL_write()   |       SSL_read()          |
-|        ↓          |          ↑                |
-+--------------------+--------------------------+
-|              Linux Kernel                     |
-+--------------------+--------------------------+
-|      send()       |         recv()            |
-|        ↓          |          ↑                |
-+-----------------------------------------------+
-```
 
 If you'd like to learn more about eBPF, here are some online resources and favorite books to help you continue learning:
 
