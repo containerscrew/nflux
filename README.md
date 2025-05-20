@@ -33,9 +33,6 @@ Nflux is an [`eBPF`](./docs/what_is_ebpf.md)-based tool that monitors `incoming/
 
 ```shell
 curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/nflux/main/install.sh | sh
-
-# Run nflux
-$ sudo nflux
 ```
 
 Read the [installation](./docs/installation.md) doc.
