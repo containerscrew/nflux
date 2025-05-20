@@ -16,7 +16,7 @@
 [![GitHub Releases Stats](https://img.shields.io/github/downloads/containerscrew/nflux/total.svg?logo=github)](https://somsubhra.github.io/github-release-stats/?username=containerscrew&repository=nflux)
 ---
 <p align="center">
-    <h3 align="center">$ nflux</h3>
+    <h3 align="center">$ nflux </h3>
     <img src="./examples/example.png" alt="example"/>
 </p>
 
