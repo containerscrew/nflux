@@ -63,7 +63,7 @@ For development in a Mac OSX (Apple Silicon) environment, you can use [**lima**]
 
 ## Fedora
 
-Take a look at the `fedora.yml` configuration file. Change the relevant directories to your local path where the nflux code is located. Creating an SSH key is optional if you're working locally.
+Take a look at the `fedora.yml` configuration file. Change the relevant directories to your local path where the nflux code is located. Creating an SSH key is optional.
 
 Deploy the machine:
 
@@ -73,15 +73,12 @@ limactl shell fedora
 cd /your/mapped/directory/with/your/code
 # Example
 cd /Users/dcr/Documents/Code/Personal/nflux # this is my mapped path from OSX local to the fedora VM machine
-
-# Now you can run the commands from above
 ```
 
 Cleanup:
 
 ```shell
-limactl stop fedora
-limactl delete fedora
+limactl stop fedora && limactl delete fedora
 ```
 
 ## Ubuntu
@@ -92,4 +89,16 @@ Using `ubuntu` (debian based):
 limactl start --name ubuntu ubuntu.yml
 limactl shell ubuntu
 # Reproduce same commands from above, like in fedora ...
+limactl stop ubuntu && limactl delete ubuntu
+```
+
+## Debian
+
+Using `debian`:
+
+```shell
+limactl start --name debian debian.yml
+limactl shell debian
+# Reproduce same commands from above
+limactl stop debian && limactl delete debian
 ```
