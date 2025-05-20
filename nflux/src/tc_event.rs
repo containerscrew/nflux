@@ -50,3 +50,16 @@ pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow:
         tokio::time::sleep(std::time::Duration::from_millis(100)).await;
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_format_mac() {
+        let mac = [0x00, 0x1A, 0x2B, 0x3C, 0x4D, 0x5E];
+        let formatted_mac = format_mac(&mac);
+        assert_eq!(formatted_mac, "00:1a:2b:3c:4d:5e");
+    }
+}
