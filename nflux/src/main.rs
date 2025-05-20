@@ -1,14 +1,13 @@
-use std::process;
-use std::process::exit;
+use std::{process, process::exit};
+
 use clap::Parser;
 use libc::getuid;
 use nflux_common::Configmap;
 use tracing::{error, info};
 use try_nflux::start_nflux;
 use utils::{is_true, set_mem_limit};
-use crate::cli::NfluxCliArgs;
-use crate::logger::init_logger;
-use crate::utils::check_is_root_user;
+
+use crate::{cli::NfluxCliArgs, logger::init_logger, utils::check_is_root_user};
 
 mod logger;
 mod tc_event;
@@ -52,7 +51,7 @@ async fn main() {
 
     // Prepare configmap data (data from user space to be processed in kernel space using eBPF maps)
     let configmap = Configmap {
-        disable_private_ips: 1,             // Not implemented yet
+        disable_private_ips: 1,                // Not implemented yet
         disable_udp: is_true(cli.disable_udp), // 0 = no, 1 = yes
         disable_icmp: is_true(cli.disable_icmp),
         disable_tcp: is_true(cli.disable_tcp),
@@ -61,5 +60,12 @@ async fn main() {
     };
 
     // Start nflux
-    start_nflux(&cli.interface, cli.disable_egress, cli.disable_ingress, configmap).await.expect("Failed to start nflux");
+    start_nflux(
+        &cli.interface,
+        cli.disable_egress,
+        cli.disable_ingress,
+        configmap,
+    )
+    .await
+    .expect("Failed to start nflux");
 }

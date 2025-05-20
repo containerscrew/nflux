@@ -1,8 +1,13 @@
 use core::mem;
 
-use aya_ebpf::{programs::TcContext};
-use network_types::{eth::EthHdr, ip::{IpProto, Ipv4Hdr, Ipv6Hdr}, tcp::TcpHdr, udp::UdpHdr};
-use nflux_common::{IpFamily};
+use aya_ebpf::programs::TcContext;
+use network_types::{
+    eth::EthHdr,
+    ip::{IpProto, Ipv4Hdr, Ipv6Hdr},
+    tcp::TcpHdr,
+    udp::UdpHdr,
+};
+use nflux_common::IpFamily;
 
 pub enum IpHeader {
     V4(Ipv4Hdr),
@@ -36,11 +41,7 @@ fn ptr_at<T>(ctx: &TcContext, offset: usize) -> Result<*const T, ()> {
 
 /// function to extract the source and destination ports from the TCP/UDP headers
 /// So redundant code by the moment, but works
-fn handle_ports(
-    ctx: &TcContext,
-    proto: IpProto,
-    is_ether: bool,
-) -> Result<(u16, u16), ()> {
+fn handle_ports(ctx: &TcContext, proto: IpProto, is_ether: bool) -> Result<(u16, u16), ()> {
     match proto {
         IpProto::Tcp => {
             let (src_port, dst_port);
@@ -72,12 +73,8 @@ fn handle_ports(
             }
             Ok((src_port, dst_port))
         }
-        IpProto::Icmp => {
-            Ok((0, 0))
-        }
-        _ => {
-            Ok((0, 0))
-        }
+        IpProto::Icmp => Ok((0, 0)),
+        _ => Ok((0, 0)),
     }
 }
 
@@ -95,7 +92,7 @@ pub fn handle_packet(
             let ttl = u8::from_be(ipv4hdr.ttl);
             let proto = ipv4hdr.proto;
             let (src_port, dst_port) = handle_ports(ctx, proto, is_ether).unwrap_or((0, 0));
-            
+
             let packet_data = PacketData {
                 src_ip: source,
                 dst_ip: destination,
@@ -107,7 +104,7 @@ pub fn handle_packet(
                 ip_family: IpFamily::Ipv4,
                 direction,
             };
-            
+
             Ok(packet_data)
         }
         IpHeader::V6(_ipv6hdr) => {

@@ -2,6 +2,7 @@ use std::fmt;
 
 use clap::Parser;
 use colored::Colorize;
+
 use crate::utils::set_default_iface;
 
 #[derive(Parser, Debug)]
@@ -128,6 +129,6 @@ fn print_banner() -> String {
     ██║ ╚████║██║     ███████╗╚██████╔╝██╔╝ ██╗
     ╚═╝  ╚═══╝╚═╝     ╚══════╝ ╚═════╝ ╚═╝  ╚═╝
     "#
-        .red()
-        .to_string()
+    .red()
+    .to_string()
 }
