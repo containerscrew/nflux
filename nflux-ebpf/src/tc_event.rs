@@ -1,45 +1,32 @@
 use aya_ebpf::helpers::gen::bpf_ktime_get_ns;
-use nflux_common::{IpType, TcEvent};
+use nflux_common::TcEvent;
 
-use crate::maps::{ActiveConnectionKey, ACTIVE_CONNECTIONS, PACKET_COUNT, TC_EVENT};
+use crate::{
+    handle_packet::PacketData,
+    maps::{ActiveConnectionKey, ACTIVE_CONNECTIONS, TC_EVENT},
+};
 
 #[inline]
 pub unsafe fn log_connection(
-    source: u32,
-    destination: u32,
-    total_len: u16,
-    ttl: u8,
-    src_port: u16,
-    dst_port: u16,
-    protocol: u8,
-    direction: u8, // 0: ingress, 1: egress
-    proto: &str,   // ipv4 or ipv6
-    pid: u32,
+    packet_data: &PacketData,
+    src_mac: [u8; 6],
+    dst_mac: [u8; 6],
     log_interval: u8,
     disable_full_log: u8,
 ) {
     let event = TcEvent {
-        src_ip: source,
-        dst_ip: destination,
-        total_len,
-        ttl,
-        src_port,
-        dst_port,
-        protocol,
-        direction,
-        ip_type: if proto == "ipv4" {
-            IpType::Ipv4
-        } else {
-            IpType::Ipv6
-        },
-        pid,
+        src_mac,
+        dst_mac,
+        src_ip: packet_data.src_ip,
+        dst_ip: packet_data.dst_ip,
+        total_len: packet_data.total_len,
+        ttl: packet_data.ttl,
+        src_port: packet_data.src_port,
+        dst_port: packet_data.dst_port,
+        protocol: packet_data.proto,
+        direction: packet_data.direction,
+        ip_family: packet_data.ip_family,
     };
-
-    // let key = 0;
-
-    // let mut packet_count = PACKET_COUNT.get(key).unwrap_or(&0);
-
-    // packet_count += 1;
 
     if disable_full_log == 0 {
         if let Some(mut data) = TC_EVENT.reserve::<TcEvent>(0) {
@@ -51,12 +38,16 @@ pub unsafe fn log_connection(
         let current_time = bpf_ktime_get_ns();
 
         let key = ActiveConnectionKey {
-            port: if direction == 1 {
-                src_port as u32
+            port: if packet_data.direction == 1 {
+                packet_data.src_port as u32
             } else {
-                dst_port as u32
+                packet_data.dst_port as u32
             },
-            ip: if direction == 1 { destination } else { source },
+            ip: if packet_data.direction == 1 {
+                packet_data.dst_ip
+            } else {
+                packet_data.src_ip
+            },
         };
 
         // If the connection (src_port, dst_ip) is already tracked, return

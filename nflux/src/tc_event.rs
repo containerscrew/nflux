@@ -4,7 +4,14 @@ use aya::maps::{MapData, RingBuf};
 use nflux_common::TcEvent;
 use tracing::info;
 
-use crate::utils::{convert_protocol, get_process_name, get_service_name};
+use crate::utils::convert_protocol;
+
+fn format_mac(mac: &[u8; 6]) -> String {
+    mac.iter()
+        .map(|b| format!("{:02x}", b))
+        .collect::<Vec<_>>()
+        .join(":")
+}
 
 pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow::Error> {
     loop {
@@ -15,10 +22,6 @@ pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow:
             // Make sure the data is the correct size
             if data.len() == std::mem::size_of::<TcEvent>() {
                 let event: &TcEvent = unsafe { &*(data.as_ptr() as *const TcEvent) };
-                let src_service_name =
-                    get_service_name(event.src_port, convert_protocol(event.protocol));
-                let dest_service_name =
-                    get_service_name(event.dst_port, convert_protocol(event.protocol));
 
                 let direction = if event.direction == 0 {
                     "ingress"
@@ -27,25 +30,35 @@ pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow:
                 };
 
                 info!(
-                    "dir={} type={}, pid={}, comm={}, protocol={}, src_service={}, dest_service={}, total_len={}B, ttl={}, src_ip={}, dst_ip={}, src_port={}, dst_port={}",
+                    "dir={} type={} protocol={} total_len={}B ttl={} src_ip={} dst_ip={} src_port={} dst_port={} src_mac={} dst_mac={}",
                     direction,
-                    event.ip_type.as_str(),
-                    event.pid,
-                    get_process_name(event.pid),
+                    event.ip_family.as_str(),
                     convert_protocol(event.protocol),
-                    src_service_name,
-                    dest_service_name,
                     event.total_len,
                     event.ttl,
                     Ipv4Addr::from(event.src_ip),
                     Ipv4Addr::from(event.dst_ip),
                     event.src_port,
                     event.dst_port,
+                    format_mac(&event.src_mac),
+                    format_mac(&event.dst_mac)
                 );
             }
         }
 
         // Sleep for a while
         tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_format_mac() {
+        let mac = [0x00, 0x1A, 0x2B, 0x3C, 0x4D, 0x5E];
+        let formatted_mac = format_mac(&mac);
+        assert_eq!(formatted_mac, "00:1a:2b:3c:4d:5e");
     }
 }

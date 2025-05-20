@@ -11,14 +11,19 @@ use tracing::{debug, error, info};
 use super::tc_event::process_event;
 use crate::utils::wait_for_shutdown;
 
-pub async fn start_netrace(
+pub async fn start_nflux(
     interface: &str,
     disable_egress: bool,
     disable_ingress: bool,
     configmap: Configmap,
 ) -> anyhow::Result<()> {
     // Load eBPF program
-    let mut ebpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/netrace")))?;
+    let mut ebpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/nflux")))?;
+
+    // if let Err(e) = EbpfLogger::init(&mut ebpf) {
+    //     // This can happen if you remove all log statements from your eBPF program.
+    //     warn!("failed to initialize eBPF logger: {}", e);
+    // }
 
     try_traffic_control(
         &mut ebpf,
