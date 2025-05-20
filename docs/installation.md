@@ -10,13 +10,13 @@
 <!-- END OF TOC -->
 # Compatibility
 
-**Nflux has been created and tested in:**
+**Nflux has been created/tested in:**
 
 |   OS    | ARM64 | x86_64 | Kernel version |
 |---------|------|------|------|
-| linux fedora 41    | ✅    | ✅  | `6.13.7-200.fc41.x86_64 ` |
-| linux ubuntu 24.10-server   | ✅    | ✅  | `6.11.0-19-generic ` |
-| linux debian 12   | ✅    | ✅  | `6.1.0-35-cloud-arm64` |
+| Linux fedora 41    | ✅    | ✅  | `6.13.7-200.fc41.x86_64 ` |
+| Linux ubuntu 24.10-server   | ✅    | ✅  | `6.11.0-19-generic ` |
+| Linux debian 12   | ✅    | ✅  | `6.1.0-35-cloud-arm64` |
 
 > [!TIP]
 > If you want to try nflux on your Mac OSX, check out the ['Using Mac OSX section' in local dev doc](./local_dev.md).
