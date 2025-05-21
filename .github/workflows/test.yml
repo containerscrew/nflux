@@ -31,6 +31,7 @@ jobs:
       - name: Dependencies
         run: |
           rustup install stable && rustup toolchain install nightly --component rust-src
+          rustup target add ${{ matrix.target }} --toolchain nightly
           rustup default nightly
           cargo install bpf-linker
 
