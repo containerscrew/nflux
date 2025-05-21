@@ -1,4 +1,4 @@
-name: Test & Lint 🤖
+name: Test 🐛
 
 on:
   pull_request:
@@ -33,15 +33,15 @@ jobs:
           toolchain: nightly
           targets: ${{ matrix.target }}
 
-      # - name: Cache cargo registry + nextest
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: |
-      #       ~/.cargo/bin/nextest
-      #       ~/.cargo/registry
-      #       ~/.cargo/git
-      #       target
-      #     key: nextest-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+      - name: Cache cargo registry + nextest
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/nextest
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: nextest-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
       #
       # - name: Install cargo-nextest if missing
       #   run: |
