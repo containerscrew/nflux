@@ -68,7 +68,7 @@ Take a look at the `fedora.yml` configuration file. Change the relevant director
 Deploy the machine:
 
 ```shell
-limactl start --name fedora fedora.yml
+limactl start --name fedora lima/fedora.yml
 limactl shell fedora
 cd /your/mapped/directory/with/your/code
 # Example
@@ -86,7 +86,7 @@ limactl stop fedora && limactl delete fedora
 Using `ubuntu` (debian based):
 
 ```shell
-limactl start --name ubuntu ubuntu.yml
+limactl start --name ubuntu lima/ubuntu.yml
 limactl shell ubuntu
 # Reproduce same commands from above, like in fedora ...
 limactl stop ubuntu && limactl delete ubuntu
@@ -97,7 +97,7 @@ limactl stop ubuntu && limactl delete ubuntu
 Using `debian`:
 
 ```shell
-limactl start --name debian debian.yml
+limactl start --name debian lima/debian.yml
 limactl shell debian
 # Reproduce same commands from above
 limactl stop debian && limactl delete debian
