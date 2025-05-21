@@ -28,10 +28,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: dtolnay/rust-toolchain@v1
-        with:
-          toolchain: nightly
-          targets: ${{ matrix.target }}
+      - name: Dependencies
+        run: |
+          rustup default nightly
+          rustup target add ${{ matrix.target }}
+          rustup component add rustfmt clippy
+          cargo install cargo-nextest --locked
 
       - name: Cache cargo registry + nextest
         uses: actions/cache@v3
