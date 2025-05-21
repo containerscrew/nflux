@@ -30,10 +30,9 @@ jobs:
 
       - name: Dependencies
         run: |
+          rustup install stable && rustup toolchain install nightly --component rust-src
           rustup default nightly
-          rustup target add ${{ matrix.target }}
-          rustup component add rustfmt clippy
-          cargo install cargo-nextest --locked
+          cargo install bpf-linker
 
       - name: Cache cargo registry + nextest
         uses: actions/cache@v3
