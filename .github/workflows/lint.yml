@@ -5,7 +5,7 @@ on:
   push:
     paths:
       - '**.rs'
-      - .github/workflows/lint.yml
+      - '.github/workflows/lint.yml'
     branches:
       - '**'
 
@@ -37,7 +37,8 @@ jobs:
 
       - name: Rustup
         run: |
-          rustup install stable && rustup toolchain install nightly --component rust-src clippy
+          rustup install stable && rustup toolchain install nightly --component rust-src
+          rustup component add clippy
           rustup default nightly
 
       - name: Check formatting
