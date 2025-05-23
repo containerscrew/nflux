@@ -38,7 +38,7 @@ jobs:
       - name: Rustup
         run: |
           rustup install stable && rustup toolchain install nightly --component rust-src
-          rustup component add clippy
+          rustup component add clippy --toolchain nightly
           rustup default nightly
 
       - name: Check formatting
