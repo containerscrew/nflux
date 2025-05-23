@@ -31,10 +31,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: dtolnay/rust-toolchain@v1
-        with:
-          toolchain: nightly
-          components: clippy
+      - name: System dependencies
+        run: |
+          sudo apt-get -y install linux-headers-$(uname -r) make
+
+      - name: Rustup
+        run: |
+          rustup install stable && rustup toolchain install nightly --component rust-src clippy
+          rustup default nightly
 
       - name: Check formatting
-        run: cargo +nightly clippy --all-features -- -D warnings
+        run: cargo clippy --all-features -- -D warnings
