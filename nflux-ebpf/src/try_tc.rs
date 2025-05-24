@@ -7,8 +7,7 @@ use network_types::{
 };
 
 use crate::{
-    handle_packet::{handle_packet, IpHeader},
-    tc_event::log_connection,
+    handle_packet::{handle_packet, IpHeader}, maps::TC_CONFIG, tc_event::log_connection
 };
 
 #[inline]
@@ -40,7 +39,7 @@ pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
         let dst_mac = ethhdr.dst_addr;
 
         // Load runtime config from eBPF map
-        // let tc_config = TC_CONFIG.get(0).ok_or(())?;
+        let tc_config = TC_CONFIG.get(0).ok_or(())?;
 
         // Inspect EtherType to know what protocol comes next
         match ethhdr.ether_type {
@@ -62,7 +61,7 @@ pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
 
                 if let Ok(event) = event {
                     unsafe {
-                        log_connection(&event);
+                        log_connection(&event, *tc_config);
                     }
                 }
 
@@ -75,6 +74,9 @@ pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
                 // STEP 3b: Parse IPv6 header (starts at same place: offset 14)
                 let ipv6hdr: Ipv6Hdr = ctx.load(EthHdr::LEN).map_err(|_| ())?;
 
+                // Load runtime config from eBPF map
+                let tc_config = TC_CONFIG.get(0).ok_or(())?;
+
                 let event = handle_packet(
                     &ctx,
                     direction,
@@ -86,7 +88,7 @@ pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
 
                 if let Ok(event) = event {
                     unsafe {
-                        log_connection(&event);
+                        log_connection(&event, *tc_config);
                     }
                 }
 
@@ -111,7 +113,7 @@ pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
     // Try to interpret the packet as starting directly with IPv4 or IPv6
 
     if let Ok(ipv4hdr) = ctx.load::<Ipv4Hdr>(0) {
-        // let tc_config = TC_CONFIG.get(0).ok_or(())?;
+        let tc_config = TC_CONFIG.get(0).ok_or(())?;
         let event = handle_packet(
             &ctx,
             direction,
@@ -123,7 +125,7 @@ pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
 
         if let Ok(event) = event {
             unsafe {
-                log_connection(&event);
+                log_connection(&event, *tc_config);
             }
         }
 
