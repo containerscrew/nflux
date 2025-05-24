@@ -1,10 +1,11 @@
-use std::net::Ipv4Addr;
+use std::{net::Ipv4Addr, sync::Arc};
 
 use aya::maps::{MapData, RingBuf};
 use nflux_common::TcEvent;
+use prometheus::Registry;
 use tracing::info;
 
-use crate::utils::convert_protocol;
+use crate::{metrics::{start_api, Metrics}, utils::convert_protocol};
 
 fn format_mac(mac: &[u8; 6]) -> String {
     mac.iter()
@@ -14,6 +15,10 @@ fn format_mac(mac: &[u8; 6]) -> String {
 }
 
 pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow::Error> {
+    let registry = Arc::new(Registry::new());
+    let metrics = Metrics::new(&registry);
+    tokio::spawn(start_api(registry.clone()));
+
     loop {
         while let Some(event) = ring_buf.next() {
             // Get the data from the event
@@ -42,6 +47,20 @@ pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow:
                     event.dst_port,
                     format_mac(&event.src_mac),
                     format_mac(&event.dst_mac)
+                );
+
+                metrics.track_connection(
+                    direction,
+                    event.ip_family.as_str(),
+                    convert_protocol(event.protocol),
+                    &event.total_len.to_string(),
+                    &event.ttl.to_string(),
+                    &Ipv4Addr::from(event.src_ip).to_string(),
+                    &Ipv4Addr::from(event.dst_ip).to_string(),
+                    &event.src_port.to_string(),
+                    &event.dst_port.to_string(),
+                    &format_mac(&event.src_mac),
+                    &format_mac(&event.dst_mac),
                 );
             }
         }

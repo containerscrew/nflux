@@ -13,6 +13,7 @@ mod logger;
 mod tc_event;
 mod try_nflux;
 mod utils;
+mod metrics;
 
 mod cli;
 

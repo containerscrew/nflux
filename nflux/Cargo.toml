@@ -24,6 +24,8 @@ clap = { version = "4.5.38", features = ["derive"] }
 chrono = "0.4.41"
 colored = "3.0.0"
 default-net = "0.22.0"
+prometheus = "0.14.0"
+axum = "0.8.4"
 
 [build-dependencies]
 anyhow = { workspace = true }
