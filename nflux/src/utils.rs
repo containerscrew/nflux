@@ -123,6 +123,14 @@ pub fn _get_process_name(pid: u32) -> String {
     }
 }
 
+pub fn convert_direction(direction: u8) -> &'static str {
+    match direction {
+        0 => "ingress",
+        1 => "egress",
+        _ => "unknown",
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -147,5 +155,12 @@ mod tests {
     fn test_is_true() {
         assert_eq!(is_true(true), 1);
         assert_eq!(is_true(false), 0);
+    }
+
+    #[test]
+    fn test_convert_direction() {
+        assert_eq!(convert_direction(0), "ingress");
+        assert_eq!(convert_direction(1), "egress");
+        assert_eq!(convert_direction(2), "unknown");
     }
 }
