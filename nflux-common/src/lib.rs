@@ -57,21 +57,6 @@ pub struct TcEvent {
 pub const MAX_BUF_SIZE: usize = 2048;
 pub const TASK_COMM_LEN: usize = 16;
 
-#[repr(C)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum Kind {
-    Read,
-    Write,
-}
-#[repr(C)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct TLSData {
-    pub kind: Kind,
-    pub len: i32,
-    pub buf: [u8; MAX_BUF_SIZE],
-    pub comm: [u8; TASK_COMM_LEN],
-}
-
 #[cfg(feature = "user")]
 pub mod user {
     use super::*;
