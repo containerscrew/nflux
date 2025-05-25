@@ -42,11 +42,11 @@ pub fn init_logger(log_level: &str, log_format: &str) {
         .with_thread_names(false)
         .with_span_events(FmtSpan::FULL)
         .with_file(false)
-        .with_timer(MyTimer)
+        .without_time()
         .with_target(false);
 
     match log_format {
-        "json" => base_subscriber.json().init(),
+        "json" => base_subscriber.json().flatten_event(true).init(),
         _ => base_subscriber.init(), // Defaults to text
     }
 }

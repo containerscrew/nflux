@@ -7,7 +7,9 @@ use network_types::{
 };
 
 use crate::{
-    handle_packet::{handle_packet, IpHeader}, maps::TC_CONFIG, tc_event::log_connection
+    handle_packet::{handle_packet, IpHeader},
+    maps::TC_CONFIG,
+    tc_event::log_connection,
 };
 
 #[inline]
