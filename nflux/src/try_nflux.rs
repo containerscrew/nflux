@@ -121,10 +121,7 @@ fn attach_tc_program(
         ));
     }
 
-    info!(
-        "{} program attached to interface {}",
-        program_name, interface
-    );
+    info!("listening on {}", interface);
 
     Ok(())
 }
