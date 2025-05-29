@@ -22,36 +22,43 @@ pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow:
             // Make sure the data is the correct size
             if data.len() == std::mem::size_of::<TcEvent>() {
                 let event: &TcEvent = unsafe { &*(data.as_ptr() as *const TcEvent) };
+                
+                let log_format = "text" ;
 
-                info!(
-                     dir = %convert_direction(event.direction),
-                     ip_family = %event.ip_family.as_str(),
-                     protocol = %convert_protocol(event.protocol),
-                     total_len = event.total_len,
-                     ttl = event.ttl,
-                     src_ip = %Ipv4Addr::from(event.src_ip),
-                     dst_ip = %Ipv4Addr::from(event.dst_ip),
-                     src_port = event.src_port,
-                     dst_port = event.dst_port,
-                     src_mac = %format_mac(&event.src_mac),
-                     dst_mac = %format_mac(&event.dst_mac),
-                );
-
-
-                //info!(
-                //    "dir={} type={} protocol={} total_len={}B ttl={} src_ip={} dst_ip={} src_port={} dst_port={} src_mac={} dst_mac={}",
-                //    convert_direction(event.direction),
-                //    event.ip_family.as_str(),
-                //    convert_protocol(event.protocol),
-                //    event.total_len,
-                //    event.ttl,
-                //    Ipv4Addr::from(event.src_ip),
-                //    Ipv4Addr::from(event.dst_ip),
-                //    event.src_port,
-                //    event.dst_port,
-                //    format_mac(&event.src_mac),
-                //    format_mac(&event.dst_mac)
-                //);
+                match log_format {
+                    "json" => {
+                        info!(
+                            dir = %convert_direction(event.direction),
+                            ip_family = %event.ip_family.as_str(),
+                            protocol = %convert_protocol(event.protocol),
+                            total_len = event.total_len,
+                            ttl = event.ttl,
+                            src_ip = %Ipv4Addr::from(event.src_ip),
+                            dst_ip = %Ipv4Addr::from(event.dst_ip),
+                            src_port = event.src_port,
+                            dst_port = event.dst_port,
+                            src_mac = %format_mac(&event.src_mac),
+                            dst_mac = %format_mac(&event.dst_mac),
+                        );
+                    },
+                    _ => {
+                        // Default log format (text format)
+                        info!(
+                            "[{}][{}][{}] {}:{} -> {}:{} len={} ttl={}",
+                            convert_direction(event.direction),
+                            convert_protocol(event.protocol),
+                            event.ip_family.as_str(),
+                            Ipv4Addr::from(event.src_ip),
+                            event.src_port,
+                            Ipv4Addr::from(event.dst_ip),
+                            event.dst_port,
+                            event.total_len,
+                            event.ttl,
+                            //    format_mac(&event.src_mac),
+                            //    format_mac(&event.dst_mac)
+                        );
+                    }
+                }
             }
         }
         tokio::time::sleep(std::time::Duration::from_millis(100)).await;
