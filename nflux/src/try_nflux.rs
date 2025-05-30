@@ -39,6 +39,8 @@ pub async fn start_nflux(
 
     let ring_buf = RingBuf::try_from(tc_event_ring_map)?;
 
+    info!("listening on {}", interface);
+
     tokio::spawn(async move { process_event(ring_buf).await });
 
     let _ = wait_for_shutdown().await;
@@ -120,8 +122,6 @@ fn attach_tc_program(
             interface
         ));
     }
-
-    info!("listening on {}", interface);
 
     Ok(())
 }

@@ -9,7 +9,7 @@ use libc::{c_char, c_int, getservbyport, ntohs, servent, setrlimit};
 use nflux_common::utils::is_private_ip;
 use sysinfo::{Pid, System};
 use tokio::signal;
-use tracing::{info, warn};
+use tracing::{debug, warn};
 
 /// is_root_user checks if the current user who runs the program is root.
 /// Avoid running nflux as uid != 0 (root). Ebpf requires privileges
@@ -48,7 +48,7 @@ pub fn set_mem_limit() {
 
 pub async fn wait_for_shutdown() -> anyhow::Result<()> {
     let ctrl_c = signal::ctrl_c();
-    info!("Waiting for Ctrl-C...");
+    debug!("Waiting for Ctrl-C...");
     ctrl_c.await?;
     warn!("You press Ctrl-C, shutting down nflux...");
     Ok(())
