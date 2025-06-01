@@ -2,6 +2,7 @@ use std::{process, process::exit};
 
 use clap::Parser;
 use libc::getuid;
+use logger::LoggerConfig;
 use nflux_common::Configmap;
 use tracing::{error, info};
 use try_nflux::start_nflux;
@@ -22,7 +23,11 @@ async fn main() {
     let cli = NfluxCliArgs::parse();
 
     // Start logger
-    init_logger(&cli.log_level, &cli.log_format.as_str());
+    init_logger(LoggerConfig{
+        level: cli.log_level,
+        format: cli.log_format.clone(),
+        with_timer: cli.with_timer,
+    });
 
     // User should be root
     let uid = unsafe { getuid() };
@@ -65,6 +70,7 @@ async fn main() {
         cli.disable_egress,
         cli.disable_ingress,
         configmap,
+        cli.log_format
     )
     .await
     .expect("Failed to start nflux");
