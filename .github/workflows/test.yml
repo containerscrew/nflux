@@ -27,7 +27,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-
+            # https://github.com/Swatinem/rust-cache
+      - uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: "nflux-ebpf-v1"
+          cache-all-crates: true
+          save-if: ${{ github.ref == 'refs/heads/main' }}
       - name: Dependencies
         run: |
           rustup install stable && rustup toolchain install nightly --component rust-src
@@ -35,22 +40,5 @@ jobs:
           rustup default nightly
           cargo install bpf-linker
           cargo install cargo-nextest --locked
-
-      - name: Cache cargo registry + nextest
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/bin/nextest
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: nextest-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
-      #
-      # - name: Install cargo-nextest if missing
-      #   run: |
-      #     if ! command -v cargo-nextest &> /dev/null; then
-      #       cargo install cargo-nextest --locked
-      #     fi
-
       - name: Run cargo test
         run: cargo test --locked --target ${{ matrix.target }} --no-default-features
