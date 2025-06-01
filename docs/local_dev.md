@@ -7,6 +7,7 @@
 - [Using Mac OSX?](#using-mac-osx)
   - [Fedora](#fedora)
   - [Ubuntu](#ubuntu)
+  - [Debian](#debian)
 <!-- END OF TOC -->
 
 # Local development
