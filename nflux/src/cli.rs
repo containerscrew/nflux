@@ -10,7 +10,7 @@ use crate::utils::set_default_iface;
     about = "nflux",
     version = env!("CARGO_PKG_VERSION"),
     author = "Containerscrew info@containerscrew.com",
-    about = "Network monitoring tool & TLS/SSL sniffer using eBPF 🐝\nAuthor: github.com/containerscrew",
+    about = "eBPF network monitoring tool 🐝\nAuthor: github.com/containerscrew",
     arg_required_else_help = false,
     before_help = print_banner()
 )]
