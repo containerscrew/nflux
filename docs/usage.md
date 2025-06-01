@@ -1,11 +1,12 @@
 <!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
 **Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
 - [Usage](#usage)
-    - [Changing default interface](#changing-default-interface)
-    - [Sniffing (only) egress traffic](#sniffing-only-egress-traffic)
-    - [Sniffing (only) ingress traffic](#sniffing-only-ingress-traffic)
-    - [Packet logging](#packet-logging)
-    - [Available procotols](#available-procotols)
+  - [Changing default interface](#changing-default-interface)
+  - [Sniffing (only) egress traffic](#sniffing-only-egress-traffic)
+  - [Sniffing (only) ingress traffic](#sniffing-only-ingress-traffic)
+  - [Packet logging](#packet-logging)
+  - [Available procotols](#available-procotols)
+  - [Enable timestmp in log output](#enable-timestmp-in-log-output)
 <!-- END OF TOC -->
 # Usage
 
@@ -32,7 +33,7 @@ By default, everything is enabled. Which means:
 
 Let's see in the following sections how to customize `nflux`.
 
-### Changing default interface
+## Changing default interface
 
 _The program automatically detects your default iface._
 
@@ -40,19 +41,19 @@ _The program automatically detects your default iface._
 sudo nflux -i eth0
 ```
 
-### Sniffing (only) egress traffic
+## Sniffing (only) egress traffic
 
 ```shell
 sudo nflux --disable-ingress
 ```
 
-### Sniffing (only) ingress traffic
+## Sniffing (only) ingress traffic
 
 ```shell
 sudo nflux --enable-egress
 ```
 
-### Packet logging
+## Packet logging
 
 By default `nflux` will log **all packets** (egress/ingress) entering the NIC (Network Interface or virtual interface (like tun0)). If you use `--disable-full-log`, you can use `--log-interval` to set the time interval in which the same `ip->port` connection will be logged.
 
@@ -82,7 +83,7 @@ Or you can also change the `--log-interval`:
 sudo nflux --disable-full-log --log-inveral 3 # every 3 seconds
 ```
 
-### Available procotols
+## Available procotols
 
 `UDP/TCP/ICMP` available by default.
 
@@ -93,3 +94,11 @@ sudo nflux --disable-udp
 sudo nflux --disable-icmp
 sudo nflux --disable-tcp
 ```
+
+## Enable timestmp in log output
+
+```shell
+sufo nflux --disable-ingress --with-timer
+```
+
+> Timestamp is disabled in the logger by default for brevity
