@@ -4,4 +4,4 @@ Section: utils
 Priority: optional
 Architecture: arm64
 Maintainer: Daniels <info@containerscrew.com>
-Description: Network monitoring tool & TLS/SSL sniffer using eBPF 🐝
+Description: eBPF network monitoring tool🐝

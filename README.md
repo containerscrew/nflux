@@ -1,6 +1,6 @@
 <p align="center">
     <h1 align="center">The nflux project</h1>
-    <p align="center">Network monitoring tool. Powered by eBPF 🐝</p>
+    <p align="center">eBPF network monitoring tool 🐝</p>
     <p align="center">Kernel and user space code written entirely in Rust ❤</p>
 </p>
 
@@ -32,6 +32,8 @@ Nflux is an [`eBPF`](./docs/what_is_ebpf.md)-based tool that monitors `incoming/
 
 # Installation
 
+Quick installation:
+
 ```shell
 curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/nflux/main/install.sh | sh
 ```
@@ -41,10 +43,10 @@ Read the [installation](./docs/installation.md) doc.
 # Usage
 
 ```shell
-sudo nflux --disable-full-log # avoid logging every packet
+sudo nflux # log everything, which means: ingress/egress traffic, tcp,udp,icmp protocols, ipv4/ipv6
 ```
 
-Read the [usage](./docs/usage.md) doc.
+Read the [usage](./docs/usage.md) doc for more options.
 
 # License
 

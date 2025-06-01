@@ -1,7 +1,7 @@
 Name:           nflux
 Version:        0.1.0
 Release:        1%{?dist}
-Summary:        Network monitoring tool & TLS/SSL sniffer using eBPF 🐝
+Summary:        eBPF network monitoring tool 🐝
 
 License:        MIT
 URL:            https://github.com/tu-usuario/nflux
@@ -11,7 +11,7 @@ BuildArch:      x86_64
 Requires:       iproute, libbpf, bpftool
 
 %description
-Network monitoring tool & TLS/SSL sniffer using eBPF 🐝
+eBPF network monitoring tool 🐝
 It is powered by Aya-rs and provides high-performance network observability.
 
 %prep
