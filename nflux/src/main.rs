@@ -23,7 +23,7 @@ async fn main() {
     let cli = NfluxCliArgs::parse();
 
     // Start logger
-    init_logger(LoggerConfig{
+    init_logger(LoggerConfig {
         level: cli.log_level,
         format: cli.log_format.clone(),
         with_timer: cli.with_timer,
@@ -70,7 +70,7 @@ async fn main() {
         cli.disable_egress,
         cli.disable_ingress,
         configmap,
-        cli.log_format
+        cli.log_format,
     )
     .await
     .expect("Failed to start nflux");
