@@ -62,6 +62,8 @@ ip link show dev wlo1 # xdp attached to your interface
 
 For development in a Mac OSX (Apple Silicon) environment, you can use [**lima**](https://github.com/lima-vm/lima) (VM using qemu or Apple silicion virtualization).
 
+See [`examples`](../lima/).
+
 ## Fedora
 
 Take a look at the `fedora.yml` configuration file. Change the relevant directories to your local path where the nflux code is located. Creating an SSH key is optional.
