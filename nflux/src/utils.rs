@@ -15,9 +15,7 @@ use tracing::{debug, warn};
 /// Avoid running nflux as uid != 0 (root). Ebpf requires privileges
 pub fn check_is_root_user(uid: u32) -> Result<(), String> {
     if uid != 0 {
-        return Err(
-            "This program must be run as root. Try: $ sudo nflux".to_string(),
-        );
+        return Err("This program must be run as root. Try: $ sudo nflux".to_string());
     }
     Ok(())
 }

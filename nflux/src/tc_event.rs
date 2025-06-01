@@ -1,4 +1,4 @@
-use std::{net::Ipv4Addr};
+use std::net::Ipv4Addr;
 
 use aya::maps::{MapData, RingBuf};
 use nflux_common::TcEvent;
@@ -13,7 +13,10 @@ fn _format_mac(mac: &[u8; 6]) -> String {
         .join(":")
 }
 
-pub async fn process_event(mut ring_buf: RingBuf<MapData>, log_format: String) -> Result<(), anyhow::Error> {
+pub async fn process_event(
+    mut ring_buf: RingBuf<MapData>,
+    log_format: String,
+) -> Result<(), anyhow::Error> {
     loop {
         while let Some(event) = ring_buf.next() {
             // Get the data from the event
@@ -38,7 +41,7 @@ pub async fn process_event(mut ring_buf: RingBuf<MapData>, log_format: String) -
                             // src_mac = %format_mac(&event.src_mac),
                             // dst_mac = %format_mac(&event.dst_mac),
                         );
-                    },
+                    }
                     _ => {
                         // Default log format (text format)
                         info!(
