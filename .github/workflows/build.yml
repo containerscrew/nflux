@@ -37,6 +37,12 @@ jobs:
         run: |
           sudo apt-get -y install linux-headers-$(uname -r) make
 
+      - uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: "nflux-ebpf-v1"
+          cache-all-crates: true
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+
       - name: Rustup
         run: |
           rustup install stable && rustup toolchain install nightly --component rust-src
