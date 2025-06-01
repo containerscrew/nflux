@@ -96,6 +96,14 @@ pub struct NfluxCliArgs {
         required = false
     )]
     pub disable_full_log: bool,
+
+    #[arg(
+        long = "with-timer",
+        help = "Add timer to the logs. This will add a timestamp to each log entry. Ej: 2025-06-01 23:02:47",
+        default_value_t = false,
+        required = false
+    )]
+    pub with_timer: bool,
 }
 
 // Custom implementation of Display trait for the Structure NfluxCliArgs

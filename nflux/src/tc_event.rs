@@ -6,14 +6,14 @@ use tracing::info;
 
 use crate::utils::{convert_direction, convert_protocol};
 
-fn format_mac(mac: &[u8; 6]) -> String {
+fn _format_mac(mac: &[u8; 6]) -> String {
     mac.iter()
         .map(|b| format!("{:02x}", b))
         .collect::<Vec<_>>()
         .join(":")
 }
 
-pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow::Error> {
+pub async fn process_event(mut ring_buf: RingBuf<MapData>, log_format: String) -> Result<(), anyhow::Error> {
     loop {
         while let Some(event) = ring_buf.next() {
             // Get the data from the event
@@ -23,9 +23,7 @@ pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow:
             if data.len() == std::mem::size_of::<TcEvent>() {
                 let event: &TcEvent = unsafe { &*(data.as_ptr() as *const TcEvent) };
 
-                let log_format = "text" ;
-
-                match log_format {
+                match log_format.as_str() {
                     "json" => {
                         info!(
                             dir = %convert_direction(event.direction),
@@ -37,8 +35,8 @@ pub async fn process_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow:
                             dst_ip = %Ipv4Addr::from(event.dst_ip),
                             src_port = event.src_port,
                             dst_port = event.dst_port,
-                            src_mac = %format_mac(&event.src_mac),
-                            dst_mac = %format_mac(&event.dst_mac),
+                            // src_mac = %format_mac(&event.src_mac),
+                            // dst_mac = %format_mac(&event.dst_mac),
                         );
                     },
                     _ => {
