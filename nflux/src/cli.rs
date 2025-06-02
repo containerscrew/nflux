@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{fmt, vec};
 
 use clap::Parser;
 use crate::utils::set_default_iface;
@@ -54,6 +54,13 @@ pub struct NfluxCliArgs {
         required = false
     )]
     pub disable_ingress: bool,
+
+    #[arg(
+        long = "filter-ports",
+        help = "Filter which ports do you want to sniff.",
+        required = false
+    )]
+    pub filter_ports: Vec<u8>,
 
     #[arg(
         long = "disable-udp",
