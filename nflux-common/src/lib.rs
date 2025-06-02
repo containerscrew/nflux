@@ -27,15 +27,20 @@ impl IpFamily {
             IpFamily::Ipv6 => "IPv6",
         }
     }
+
+    pub fn to_owned(&self) -> u8 {
+        match self {
+            IpFamily::Ipv4 => 4,
+            IpFamily::Ipv6 => 6,
+        }
+    }
 }
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct TcEvent {
-    pub src_mac: [u8; 6],
-    pub dst_mac: [u8; 6],
-    pub src_ip: u32,
-    pub dst_ip: u32,
+    pub src_ip: [u8; 16],
+    pub dst_ip: [u8; 16],
     pub total_len: u16,
     pub ttl: u8,
     pub src_port: u16,

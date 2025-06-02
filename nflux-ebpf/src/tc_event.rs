@@ -16,9 +16,9 @@ pub unsafe fn log_connection(event: &TcEvent, configmap: Configmap) {
 
         let key = ActiveConnectionKey {
             port: if event.direction == 1 {
-                event.src_port as u32
+                event.src_port
             } else {
-                event.dst_port as u32
+                event.dst_port
             },
             ip: if event.direction == 1 {
                 event.dst_ip
