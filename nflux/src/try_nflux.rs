@@ -5,8 +5,9 @@ use aya::{
     programs::{tc, SchedClassifier, TcAttachType},
     Ebpf,
 };
+use aya_log::EbpfLogger;
 use nflux_common::Configmap;
-use tracing::{debug, error, info};
+use tracing::{debug, error, info, warn};
 
 use super::tc_event::process_event;
 use crate::utils::wait_for_shutdown;
@@ -21,10 +22,10 @@ pub async fn start_nflux(
     // Load eBPF program
     let mut ebpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/nflux")))?;
 
-    // if let Err(e) = EbpfLogger::init(&mut ebpf) {
-    //     // This can happen if you remove all log statements from your eBPF program.
-    //     warn!("failed to initialize eBPF logger: {}", e);
-    // }
+    if let Err(e) = EbpfLogger::init(&mut ebpf) {
+        // This can happen if you remove all log statements from your eBPF program.
+        warn!("failed to initialize eBPF logger: {}", e);
+    }
 
     try_traffic_control(
         &mut ebpf,

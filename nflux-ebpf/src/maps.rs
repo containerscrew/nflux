@@ -10,8 +10,8 @@ use nflux_common::Configmap;
 // If egress port = src_port ip = dst_ip
 // If ingress port = dst_port ip = src_ip
 pub struct ActiveConnectionKey {
-    pub port: u32,
-    pub ip: u32,
+    pub port: u16,
+    pub ip: [u8; 16],
 }
 
 #[map]

@@ -1,6 +1,6 @@
 use core::mem;
 
-use aya_ebpf::programs::TcContext;
+use aya_ebpf::{bindings::TC_ACT_PIPE, programs::TcContext};
 use network_types::{
     eth::EthHdr,
     ip::{IpProto, Ipv4Hdr, Ipv6Hdr},
@@ -9,21 +9,11 @@ use network_types::{
 };
 use nflux_common::{IpFamily, TcEvent};
 
+use crate::{maps::TC_CONFIG, tc_event::log_connection};
+
 pub enum IpHeader {
     V4(Ipv4Hdr),
     V6(Ipv6Hdr),
-}
-
-pub struct PacketData {
-    pub src_ip: u32,
-    pub dst_ip: u32,
-    pub total_len: u16,
-    pub ttl: u8,
-    pub proto: u8,
-    pub src_port: u16,
-    pub dst_port: u16,
-    pub ip_family: IpFamily,
-    pub direction: u8,
 }
 
 #[inline]
@@ -47,6 +37,7 @@ fn handle_ports(
     is_ether: bool,
     ip_family: IpFamily,
 ) -> Result<(u16, u16), ()> {
+
     // Determine the offset based on whether it's an Ethernet frame and the IP family
     let offset = match (is_ether, ip_family) {
         (true, IpFamily::Ipv4) => EthHdr::LEN + Ipv4Hdr::LEN,
@@ -80,23 +71,25 @@ pub fn handle_packet(
     ctx: &TcContext,
     direction: u8,
     header: IpHeader,
-    is_ether: bool,
-    src_mac: [u8; 6],
-    dst_mac: [u8; 6],
-) -> Result<TcEvent, ()> {
+    l2: bool,
+) -> Result<i32, ()> {
+    // Load runtime config from eBPF map
+    let tc_config = TC_CONFIG.get(0).ok_or(())?;
+
     match header {
         IpHeader::V4(ipv4hdr) => {
-            let src_ip = u32::from_be_bytes(ipv4hdr.src_addr);
-            let dst_ip = u32::from_be_bytes(ipv4hdr.dst_addr);
+            let mut src_ip = [0u8; 16];
+            src_ip[12..].copy_from_slice(&ipv4hdr.src_addr); // header only has 32 bits (4ytes)
+            let mut dst_ip = [0u8; 16];
+            dst_ip[12..].copy_from_slice(&ipv4hdr.dst_addr);
             let total_len = u16::from_be_bytes(ipv4hdr.tot_len);
-            let ttl = u8::from_be(ipv4hdr.ttl);
+            let ttl = ipv4hdr.ttl;
             let protocol = ipv4hdr.proto;
+
             let (src_port, dst_port) =
-                handle_ports(ctx, protocol, is_ether, IpFamily::Ipv4).unwrap_or((0, 0));
+                handle_ports(ctx, protocol, l2, IpFamily::Ipv4).unwrap_or((0, 0));
 
             let event = TcEvent {
-                src_mac,
-                dst_mac,
                 src_ip,
                 dst_ip,
                 total_len,
@@ -108,20 +101,22 @@ pub fn handle_packet(
                 ip_family: IpFamily::Ipv4,
             };
 
-            Ok(event)
+            unsafe {
+                log_connection(&event, *tc_config);
+            }
+
+            Ok(TC_ACT_PIPE)
         }
         IpHeader::V6(ipv6hdr) => {
-            let source = ipv6hdr.src_addr().to_bits();
-            let destionation = ipv6hdr.dst_addr().to_bits();
+            let source = ipv6hdr.src_addr().octets(); // header already has 128 bits (16 bytes)
+            let destination = ipv6hdr.dst_addr().octets();
             let proto = ipv6hdr.next_hdr;
             let (src_port, dst_port) =
-                handle_ports(ctx, proto, is_ether, IpFamily::Ipv6).unwrap_or((0, 0));
+                handle_ports(ctx, proto, l2, IpFamily::Ipv6).unwrap_or((0, 0));
 
             let event = TcEvent {
-                src_mac,
-                dst_mac,
-                src_ip: source as u32,
-                dst_ip: destionation as u32,
+                src_ip: source,
+                dst_ip: destination,
                 total_len: u16::from_be_bytes(ipv6hdr.payload_len),
                 ttl: ipv6hdr.hop_limit,
                 src_port,
@@ -131,7 +126,11 @@ pub fn handle_packet(
                 ip_family: IpFamily::Ipv6,
             };
 
-            Ok(event)
+            unsafe {
+                log_connection(&event, *tc_config);
+            }
+
+            Ok(TC_ACT_PIPE)
         }
     }
 }
