@@ -55,7 +55,6 @@ pub fn init_logger(logger_config: LoggerConfig) {
             .init(),
         ("text", true) => base_subscriber.with_timer(MyTimer).init(),
         ("json", true) => base_subscriber
-            .without_time()
             .json()
             .flatten_event(true)
             .init(),

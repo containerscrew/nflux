@@ -22,7 +22,6 @@ dns-lookup = "2.0.4"
 sysinfo = "0.35.0"
 clap = { version = "4.5.39", features = ["derive"] }
 chrono = "0.4.41"
-colored = "3.0.0"
 default-net = "0.22.0"
 
 [build-dependencies]

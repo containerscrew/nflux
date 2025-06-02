@@ -1,8 +1,6 @@
 use std::fmt;
 
 use clap::Parser;
-use colored::Colorize;
-
 use crate::utils::set_default_iface;
 
 #[derive(Parser, Debug)]
@@ -10,9 +8,9 @@ use crate::utils::set_default_iface;
     about = "nflux",
     version = env!("CARGO_PKG_VERSION"),
     author = "Containerscrew info@containerscrew.com",
-    about = "eBPF network monitoring tool 🐝\nAuthor: github.com/containerscrew",
+    about = "eBPF network monitoring tool 🐝",
     arg_required_else_help = false,
-    before_help = print_banner()
+    after_help = print_help_message(),
 )]
 pub struct NfluxCliArgs {
     #[arg(
@@ -128,15 +126,11 @@ impl fmt::Display for NfluxCliArgs {
     }
 }
 
-fn print_banner() -> String {
-    r#"
-    ███╗   ██╗███████╗██╗     ██╗   ██╗██╗  ██╗
-    ████╗  ██║██╔════╝██║     ██║   ██║╚██╗██╔╝
-    ██╔██╗ ██║█████╗  ██║     ██║   ██║ ╚███╔╝
-    ██║╚██╗██║██╔══╝  ██║     ██║   ██║ ██╔██╗
-    ██║ ╚████║██║     ███████╗╚██████╔╝██╔╝ ██╗
-    ╚═╝  ╚═══╝╚═╝     ╚══════╝ ╚═════╝ ╚═╝  ╚═╝
-    "#
-    .red()
-    .to_string()
+fn print_help_message() -> String {
+    return format!("Author: containerscrew \nWebsite: github.com/containerscrew/nflux\nLicense: GPL 3\nIssues: https://github.com/containerscrew/nflux/issues")
+}
+
+#[test]
+fn test_print_help_message() {
+    assert_eq!(print_help_message(), "Author: containerscrew \nWebsite: github.com/containerscrew/nflux\nLicense: GPL 3\nIssues: https://github.com/containerscrew/nflux/issues")
 }
