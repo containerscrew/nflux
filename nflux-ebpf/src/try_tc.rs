@@ -6,9 +6,7 @@ use network_types::{
     ip::{Ipv4Hdr, Ipv6Hdr},
 };
 
-use crate::{
-    handle_packet::{handle_packet, IpHeader},
-};
+use crate::handle_packet::{handle_packet, IpHeader};
 
 #[inline]
 fn ptr_at<T>(ctx: &TcContext, offset: usize) -> Result<*const T, ()> {
@@ -50,12 +48,7 @@ pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
                 let ipv4hdr: Ipv4Hdr = ctx.load(EthHdr::LEN).map_err(|_| ())?;
 
                 // Now we can process the packet, marking that it was a regular L2 IPv4 frame (true)
-                let _ = handle_packet(
-                    &ctx,
-                    direction,
-                    IpHeader::V4(ipv4hdr),
-                    true,
-                );
+                let _ = handle_packet(&ctx, direction, IpHeader::V4(ipv4hdr), true);
 
                 // Default case: just let the packet pass through
                 return Ok(TC_ACT_PIPE);
@@ -66,12 +59,7 @@ pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
                 // STEP 3b: Parse IPv6 header (starts at same place: offset 14)
                 let ipv6hdr: Ipv6Hdr = ctx.load(EthHdr::LEN).map_err(|_| ())?;
 
-                let _ = handle_packet(
-                    &ctx,
-                    direction,
-                    IpHeader::V6(ipv6hdr),
-                    true,
-                );
+                let _ = handle_packet(&ctx, direction, IpHeader::V6(ipv6hdr), true);
 
                 // IPv6 header is always 40 bytes, and has src/dst IPs, next-header, etc.
                 return Ok(TC_ACT_PIPE);
@@ -88,28 +76,17 @@ pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
                 // Try to interpret the packet as starting directly with IPv4 or IPv6
 
                 if let Ok(ipv4hdr) = ctx.load::<Ipv4Hdr>(0) {
-                    let _ = handle_packet(
-                        &ctx,
-                        direction,
-                        IpHeader::V4(ipv4hdr),
-                        false,
-                    );
+                    let _ = handle_packet(&ctx, direction, IpHeader::V4(ipv4hdr), false);
 
                     return Ok(TC_ACT_PIPE);
-
                 } else if let Ok(ipv6hdr) = ctx.load::<Ipv6Hdr>(0) {
                     // We got a raw IPv6 packet, possibly from a tunnel
-                    let _ = handle_packet(
-                        &ctx,
-                        direction,
-                        IpHeader::V6(ipv6hdr),
-                        true,
-                    );
+                    let _ = handle_packet(&ctx, direction, IpHeader::V6(ipv6hdr), true);
 
                     return Ok(TC_ACT_PIPE);
                 }
 
-                return Ok(TC_ACT_PIPE)
+                return Ok(TC_ACT_PIPE);
             }
         }
     }

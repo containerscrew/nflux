@@ -37,7 +37,6 @@ fn handle_ports(
     is_ether: bool,
     ip_family: IpFamily,
 ) -> Result<(u16, u16), ()> {
-
     // Determine the offset based on whether it's an Ethernet frame and the IP family
     let offset = match (is_ether, ip_family) {
         (true, IpFamily::Ipv4) => EthHdr::LEN + Ipv4Hdr::LEN,
