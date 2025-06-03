@@ -170,6 +170,7 @@ mod test {
             log_interval: 5,
             disable_full_log: false,
             with_timer: false,
+            filter_ports: todo!(),
         };
         assert_eq!(
             format!("{}", args),
