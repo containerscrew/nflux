@@ -101,7 +101,9 @@ mod tests {
         let result = to_ipaddr(ip, 6);
         assert_eq!(
             result,
-            IpAddr::V6(Ipv6Addr::new(0xfe80, 0, 0, 0, 0x0202, 0xb3ff, 0xfe1e, 0x8329))
+            IpAddr::V6(Ipv6Addr::new(
+                0xfe80, 0, 0, 0, 0x0202, 0xb3ff, 0xfe1e, 0x8329
+            ))
         );
     }
 

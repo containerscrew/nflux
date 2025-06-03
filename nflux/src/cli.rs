@@ -1,14 +1,15 @@
 use std::{fmt, vec};
 
-use clap::Parser;
 use crate::utils::set_default_iface;
+use clap::Parser;
+use colored::Colorize;
 
 #[derive(Parser, Debug)]
 #[clap(
     about = "nflux",
     version = env!("CARGO_PKG_VERSION"),
     author = "Containerscrew info@containerscrew.com",
-    about = "eBPF network monitoring tool 🐝",
+    about = set_about(),
     arg_required_else_help = false,
     after_help = print_help_message(),
 )]
@@ -133,11 +134,48 @@ impl fmt::Display for NfluxCliArgs {
     }
 }
 
-fn print_help_message() -> String {
-    return format!("Author: containerscrew \nWebsite: github.com/containerscrew/nflux\nLicense: GPL 3\nIssues: https://github.com/containerscrew/nflux/issues")
+fn set_about() -> String {
+    "eBPF network monitoring tool 🐝".red().italic().to_string()
 }
 
-#[test]
-fn test_print_help_message() {
-    assert_eq!(print_help_message(), "Author: containerscrew \nWebsite: github.com/containerscrew/nflux\nLicense: GPL 3\nIssues: https://github.com/containerscrew/nflux/issues")
+fn print_help_message() -> String {
+    format!("Author: containerscrew \nWebsite: github.com/containerscrew/nflux\nLicense: GPL 3\nIssues: https://github.com/containerscrew/nflux/issues")
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_set_about() {
+        assert_eq!(set_about(), "eBPF network monitoring tool 🐝".blue().to_string());
+    }
+
+    #[test]
+    fn test_print_help_message() {
+        assert_eq!(print_help_message(), "Author: containerscrew \nWebsite: github.com/containerscrew/nflux\nLicense: GPL 3\nIssues: https://github.com/containerscrew/nflux/issues")
+    }
+
+    #[test]
+    fn test_nflux_cli_args_display() {
+        let args = NfluxCliArgs {
+            log_level: "info".to_string(),
+            log_format: "text".to_string(),
+            interface: "eth0".to_string(),
+            disable_egress: false,
+            disable_ingress: false,
+            disable_udp: false,
+            disable_icmp: false,
+            disable_tcp: false,
+            log_interval: 5,
+            disable_full_log: false,
+            with_timer: false,
+        };
+        assert_eq!(
+            format!("{}", args),
+            "log_level: info, log_format: text, interface: eth0, \
+             disable_egress: false, disable_ingress: false, disable_udp: false, \
+             disable_icmp: false, disable_tcp: false, log_interval: 5, disable_full_log: false"
+        );
+    }
 }

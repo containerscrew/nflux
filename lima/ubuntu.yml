@@ -26,9 +26,9 @@ mounts:
   mountPoint: "/tmp/lima"
   writable: false
 
-memory: "2GiB"
-cpus: 2
-disk: "15GiB"
+memory: "4GiB"
+cpus: 3
+disk: "20GiB"
 ssh:
   localPort: 2222
   loadDotSSHPubKeys: true
@@ -48,6 +48,7 @@ provision:
       curl https://sh.rustup.rs -sSf | sh -s -- -y
       source $HOME/.cargo/env
       rustup install stable && rustup toolchain install nightly --component rust-src
+      rustup component add rust-analyzer
       rustup default nightly
       cargo install bpf-linker
       sudo cat /tmp/lima/lima.pub >> $HOME/.ssh/authorized_keys
