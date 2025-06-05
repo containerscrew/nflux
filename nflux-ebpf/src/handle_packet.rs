@@ -1,6 +1,7 @@
 use core::mem;
 
-use aya_ebpf::{bindings::TC_ACT_PIPE, programs::TcContext};
+use aya_ebpf::{bindings::TC_ACT_PIPE, programs::{TcContext}};
+use aya_log_ebpf::info;
 use network_types::{
     eth::EthHdr,
     ip::{IpProto, Ipv4Hdr, Ipv6Hdr},
@@ -88,6 +89,7 @@ pub fn handle_packet(
             let (src_port, dst_port) =
                 handle_ports(ctx, protocol, l2, IpFamily::Ipv4).unwrap_or((0, 0));
 
+            // Mount data into the TcEvent struct
             let event = TcEvent {
                 src_ip,
                 dst_ip,
