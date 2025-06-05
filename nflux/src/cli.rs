@@ -1,8 +1,9 @@
-use std::{fmt, vec};
+use std::{fmt};
 
 use crate::utils::set_default_iface;
 use clap::Parser;
 use colored::Colorize;
+use anyhow::anyhow;
 
 #[derive(Parser, Debug)]
 #[clap(
@@ -57,11 +58,13 @@ pub struct NfluxCliArgs {
     pub disable_ingress: bool,
 
     #[arg(
-        long = "filter-ports",
+        long = "listen-ports",
         help = "Filter which ports do you want to sniff.",
+        value_delimiter = ',',
+        num_args = 0..=16,
         required = false
     )]
-    pub filter_ports: Vec<u8>,
+    pub listen_ports: Vec<u16>,
 
     #[arg(
         long = "disable-udp",
@@ -133,6 +136,24 @@ impl fmt::Display for NfluxCliArgs {
         )
     }
 }
+
+// impl NfluxCliArgs {
+//     pub fn init() -> Result<Self> {
+//         let args = NfluxCliArgs::parse();
+//         args.validate()?;
+//         Ok(args)
+//     }
+
+//     fn validate(&self) -> Result<(), anyhow::Error> {
+//         if self.listen_ports.len() > 16 {
+//             return Err(anyhow!(
+//                 "Too many ports: {} provided, but max is 16",
+//                 self.listen_ports.len()
+//             ));
+//         }
+//         Ok(())
+//     }
+// }
 
 fn set_about() -> String {
     "eBPF network monitoring tool 🐝".red().italic().to_string()
