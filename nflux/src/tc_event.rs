@@ -40,7 +40,7 @@ pub async fn process_event(
                             dir = %convert_direction(event.direction),
                             ip_family = %event.ip_family.as_str(),
                             protocol = %convert_protocol(event.protocol),
-                            total_len = event.total_len,
+                            pkt_len = event.total_len,
                             ttl = event.ttl,
                             src_ip = %to_ipaddr(event.src_ip, event.ip_family.to_owned()),
                             dst_ip = %to_ipaddr(event.dst_ip, 4),
@@ -51,7 +51,7 @@ pub async fn process_event(
                     _ => {
                         // Default log format (text format)
                         info!(
-                            "[{}][{}][{}] {}:{} -> {}:{} len={} ttl={}",
+                            "[{}][{}][{}] {}:{} -> {}:{} pkt_len={} ttl={}",
                             convert_direction(event.direction),
                             convert_protocol(event.protocol),
                             event.ip_family.as_str(),
