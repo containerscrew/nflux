@@ -4,8 +4,6 @@ use clap::{value_parser, Parser};
 use colored::Colorize;
 
 use crate::utils::set_default_iface;
-use clap::Parser;
-use colored::Colorize;
 
 #[derive(Parser, Debug)]
 #[clap(
@@ -138,8 +136,6 @@ impl fmt::Display for NfluxCliArgs {
     }
 }
 
-<<<<<<< HEAD
-=======
 // impl NfluxCliArgs {
 //     pub fn init() -> Result<Self> {
 //         let args = NfluxCliArgs::parse();
@@ -158,7 +154,6 @@ impl fmt::Display for NfluxCliArgs {
 //     }
 // }
 
->>>>>>> feat/filter-ports
 fn set_about() -> String {
     "eBPF network monitoring tool 🐝".red().italic().to_string()
 }
@@ -173,44 +168,14 @@ mod test {
 
     #[test]
     fn test_set_about() {
-<<<<<<< HEAD
-        assert_eq!(set_about(), "eBPF network monitoring tool 🐝".blue().to_string());
-=======
         assert_eq!(
             set_about(),
             "eBPF network monitoring tool 🐝".blue().to_string()
         );
->>>>>>> feat/filter-ports
     }
 
     #[test]
     fn test_print_help_message() {
         assert_eq!(print_help_message(), "Author: containerscrew \nWebsite: github.com/containerscrew/nflux\nLicense: GPL 3\nIssues: https://github.com/containerscrew/nflux/issues")
     }
-<<<<<<< HEAD
-
-    #[test]
-    fn test_nflux_cli_args_display() {
-        let args = NfluxCliArgs {
-            log_level: "info".to_string(),
-            log_format: "text".to_string(),
-            interface: "eth0".to_string(),
-            disable_egress: false,
-            disable_ingress: false,
-            disable_udp: false,
-            disable_icmp: false,
-            disable_tcp: false,
-            log_interval: 5,
-            disable_full_log: false,
-            with_timer: false,
-        };
-        assert_eq!(
-            format!("{}", args),
-            "log_level: info, log_format: text, interface: eth0, \
-             disable_egress: false, disable_ingress: false, disable_udp: false, \
-             disable_icmp: false, disable_tcp: false, log_interval: 5, disable_full_log: false"
-        );
-    }
-=======
->>>>>>> feat/filter-ports
 }
