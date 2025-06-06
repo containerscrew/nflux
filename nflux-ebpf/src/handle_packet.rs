@@ -88,6 +88,7 @@ pub fn handle_packet(
             let (src_port, dst_port) =
                 handle_ports(ctx, protocol, l2, IpFamily::Ipv4).unwrap_or((0, 0));
 
+            // Mount data into the TcEvent struct
             let event = TcEvent {
                 src_ip,
                 dst_ip,
@@ -99,6 +100,13 @@ pub fn handle_packet(
                 direction,
                 ip_family: IpFamily::Ipv4,
             };
+
+            // Sniff specific port
+            if tc_config.listen_port != 0
+                && (src_port != tc_config.listen_port && dst_port != tc_config.listen_port)
+            {
+                return Ok(TC_ACT_PIPE);
+            }
 
             unsafe {
                 log_connection(&event, *tc_config);
