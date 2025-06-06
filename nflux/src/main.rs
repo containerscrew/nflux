@@ -62,6 +62,7 @@ async fn main() {
         disable_tcp: is_true(cli.disable_tcp),
         log_interval: cli.log_interval,
         disable_full_log: is_true(cli.disable_full_log),
+        listen_port: cli.listen_port.unwrap_or(0), // Default to 0 if not provided
     };
 
     // Start nflux
