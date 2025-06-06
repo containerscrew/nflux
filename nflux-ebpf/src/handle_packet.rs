@@ -1,7 +1,6 @@
 use core::mem;
 
-use aya_ebpf::{bindings::TC_ACT_PIPE, programs::{TcContext}};
-use aya_log_ebpf::info;
+use aya_ebpf::{bindings::TC_ACT_PIPE, programs::TcContext};
 use network_types::{
     eth::EthHdr,
     ip::{IpProto, Ipv4Hdr, Ipv6Hdr},
@@ -101,6 +100,13 @@ pub fn handle_packet(
                 direction,
                 ip_family: IpFamily::Ipv4,
             };
+
+            // Sniff specific port
+            if tc_config.listen_port != 0
+                && (src_port != tc_config.listen_port && dst_port != tc_config.listen_port)
+            {
+                return Ok(TC_ACT_PIPE);
+            }
 
             unsafe {
                 log_connection(&event, *tc_config);

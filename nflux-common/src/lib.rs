@@ -11,7 +11,7 @@ pub struct Configmap {
     pub disable_tcp: u8,         // 0 = no, 1 = yes
     pub log_interval: u8,        // Log connection of same ip --> port every X seconds
     pub disable_full_log: u8,    // Disable full packet log
-    pub listen_ports: [u16; 16],  // Filter ports to sniff. Up to 16 ports.
+    pub listen_port: u16,        // Filter port to sniff.
 }
 
 #[repr(C)]

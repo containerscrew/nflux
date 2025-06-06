@@ -1,9 +1,9 @@
-use std::{fmt};
+use std::fmt;
+
+use clap::{value_parser, Parser};
+use colored::Colorize;
 
 use crate::utils::set_default_iface;
-use clap::Parser;
-use colored::Colorize;
-use anyhow::anyhow;
 
 #[derive(Parser, Debug)]
 #[clap(
@@ -58,13 +58,12 @@ pub struct NfluxCliArgs {
     pub disable_ingress: bool,
 
     #[arg(
-        long = "listen-ports",
-        help = "Filter which ports do you want to sniff.",
-        value_delimiter = ',',
-        num_args = 0..=16,
+        long = "listen-port",
+        help = "Filter which port do you want to sniff.",
+        value_parser = value_parser!(u16).range(1..=65535),
         required = false
     )]
-    pub listen_ports: Vec<u16>,
+    pub listen_port: Option<u16>,
 
     #[arg(
         long = "disable-udp",
@@ -169,35 +168,14 @@ mod test {
 
     #[test]
     fn test_set_about() {
-        assert_eq!(set_about(), "eBPF network monitoring tool 🐝".blue().to_string());
+        assert_eq!(
+            set_about(),
+            "eBPF network monitoring tool 🐝".blue().to_string()
+        );
     }
 
     #[test]
     fn test_print_help_message() {
         assert_eq!(print_help_message(), "Author: containerscrew \nWebsite: github.com/containerscrew/nflux\nLicense: GPL 3\nIssues: https://github.com/containerscrew/nflux/issues")
-    }
-
-    #[test]
-    fn test_nflux_cli_args_display() {
-        let args = NfluxCliArgs {
-            log_level: "info".to_string(),
-            log_format: "text".to_string(),
-            interface: "eth0".to_string(),
-            disable_egress: false,
-            disable_ingress: false,
-            disable_udp: false,
-            disable_icmp: false,
-            disable_tcp: false,
-            log_interval: 5,
-            disable_full_log: false,
-            with_timer: false,
-            filter_ports: todo!(),
-        };
-        assert_eq!(
-            format!("{}", args),
-            "log_level: info, log_format: text, interface: eth0, \
-             disable_egress: false, disable_ingress: false, disable_udp: false, \
-             disable_icmp: false, disable_tcp: false, log_interval: 5, disable_full_log: false"
-        );
     }
 }
