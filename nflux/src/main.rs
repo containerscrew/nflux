@@ -20,9 +20,7 @@ mod cli;
 #[tokio::main]
 async fn main() {
     // Parse cli args
-    // TODO: validate max listen-ports 
     let cli = NfluxCliArgs::parse();
-    
 
     // Start logger
     init_logger(LoggerConfig {
@@ -56,15 +54,6 @@ async fn main() {
         exit(1)
     }
 
- 
-
-    let mut listen_ports = [0u16; 16];
-    for (i, &port) in cli.listen_ports.iter().enumerate().take(16) {
-        listen_ports[i] = port as u16;
-    }
-
-    println!("{:?}", listen_ports.to_vec());
-
     // Prepare configmap data (data from user space to be processed in kernel space using eBPF maps)
     let configmap = Configmap {
         disable_private_ips: 1,                // Not implemented yet
@@ -73,7 +62,7 @@ async fn main() {
         disable_tcp: is_true(cli.disable_tcp),
         log_interval: cli.log_interval,
         disable_full_log: is_true(cli.disable_full_log),
-        listen_ports: listen_ports,
+        listen_port: cli.listen_port.unwrap_or(0), // Default to 0 if not provided
     };
 
     // Start nflux
