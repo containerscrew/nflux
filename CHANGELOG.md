@@ -1,11 +1,3 @@
-<!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
-**Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
-- [Changelog](#changelog)
-  - [[unreleased]](#unreleased)
-  - [[0.2.1] - 2025-03-27](#021---2025-03-27)
-  - [[0.2.0] - 2025-03-25](#020---2025-03-25)
-  - [[0.1.0] - 2025-03-24](#010---2025-03-24)
-<!-- END OF TOC -->
 # Changelog
 
 All notable changes to this project will be documented in this file.
@@ -473,6 +465,14 @@ Bump sysinfo from 0.35.1 to 0.35.2
 - Merge branch feat/filter-ports
 
 - Fix(cli): merge conflix cli.rs
+
+- Update CHANGELOG.md for release v0.3.0-beta.2
+
+- Feat(exclude-ports): new feature flag --exlude-ports from the logger)
+
+- Mtoc
+
+- Fix(install.sh): shebang and welcome message
 
 ## [0.2.1] - 2025-03-27
 
