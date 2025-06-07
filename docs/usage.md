@@ -5,7 +5,8 @@
   - [Sniffing (only) egress traffic](#sniffing-only-egress-traffic)
   - [Sniffing (only) ingress traffic](#sniffing-only-ingress-traffic)
   - [Packet logging](#packet-logging)
-- [Listen specific port](#listen-specific-port)
+  - [Listen specific port](#listen-specific-port)
+  - [Exclude ports from the log](#exclude-ports-from-the-log)
   - [Available procotols](#available-procotols)
   - [Enable timestmp in log output](#enable-timestmp-in-log-output)
 <!-- END OF TOC -->
