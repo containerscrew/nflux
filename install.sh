@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -e
 
 # Global vars
 INSTALLATION_PATH="/usr/local/bin/"
