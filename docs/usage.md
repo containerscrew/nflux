@@ -83,12 +83,19 @@ Or you can also change the `--log-interval`:
 ```shell
 sudo nflux --disable-full-log --log-inveral 3 # every 3 seconds
 ```
-# Listen specific port
+
+## Listen specific port
 
 Example, only listening port `3306`:
 
 ```shell
 sudo nflux --listen-port 3306
+```
+
+## Exclude ports from the log
+
+```shell
+sudo nflux --exclude-ports 22,443
 ```
 
 ## Available procotols

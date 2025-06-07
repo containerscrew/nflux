@@ -17,6 +17,7 @@ pub async fn start_nflux(
     disable_ingress: bool,
     configmap: Configmap,
     log_format: String,
+    exclude_ports: Option<Vec<u16>>,
 ) -> anyhow::Result<()> {
     // Load eBPF program
     let mut ebpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/nflux")))?;
@@ -42,7 +43,7 @@ pub async fn start_nflux(
 
     info!("listening on {}", interface);
 
-    tokio::spawn(async move { process_event(ring_buf, log_format).await });
+    tokio::spawn(async move { process_event(ring_buf, log_format, exclude_ports).await });
 
     let _ = wait_for_shutdown().await;
 

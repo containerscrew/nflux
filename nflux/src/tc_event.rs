@@ -24,6 +24,7 @@ fn to_ipaddr(ip: [u8; 16], ip_family: u8) -> IpAddr {
 pub async fn process_event(
     mut ring_buf: RingBuf<MapData>,
     log_format: String,
+    exclude_ports: Option<Vec<u16>>,
 ) -> Result<(), anyhow::Error> {
     loop {
         while let Some(event) = ring_buf.next() {
@@ -33,6 +34,13 @@ pub async fn process_event(
             // Make sure the data is the correct size
             if data.len() == std::mem::size_of::<TcEvent>() {
                 let event: &TcEvent = unsafe { &*(data.as_ptr() as *const TcEvent) };
+
+                // Exclude ports if specified
+                if let Some(ref ports) = exclude_ports {
+                    if ports.contains(&event.src_port) || ports.contains(&event.dst_port) {
+                        continue;
+                    }
+                }
 
                 match log_format.as_str() {
                     "json" => {
