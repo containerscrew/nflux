@@ -66,7 +66,6 @@ fn handle_ports(
     }
 }
 
-
 // Process the protocol before sending data to ebpf map
 // Handle flags --disable-tcp, --disable-udp, --disable-icmp
 fn is_protocol_enabled(protocol: IpProto, configmap: &Configmap) -> bool {
@@ -77,7 +76,6 @@ fn is_protocol_enabled(protocol: IpProto, configmap: &Configmap) -> bool {
         _ => true, // By default, allow other protocols
     }
 }
-
 
 pub fn handle_packet(
     ctx: &TcContext,
@@ -103,7 +101,6 @@ pub fn handle_packet(
             dst_ip[12..].copy_from_slice(&ipv4hdr.dst_addr);
             let total_len = u16::from_be_bytes(ipv4hdr.tot_len);
             let ttl = ipv4hdr.ttl;
-
 
             let (src_port, dst_port) =
                 handle_ports(ctx, protocol, l2, IpFamily::Ipv4).unwrap_or((0, 0));
