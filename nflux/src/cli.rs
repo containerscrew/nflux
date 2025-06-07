@@ -59,11 +59,21 @@ pub struct NfluxCliArgs {
 
     #[arg(
         long = "listen-port",
-        help = "Filter which port do you want to sniff.",
+        help = "Filter which port do you want to sniff. Affects both, src and dest ports",
         value_parser = value_parser!(u16).range(1..=65535),
         required = false
     )]
     pub listen_port: Option<u16>,
+
+    #[arg(
+        long = "exclude-ports",
+        help = "Exclude ports from the logger. For example, do not show logs for port 80 in the logs. Affects both, src and dest ports.",
+        value_parser = value_parser!(u16).range(1..=65535),
+        value_delimiter = ',',
+        num_args = 1..,
+        required = false
+    )]
+    pub exclude_port: Option<Vec<u16>>,
 
     #[arg(
         long = "disable-udp",

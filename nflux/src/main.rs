@@ -72,6 +72,7 @@ async fn main() {
         cli.disable_ingress,
         configmap,
         cli.log_format,
+        cli.exclude_port,
     )
     .await
     .expect("Failed to start nflux");
