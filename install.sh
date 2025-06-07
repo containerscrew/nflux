@@ -1,10 +1,13 @@
-#! /usr/env/bin bash
+#!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
 # Global vars
 INSTALLATION_PATH="/usr/local/bin/"
 BINARY_NAME="nflux"
+
+# Welcome message
+echo -e "Welcome to the $BINARY_NAME installation script! 🚀. \n Author: github.com/containerscrew"
 
 happyexit(){
   echo ""
