@@ -7,7 +7,7 @@ use network_types::{
     tcp::TcpHdr,
     udp::UdpHdr,
 };
-use nflux_common::{IpFamily, TcEvent};
+use nflux_common::{Configmap, IpFamily, TcEvent};
 
 use crate::{maps::TC_CONFIG, tc_event::log_connection};
 
@@ -66,6 +66,19 @@ fn handle_ports(
     }
 }
 
+
+// Process the protocol before sending data to ebpf map
+// Handle flags --disable-tcp, --disable-udp, --disable-icmp
+fn is_protocol_enabled(protocol: IpProto, configmap: &Configmap) -> bool {
+    match protocol {
+        IpProto::Tcp => configmap.disable_tcp == 0,
+        IpProto::Udp => configmap.disable_udp == 0,
+        IpProto::Icmp => configmap.disable_icmp == 0,
+        _ => true, // By default, allow other protocols
+    }
+}
+
+
 pub fn handle_packet(
     ctx: &TcContext,
     direction: u8,
@@ -77,13 +90,20 @@ pub fn handle_packet(
 
     match header {
         IpHeader::V4(ipv4hdr) => {
+            let protocol = ipv4hdr.proto;
+
+            // Skip logging if protocol is disabled
+            if !is_protocol_enabled(protocol, tc_config) {
+                return Ok(TC_ACT_PIPE);
+            }
+
             let mut src_ip = [0u8; 16];
             src_ip[12..].copy_from_slice(&ipv4hdr.src_addr); // header only has 32 bits (4ytes)
             let mut dst_ip = [0u8; 16];
             dst_ip[12..].copy_from_slice(&ipv4hdr.dst_addr);
             let total_len = u16::from_be_bytes(ipv4hdr.tot_len);
             let ttl = ipv4hdr.ttl;
-            let protocol = ipv4hdr.proto;
+
 
             let (src_port, dst_port) =
                 handle_ports(ctx, protocol, l2, IpFamily::Ipv4).unwrap_or((0, 0));
