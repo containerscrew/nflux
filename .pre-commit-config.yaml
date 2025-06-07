@@ -25,11 +25,11 @@ repos:
   #       entry: cargo test --locked --no-default-features
   #       language: system
   #       description: "Run cargo test with no default features"
-  # - repo: https://github.com/doublify/pre-commit-rust
-  #   rev: v1.0
-  #   hooks:
-  #     - id: fmt
-  #       args: ['--verbose', '--']
+  - repo: https://github.com/doublify/pre-commit-rust
+    rev: v1.0
+    hooks:
+      - id: fmt
+        args: ['--all', '--']
       # - id: cargo-check
       # - id: clippy
       #   args: ["--", "-D", "warnings", "-D", "unused-imports"]
