@@ -86,6 +86,7 @@ jobs:
         run: |
           rustup default stable
           cargo install git-cliff
+          cargo install mtoc
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -106,6 +107,7 @@ jobs:
           git config --global user.name 'containerscrew'
           git config --global user.email 'containerscrew@users.noreply.github.com'
           make generate-changelog
+          mtoc -e .target/ -e ./README.md
           git add CHANGELOG.md
           git commit -m "Update CHANGELOG.md for release ${{ env.TAG_NAME }}"
           git push origin main
