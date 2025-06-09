@@ -101,7 +101,7 @@ pub struct NfluxCliArgs {
 
     #[arg(
         long = "log-interval",
-        help = "Enable tcp protocol network monitoring. This flag is not used if you don't set --disable-full-log. [default: 5(seconds)]",
+        help = "How often same ip:dest port will be logged. This flag is not used if you don't set --disable-full-log. [default: 5(seconds)]",
         default_value_t = 5,
         required = false
     )]
