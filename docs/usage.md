@@ -8,7 +8,7 @@
   - [Listen specific port](#listen-specific-port)
   - [Exclude ports from the log](#exclude-ports-from-the-log)
   - [Available procotols](#available-procotols)
-  - [Enable timestmp in log output](#enable-timestmp-in-log-output)
+  - [Enable timestamp in log output](#enable-timestamp-in-log-output)
 <!-- END OF TOC -->
 # Usage
 
@@ -28,8 +28,8 @@ sudo nflux FLAGS
 
 By default, everything is enabled. Which means:
 
-- Egress traffic (ipv4 only by the moment)
-- Ingress traffic (ipv4 only by the moment)
+- Egress traffic
+- Ingress traffic
 - UDP/TCP/ICMP protocols
 - Full packet logging
 
@@ -52,7 +52,7 @@ sudo nflux --disable-ingress
 ## Sniffing (only) ingress traffic
 
 ```shell
-sudo nflux --enable-egress
+sudo nflux --disable-egress
 ```
 
 ## Packet logging
@@ -111,7 +111,7 @@ sudo nflux --disable-icmp
 sudo nflux --disable-tcp
 ```
 
-## Enable timestmp in log output
+## Enable timestamp in log output
 
 ```shell
 sufo nflux --disable-ingress --with-timer
