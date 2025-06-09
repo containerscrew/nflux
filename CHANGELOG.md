@@ -496,6 +496,16 @@ Bump sysinfo from 0.35.1 to 0.35.2
 
 - Change welcome messager install.sh
 
+- Update CHANGELOG.md for release v0.3.0-beta.4
+
+- Add mtoc in changelog release pipeline
+
+- Update docs/todo.md
+
+- Update mtoc in CHANGELOG.md
+
+- Fix(cli): help message in --log-inverval flag
+
 ## [0.2.1] - 2025-03-27
 
 - Update CHANGELOG.md for release v0.2.0
