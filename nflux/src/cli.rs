@@ -10,7 +10,7 @@ use crate::utils::set_default_iface;
     about = "nflux",
     version = env!("CARGO_PKG_VERSION"),
     author = "Containerscrew info@containerscrew.com",
-    about = set_about(),
+    about = print_about(),
     arg_required_else_help = false,
     after_help = print_help_message(),
 )]
@@ -164,7 +164,7 @@ impl fmt::Display for NfluxCliArgs {
 //     }
 // }
 
-fn set_about() -> String {
+fn print_about() -> String {
     "eBPF network monitoring tool 🐝".red().italic().to_string()
 }
 
