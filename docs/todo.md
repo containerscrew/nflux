@@ -4,3 +4,4 @@
 - Read the payload of the packet (for example, listening on port 3306 will print mysql selects if is not encrypted)
 - Calculate latency, dropped packets... and other interesting data.
 - Setup nflux to run in a container
+- Display PID for egress packet
