@@ -9,6 +9,7 @@
   - [Exclude ports from the log](#exclude-ports-from-the-log)
   - [Available procotols](#available-procotols)
   - [Enable timestamp in log output](#enable-timestamp-in-log-output)
+  - [Examples](#examples)
 <!-- END OF TOC -->
 # Usage
 
@@ -118,3 +119,10 @@ sufo nflux --disable-ingress --with-timer
 ```
 
 > Timestamp is disabled in the logger by default for brevity
+
+## Examples
+
+```shell
+sudo nflux --disable-full-log --log-interval 10 --exclude-ports 22 --disable-udp --with-timer
+sudo nflux --disable-egress --with-timer
+```
