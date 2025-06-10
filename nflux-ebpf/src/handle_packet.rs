@@ -1,6 +1,7 @@
 use core::mem;
 
 use aya_ebpf::{bindings::TC_ACT_PIPE, programs::TcContext};
+use aya_log_ebpf::info;
 use network_types::{
     eth::EthHdr,
     ip::{IpProto, Ipv4Hdr, Ipv6Hdr},
@@ -51,6 +52,16 @@ fn handle_ports(
             unsafe {
                 let src_port = u16::from_be((*tcphdr).source);
                 let dst_port = u16::from_be((*tcphdr).dest);
+                // let syn = (*tcphdr).syn();
+                // let ack = (*tcphdr).ack();
+                // let fin = (*tcphdr).fin();
+                // let rst = (*tcphdr).rst();
+
+                // let is_syn = syn != 0;
+                // let is_ack = ack != 0;
+                // let is_fin = fin != 0;
+                // let is_rst = rst != 0;
+
                 Ok((src_port, dst_port))
             }
         }
