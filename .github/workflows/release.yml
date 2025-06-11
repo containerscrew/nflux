@@ -57,10 +57,9 @@ jobs:
         run: |
           cargo +nightly build --release --locked
 
-
       - name: Package zip
         run: |
-          make package PLATFORM=${{ matrix.platform.release_for }}
+          make package PLATFORM=${{ matrix.platform.release_for }} TARGET=${{ matrix.platform.target }}
 
       - name: Release
         uses: softprops/action-gh-release@v2
