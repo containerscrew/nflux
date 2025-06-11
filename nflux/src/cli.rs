@@ -12,7 +12,7 @@ use crate::utils::set_default_iface;
     author = "Containerscrew info@containerscrew.com",
     about = print_about(),
     arg_required_else_help = false,
-    after_help = print_help_message(),
+    after_help = print_after_help_message(),
 )]
 pub struct NfluxCliArgs {
     #[arg(
@@ -168,7 +168,7 @@ fn print_about() -> String {
     "eBPF network monitoring tool 🐝".red().italic().to_string()
 }
 
-fn print_help_message() -> String {
+fn print_after_help_message() -> String {
     format!("Author: containerscrew \nWebsite: github.com/containerscrew/nflux\nLicense: GPL 3\nIssues: https://github.com/containerscrew/nflux/issues")
 }
 
