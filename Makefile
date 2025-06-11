@@ -11,7 +11,7 @@ mtoc: ## Create table of contents with mtoc
 	mtoc
 
 package: ## Package binary with zip
-	zip -j nflux-$(PLATFORM).zip target/release/nflux
+	zip -j nflux-$(PLATFORM)-$(TARGET).zip target/release/nflux
 
 pre-commit-install: ## Install pre-commit
 	pre-commit install
