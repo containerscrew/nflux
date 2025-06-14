@@ -1,7 +1,7 @@
 <!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
 **Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
 - [Changelog](#changelog)
-  - [[unreleased]](#unreleased)
+  - [[0.4.0] - 2025-06-14](#040---2025-06-14)
   - [[0.2.1] - 2025-03-27](#021---2025-03-27)
   - [[0.2.0] - 2025-03-25](#020---2025-03-25)
   - [[0.1.0] - 2025-03-24](#010---2025-03-24)
@@ -10,7 +10,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [0.4.0] - 2025-06-14
 
 - Update CHANGELOG.md for release v0.2.1
 
@@ -505,6 +505,72 @@ Bump sysinfo from 0.35.1 to 0.35.2
 - Update mtoc in CHANGELOG.md
 
 - Fix(cli): help message in --log-inverval flag
+
+- Update CHANGELOG.md for release v0.3.0-beta.5
+
+- Bump clap from 4.5.39 to 4.5.40
+
+Bumps [clap](https://github.com/clap-rs/clap) from 4.5.39 to 4.5.40.
+- [Release notes](https://github.com/clap-rs/clap/releases)
+- [Changelog](https://github.com/clap-rs/clap/blob/master/CHANGELOG.md)
+- [Commits](https://github.com/clap-rs/clap/compare/clap_complete-v4.5.39...clap_complete-v4.5.40)
+
+---
+updated-dependencies:
+- dependency-name: clap
+  dependency-version: 4.5.40
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+- Merge pull request #61 from containerscrew/dependabot/cargo/clap-4.5.40
+
+Bump clap from 4.5.39 to 4.5.40
+
+- Fix(doc): typo in usage.md
+
+- Update doco.md
+
+- Feat(doc): add new examples section
+
+- Add TCP state examples
+
+- Handle TCP state flags
+
+- Refactor(cli): about message
+
+- Update todo.md
+
+- Fix pipeline zip package
+
+- Change after help message
+
+- Bump libc from 0.2.172 to 0.2.173
+
+Bumps [libc](https://github.com/rust-lang/libc) from 0.2.172 to 0.2.173.
+- [Release notes](https://github.com/rust-lang/libc/releases)
+- [Changelog](https://github.com/rust-lang/libc/blob/0.2.173/CHANGELOG.md)
+- [Commits](https://github.com/rust-lang/libc/compare/0.2.172...0.2.173)
+
+---
+updated-dependencies:
+- dependency-name: libc
+  dependency-version: 0.2.173
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+- Merge pull request #62 from containerscrew/dependabot/cargo/libc-0.2.173
+
+Bump libc from 0.2.172 to 0.2.173
+
+- Implement pid and process name for egress traffic
+
+- New v0.4.0 & fix unused imports
 
 ## [0.2.1] - 2025-03-27
 
