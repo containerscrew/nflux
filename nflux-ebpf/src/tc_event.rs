@@ -14,6 +14,7 @@ pub unsafe fn log_connection(event: &TcEvent, configmap: Configmap) {
         // Get current time
         let current_time = bpf_ktime_get_ns();
 
+        // TODO: ActiveConnectionKey should include pid, protocol...
         let key = ActiveConnectionKey {
             port: if event.direction == 1 {
                 event.src_port
@@ -30,7 +31,7 @@ pub unsafe fn log_connection(event: &TcEvent, configmap: Configmap) {
         // If the connection (src_port, dst_ip) is already tracked, return
         if let Some(last_log_time) = ACTIVE_CONNECTIONS.get(&key) {
             // Check if the timestamp is less than 10 seconds
-            if current_time - *last_log_time < configmap.log_interval as u64 * 1_000_000_000 {
+            if current_time - *last_log_time < configmap.log_interval {
                 return;
             }
         }

@@ -60,7 +60,7 @@ async fn main() {
         disable_udp: is_true(cli.disable_udp), // 0 = no, 1 = yes
         disable_icmp: is_true(cli.disable_icmp),
         disable_tcp: is_true(cli.disable_tcp),
-        log_interval: cli.log_interval,
+        log_interval: cli.log_interval as u64 * 1_000_000_000,
         disable_full_log: is_true(cli.disable_full_log),
         listen_port: cli.listen_port.unwrap_or(0), // Default to 0 if not provided
     };

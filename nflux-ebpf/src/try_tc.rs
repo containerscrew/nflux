@@ -1,12 +1,13 @@
 use core::mem;
 
+use crate::handle_packet::{handle_packet, IpHeader};
 use aya_ebpf::{bindings::TC_ACT_PIPE, programs::TcContext};
+use network_types::arp::ArpHdr;
+use network_types::eth::EtherType::Arp;
 use network_types::{
     eth::{EthHdr, EtherType},
     ip::{Ipv4Hdr, Ipv6Hdr},
 };
-
-use crate::handle_packet::{handle_packet, IpHeader};
 
 #[inline]
 fn ptr_at<T>(ctx: &TcContext, offset: usize) -> Result<*const T, ()> {
@@ -66,7 +67,12 @@ pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
             }
 
             // If it's ARP (EtherType 0x0806), just let it pass
-            EtherType::Arp => return Ok(TC_ACT_PIPE),
+            EtherType::Arp => {
+                // let _: ArpHdr = ctx.load(EthHdr::LEN).map_err(|_| ())?;
+                // Handle ARP packet, which is typically used for address resolution
+
+                return Ok(TC_ACT_PIPE);
+            }
 
             // Unknown EtherType, maybe the real IP header is already at offset 0 (e.g. in a tunnel)
             _ => {

@@ -4,7 +4,7 @@ use aya::maps::{MapData, RingBuf};
 use nflux_common::TcEvent;
 use tracing::info;
 
-use crate::utils::{convert_direction, convert_protocol};
+use crate::utils::{convert_direction, convert_protocol, get_process_name};
 
 fn _format_mac(mac: &[u8; 6]) -> String {
     mac.iter()
@@ -41,6 +41,23 @@ pub async fn process_event(
                         continue;
                     }
                 }
+                let mut msg = format!(
+                    "[{}][{}][{}] {}:{} -> {}:{} pkt_len={} ttl={}",
+                    convert_direction(event.direction),
+                    convert_protocol(event.protocol),
+                    event.ip_family.as_str(),
+                    to_ipaddr(event.src_ip, event.ip_family.to_owned()),
+                    event.src_port,
+                    to_ipaddr(event.dst_ip, event.ip_family.to_owned()),
+                    event.dst_port,
+                    event.total_len,
+                    event.ttl,
+                );
+
+                if event.direction == 1 && event.pid != 0 {
+                    msg.push_str(format!(" pid={}", event.pid).as_str());
+                    msg.push_str(format!(" process={}", get_process_name(event.pid)).as_str())
+                }
 
                 match log_format.as_str() {
                     "json" => {
@@ -58,18 +75,7 @@ pub async fn process_event(
                     }
                     _ => {
                         // Default log format (text format)
-                        info!(
-                            "[{}][{}][{}] {}:{} -> {}:{} pkt_len={} ttl={}",
-                            convert_direction(event.direction),
-                            convert_protocol(event.protocol),
-                            event.ip_family.as_str(),
-                            to_ipaddr(event.src_ip, event.ip_family.to_owned()),
-                            event.src_port,
-                            to_ipaddr(event.dst_ip, event.ip_family.to_owned()),
-                            event.dst_port,
-                            event.total_len,
-                            event.ttl,
-                        );
+                        info!("{}", msg);
                     }
                 }
             }

@@ -1,5 +1,6 @@
 use core::mem;
 
+use aya_ebpf::helpers::bpf_get_current_pid_tgid;
 use aya_ebpf::{bindings::TC_ACT_PIPE, programs::TcContext};
 use aya_log_ebpf::info;
 use network_types::{
@@ -127,6 +128,11 @@ pub fn handle_packet(
                 protocol: protocol as u8,
                 direction,
                 ip_family: IpFamily::Ipv4,
+                pid: if direction == 1 {
+                    bpf_get_current_pid_tgid() >> 32
+                } else {
+                    0
+                },
             };
 
             // Sniff specific port
@@ -159,6 +165,11 @@ pub fn handle_packet(
                 protocol: proto as u8,
                 direction,
                 ip_family: IpFamily::Ipv6,
+                pid: if direction == 1 {
+                    bpf_get_current_pid_tgid() >> 32
+                } else {
+                    0
+                },
             };
 
             unsafe {
