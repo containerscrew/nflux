@@ -2,7 +2,6 @@ use core::mem;
 
 use aya_ebpf::helpers::bpf_get_current_pid_tgid;
 use aya_ebpf::{bindings::TC_ACT_PIPE, programs::TcContext};
-use aya_log_ebpf::info;
 use network_types::{
     eth::EthHdr,
     ip::{IpProto, Ipv4Hdr, Ipv6Hdr},

@@ -2,8 +2,6 @@ use core::mem;
 
 use crate::handle_packet::{handle_packet, IpHeader};
 use aya_ebpf::{bindings::TC_ACT_PIPE, programs::TcContext};
-use network_types::arp::ArpHdr;
-use network_types::eth::EtherType::Arp;
 use network_types::{
     eth::{EthHdr, EtherType},
     ip::{Ipv4Hdr, Ipv6Hdr},
