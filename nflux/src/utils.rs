@@ -24,7 +24,7 @@ pub fn set_default_iface() -> String {
     match get_default_interface_name() {
         Some(iface) => {
             return iface
-        },
+        }
         None => {
             return "No default interface found. Are you connected? Try: $ nflux netrace -i iface-name".to_string()
         }
@@ -103,7 +103,7 @@ pub fn _get_service_name(port: u16, proto: &'static str) -> String {
     }
 }
 
-pub fn _get_process_name(pid: u32) -> String {
+pub fn get_process_name(pid: u64) -> String {
     let mut s = System::new_all();
 
     // Is this causing overhead?
