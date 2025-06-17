@@ -14,8 +14,10 @@ pub unsafe fn log_connection(event: &TcEvent, configmap: Configmap) {
         // Get current time
         let current_time = bpf_ktime_get_ns();
 
-        // TODO: ActiveConnectionKey should include pid, protocol...
         let key = ActiveConnectionKey {
+            pid: event.pid,
+            protocol: event.protocol,
+            direction: event.direction,
             port: if event.direction == 1 {
                 event.src_port
             } else {

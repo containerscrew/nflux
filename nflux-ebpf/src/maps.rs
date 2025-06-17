@@ -6,10 +6,11 @@ use nflux_common::Configmap;
 
 // Define a struct for the key: (pid, destination IP)
 #[repr(C)]
-#[derive(Clone, Copy, Hash)]
-// If egress port = src_port ip = dst_ip
-// If ingress port = dst_port ip = src_ip
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
 pub struct ActiveConnectionKey {
+    pub pid: u64,
+    pub protocol: u8,
+    pub direction: u8,
     pub port: u16,
     pub ip: [u8; 16],
 }
