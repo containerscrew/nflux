@@ -34,7 +34,7 @@ interfaces, allowing us to obtain networking data at a very low level.
 Quick installation:
 
 ```shell
-curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/nflux/main/build/install.sh | sh
+curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/nflux/main/scripts/install.sh | sh
 ```
 
 Read the [installation](./docs/installation.md) doc.

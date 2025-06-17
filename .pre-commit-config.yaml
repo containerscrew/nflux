@@ -2,13 +2,13 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
-      -  id: check-byte-order-marker
-      -  id: check-case-conflict
-      -  id: check-merge-conflict
-      -  id: check-symlinks
-      -  id: end-of-file-fixer
-      -  id: mixed-line-ending
-      -  id: trailing-whitespace
+      - id: fix-byte-order-marker
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: trailing-whitespace
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.18.0
     hooks:
@@ -29,15 +29,24 @@ repos:
     rev: v1.0
     hooks:
       - id: fmt
-        args: ['--all', '--']
+        args: [ '--all', '--' ]
       # - id: cargo-check
       # - id: clippy
       #   args: ["--", "-D", "warnings", "-D", "unused-imports"]
-#  - repo: local
-#    hooks:
-#      - id: git-cliff
-#        name: "CHANGELOG generator"
-#        entry: git cliff --output CHANGELOG.md
-#        language: system
-#        description: "Generate a CHANGELOG.md file using git-cliff"
-#        pass_filenames: false
+  #  - repo: local
+  #    hooks:
+  #      - id: git-cliff
+  #        name: "CHANGELOG generator"
+  #        entry: git cliff --output CHANGELOG.md
+  #        language: system
+  #        description: "Generate a CHANGELOG.md file using git-cliff"
+  #        pass_filenames: false
+
+  - repo: local
+    hooks:
+      - id: check-cargo-version-tag
+        name: "Check Git tag matches Cargo.toml version"
+        entry: ./scripts/check-version-tag.sh
+        language: script
+        pass_filenames: false
+        stages: [ pre-push ]
