@@ -75,6 +75,8 @@ pub async fn process_event(
                             dst_ip = %to_ipaddr(event.dst_ip, 4),
                             src_port = event.src_port,
                             dst_port = event.dst_port,
+                            pid = event.pid,
+                            process = %get_process_name(event.pid),
                         );
                     }
                     _ => {

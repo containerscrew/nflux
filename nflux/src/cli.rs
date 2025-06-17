@@ -67,7 +67,7 @@ pub struct NfluxCliArgs {
 
     #[arg(
         long = "exclude-ports",
-        help = "Exclude ports from the logger. For example, do not show logs for port 80 in the logs. Affects both, src and dest ports.",
+        help = "Exclude ports from the logger. For example, do not show logs for port 80 in the log. Affects both, src and dest ports.",
         value_parser = value_parser!(u16).range(1..=65535),
         value_delimiter = ',',
         num_args = 1..,
@@ -101,7 +101,7 @@ pub struct NfluxCliArgs {
 
     #[arg(
         long = "log-interval",
-        help = "How often same ip:dest port will be logged. This flag is not used if you don't set --disable-full-log. [default: 5(seconds)]",
+        help = "How often same ip,port,pid,protocol will be logged. This flag is not used if you don't set --disable-full-log.",
         default_value_t = 5,
         required = false
     )]
