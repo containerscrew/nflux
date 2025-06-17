@@ -716,7 +716,7 @@ checksum = "f2df15b1cb023b9d205ae287d5dbe74510ae4d62b5131ceec516f4913ed05230"
 
 [[package]]
 name = "nflux"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "anyhow",
  "aya",
@@ -731,6 +731,7 @@ dependencies = [
  "dns-lookup",
  "libc",
  "nflux-common",
+ "serde_json",
  "sysinfo",
  "tokio",
  "tracing",
