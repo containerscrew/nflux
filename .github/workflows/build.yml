@@ -58,4 +58,4 @@ jobs:
       - name: Test package zip
         run: |
           TAG_NAME=$(echo "${{ github.ref }}" | sed 's|.*/||')
-          zip -j aws-sso-rs-${{ matrix.platform.release_for }}-${{ env.TAG_NAME }}.zip target/${{ matrix.platform.target}}/release/aws-sso-rs
+          zip -j nflux-${{ matrix.platform.release_for }}-${{ env.TAG_NAME }}.zip target/${{ matrix.platform.target}}/release/nflux
