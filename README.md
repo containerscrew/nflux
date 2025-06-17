@@ -17,10 +17,15 @@
 [![GitHub Releases Stats](https://img.shields.io/github/downloads/containerscrew/nflux/total.svg?logo=github)](https://somsubhra.github.io/github-release-stats/?username=containerscrew&repository=nflux)
 ---
 <p align="center">
-    <h3 align="center">$ nflux </h3>
+    <h3 align="center">$ nflux --disable-ingress --disable-udp </h3>
     <img src="./examples/example.png" alt="example"/>
 </p>
 
+---
+<p align="center">
+    <h3 align="center">$ nflux --disable-ingress --listen-port 3306 </h3>
+    <img src="./examples/example2.png" alt="example"/>
+</p>
 ---
 
 # What is nflux?
