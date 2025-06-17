@@ -5,9 +5,9 @@ use aya::{
     programs::{tc, SchedClassifier, TcAttachType},
     Ebpf,
 };
-use aya_log::EbpfLogger;
 use nflux_common::Configmap;
-use tracing::{debug, error, info, warn};
+use tokio::sync::watch;
+use tracing::{debug, error, info};
 
 use super::tc_event::process_event;
 use crate::utils::wait_for_shutdown;
@@ -22,11 +22,6 @@ pub async fn start_nflux(
 ) -> anyhow::Result<()> {
     // Load eBPF program
     let mut ebpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/nflux")))?;
-
-    if let Err(e) = EbpfLogger::init(&mut ebpf) {
-        // This can happen if you remove all log statements from your eBPF program.
-        warn!("failed to initialize eBPF logger: {}", e);
-    }
 
     try_traffic_control(
         &mut ebpf,
@@ -44,9 +39,19 @@ pub async fn start_nflux(
 
     info!("listening on {}", interface);
 
-    tokio::spawn(async move { process_event(ring_buf, log_format, exclude_ports).await });
+    let (shutdown_tx, shutdown_rx) = watch::channel(false);
 
-    let _ = wait_for_shutdown().await;
+    let handle = tokio::spawn(async move {
+        if let Err(e) = process_event(ring_buf, log_format, exclude_ports, shutdown_rx).await {
+            error!("process_event failed: {:?}", e);
+        }
+    });
+
+    wait_for_shutdown().await?;
+
+    let _ = shutdown_tx.send(true);
+
+    handle.await?;
 
     Ok(())
 }

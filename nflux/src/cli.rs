@@ -169,7 +169,7 @@ fn print_about() -> String {
 }
 
 fn print_after_help_message() -> String {
-    format!("Author: containerscrew \nWebsite: github.com/containerscrew/nflux\nLicense: GPL 3\nIssues: https://github.com/containerscrew/nflux/issues")
+    format!("Author: containerscrew \nWebsite: github.com/containerscrew/nflux\nLicense: GPL 3\nIssues: github.com/containerscrew/nflux/issues")
 }
 
 #[cfg(test)]
@@ -179,13 +179,13 @@ mod test {
     #[test]
     fn test_set_about() {
         assert_eq!(
-            set_about(),
-            "eBPF network monitoring tool 🐝".blue().to_string()
+            print_about(),
+            "eBPF network monitoring tool 🐝".red().italic().to_string()
         );
     }
 
     #[test]
     fn test_print_help_message() {
-        assert_eq!(print_help_message(), "Author: containerscrew \nWebsite: github.com/containerscrew/nflux\nLicense: GPL 3\nIssues: https://github.com/containerscrew/nflux/issues")
+        assert_eq!(print_after_help_message(), "Author: containerscrew \nWebsite: github.com/containerscrew/nflux\nLicense: GPL 3\nIssues: github.com/containerscrew/nflux/issues")
     }
 }

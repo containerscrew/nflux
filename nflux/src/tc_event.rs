@@ -2,6 +2,7 @@ use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
 use aya::maps::{MapData, RingBuf};
 use nflux_common::TcEvent;
+use tokio::sync::watch;
 use tracing::info;
 
 use crate::utils::{convert_direction, convert_protocol, get_process_name};
@@ -25,22 +26,25 @@ pub async fn process_event(
     mut ring_buf: RingBuf<MapData>,
     log_format: String,
     exclude_ports: Option<Vec<u16>>,
+    mut shutdown: watch::Receiver<bool>,
 ) -> Result<(), anyhow::Error> {
     loop {
+        if *shutdown.borrow() {
+            break;
+        }
+
         while let Some(event) = ring_buf.next() {
-            // Get the data from the event
             let data = event.as_ref();
 
-            // Make sure the data is the correct size
             if data.len() == std::mem::size_of::<TcEvent>() {
                 let event: &TcEvent = unsafe { &*(data.as_ptr() as *const TcEvent) };
 
-                // Exclude ports if specified
                 if let Some(ref ports) = exclude_ports {
                     if ports.contains(&event.src_port) || ports.contains(&event.dst_port) {
                         continue;
                     }
                 }
+
                 let mut msg = format!(
                     "[{}][{}][{}] {}:{} -> {}:{} pkt_len={} ttl={}",
                     convert_direction(event.direction),
@@ -54,9 +58,9 @@ pub async fn process_event(
                     event.ttl,
                 );
 
-                if event.direction == 1 && event.pid != 0 {
+                if event.direction == 1 {
                     msg.push_str(format!(" pid={}", event.pid).as_str());
-                    msg.push_str(format!(" process={}", get_process_name(event.pid)).as_str())
+                    msg.push_str(format!(" process={}", get_process_name(event.pid)).as_str());
                 }
 
                 match log_format.as_str() {
@@ -74,14 +78,23 @@ pub async fn process_event(
                         );
                     }
                     _ => {
-                        // Default log format (text format)
                         info!("{}", msg);
                     }
                 }
             }
         }
-        tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+
+        tokio::select! {
+            _ = tokio::time::sleep(std::time::Duration::from_millis(100)) => {},
+            _ = shutdown.changed() => {
+                if *shutdown.borrow() {
+                    break;
+                }
+            }
+        }
     }
+
+    Ok(())
 }
 
 #[cfg(test)]
