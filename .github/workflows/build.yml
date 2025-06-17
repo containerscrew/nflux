@@ -55,6 +55,7 @@ jobs:
       - name: Run build
         run: |
           cargo +nightly build --release --package nflux --locked
+
       - name: Test package zip
         run: |
           TAG_NAME=$(echo "${{ github.ref }}" | sed 's|.*/||')

@@ -117,7 +117,7 @@ pub fn get_process_name(pid: u64) -> String {
                 .trim_matches('"')
                 .to_string()
         }
-        None => "nodata".to_string(),
+        None => "notfound".to_string(),
     }
 }
 
