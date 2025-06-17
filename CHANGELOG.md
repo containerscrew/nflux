@@ -1,6 +1,7 @@
 <!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
 **Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
 - [Changelog](#changelog)
+  - [[0.5.0] - 2025-06-17](#050---2025-06-17)
   - [[0.4.0] - 2025-06-14](#040---2025-06-14)
   - [[0.2.1] - 2025-03-27](#021---2025-03-27)
   - [[0.2.0] - 2025-03-25](#020---2025-03-25)
@@ -9,6 +10,39 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+
+## [0.5.0] - 2025-06-17
+
+- Update CHANGELOG.md for release v0.4.0
+
+- Fix(install.sh): relocate install.sh and fix script
+
+- Fix build pipeline
+
+- Improve gracefull shutdown & update log egress event
+
+- Bump libc from 0.2.173 to 0.2.174
+
+Bumps [libc](https://github.com/rust-lang/libc) from 0.2.173 to 0.2.174.
+- [Release notes](https://github.com/rust-lang/libc/releases)
+- [Changelog](https://github.com/rust-lang/libc/blob/0.2.174/CHANGELOG.md)
+- [Commits](https://github.com/rust-lang/libc/compare/0.2.173...0.2.174)
+
+---
+updated-dependencies:
+- dependency-name: libc
+  dependency-version: 0.2.174
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+- Merge pull request #63 from containerscrew/dependabot/cargo/libc-0.2.174
+
+Bump libc from 0.2.173 to 0.2.174
+
+- Fix release pipeline
 
 ## [0.4.0] - 2025-06-14
 
