@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 set -e
 
@@ -7,7 +7,8 @@ INSTALLATION_PATH="/usr/local/bin/"
 BINARY_NAME="nflux"
 
 # Welcome message
-echo -e "Welcome to the $BINARY_NAME installation script! 🚀. \nAuthor: github.com/containerscrew"
+echo "Welcome to the $BINARY_NAME installation script! 🚀."
+echo "Author: github.com/containerscrew"
 
 happyexit(){
   echo ""
@@ -56,8 +57,8 @@ download_release() {
   LATEST_VERSION=$(curl -s https://api.github.com/repos/containerscrew/$BINARY_NAME/releases/latest | jq -r ".name")
   if [ -z "$1" ]; then VERSION=$LATEST_VERSION; else VERSION=$1; fi
 
-  printf "\033[0;32m[info] - Downloading version: ${VERSION}/$BINARY_NAME-${OS}-${cli_arch}.zip \033[0m\n"
-  curl -L --fail --remote-name-all https://github.com/containerscrew/$BINARY_NAME/releases/download/"${VERSION}"/$BINARY_NAME-"${OS}"-"${cli_arch}".zip -o /tmp/$BINARY_NAME.zip
+  printf "\033[0;32m[info] - Downloading version: ${VERSION}/$BINARY_NAME-${OS}-${cli_arch}-${VERSION}.zip \033[0m\n"
+  curl -L --fail --remote-name-all https://github.com/containerscrew/$BINARY_NAME/releases/download/"${VERSION}"/$BINARY_NAME-${OS}-${cli_arch}-${VERSION}.zip -o /tmp/$BINARY_NAME.zip
   unzip -o /tmp/$BINARY_NAME.zip -d /tmp/
 }
 

@@ -25,14 +25,16 @@
 
 # What is nflux?
 
-Nflux is an [`eBPF`](./docs/what_is_ebpf.md)-based tool that monitors `incoming/outgoing` traffic on a Linux system by attaching a `TC (Traffic Control)` program using eBPF technology. It can be attached to both physical and virtual interfaces, allowing us to obtain networking data at a very low level.
+Nflux is an [`eBPF`](./docs/what_is_ebpf.md)-based tool that monitors `incoming/outgoing` traffic on a Linux system by
+attaching a `TC (Traffic Control)` program using eBPF technology. It can be attached to both physical and virtual
+interfaces, allowing us to obtain networking data at a very low level.
 
 # Installation
 
 Quick installation:
 
 ```shell
-curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/nflux/main/install.sh | sh
+curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/nflux/main/build/install.sh | sh
 ```
 
 Read the [installation](./docs/installation.md) doc.

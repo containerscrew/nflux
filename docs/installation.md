@@ -8,15 +8,16 @@
   - [From source](#from-source)
   - [Uninstall](#uninstall)
 <!-- END OF TOC -->
+
 # Compatibility
 
 **Nflux has been created/tested in:**
 
-|   OS    | ARM64 | x86_64 | Kernel version |
-|---------|------|------|------|
-| Linux fedora 41    | ✅    | ✅  | `6.13.7-200.fc41.x86_64 ` |
-| Linux ubuntu 24.10-server   | ✅    | ✅  | `6.11.0-19-generic ` |
-| Linux debian 12   | ✅    | ✅  | `6.1.0-35-cloud-arm64` |
+| OS                        | ARM64 | x86_64 | Kernel version            |
+|---------------------------|-------|--------|---------------------------|
+| Linux fedora 41           | ✅     | ✅      | `6.13.7-200.fc41.x86_64 ` |
+| Linux ubuntu 24.10-server | ✅     | ✅      | `6.11.0-19-generic `      |
+| Linux debian 12           | ✅     | ✅      | `6.1.0-35-cloud-arm64`    |
 
 > [!TIP]
 > If you want to try nflux on your Mac OSX, check out the ['Using Mac OSX section' in local dev doc](./local_dev.md).
@@ -25,22 +26,22 @@
 
 ## Supported Platforms
 
-| Arch    | arm64 | x86_64 |
-|---------|------|------|
-| linux   | ✅    | ✅  |
+| Arch  | arm64 | x86_64 |
+|-------|-------|--------|
+| linux | ✅     | ✅      |
 
 > Remember: `eBPF` is native for Linux (I think they are implementing it in Windows)
 
 ## Install latest version
 
 ```shell
-curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/nflux/main/install.sh | sh
+curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/nflux/main/build/install.sh | sh
 ```
 
 ## Install specific version
 
 ```shell
-curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/nflux/main/install.sh | sh -s -- -v "v0.2.0"
+curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/nflux/main/build/install.sh | sh -s -- -v "v0.2.0"
 ```
 
 ## From source
