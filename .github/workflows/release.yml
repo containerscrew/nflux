@@ -58,7 +58,7 @@ jobs:
 
       - name: Package zip
         run: |
-          zip -j nflux-${{ matrix.platform.release_for }}-${{ env.TAG_NAME }}.zip target/${{ matrix.platform.target}}/release/aws-sso-rs
+          zip -j nflux-${{ matrix.platform.release_for }}-${{ env.TAG_NAME }}.zip target/release/nflux
 
       - name: Release
         uses: softprops/action-gh-release@v2
