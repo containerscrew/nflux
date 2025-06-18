@@ -143,6 +143,13 @@ Parse `dst_ip` using `jq`:
 
 ```shell
 cat /tmp/nflux.log | jq -r '.dst_ip'
+jq -r '.dst_ip' /tmp/nflux.log | sort | uniq
+```
+
+Interactive:
+
+```shell
+tail -f /tmp/nflux.log | jq -r '.dst_ip'
 ```
 
 ## Examples
