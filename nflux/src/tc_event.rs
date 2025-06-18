@@ -5,7 +5,7 @@ use nflux_common::TcEvent;
 use tokio::sync::watch;
 use tracing::info;
 
-use crate::utils::{convert_direction, convert_protocol, get_process_name};
+use crate::utils::{convert_direction, convert_protocol};
 
 fn _format_mac(mac: &[u8; 6]) -> String {
     mac.iter()
@@ -57,12 +57,11 @@ pub async fn process_event(
                     event.total_len,
                     event.ttl,
                 );
-
-                if event.direction == 1 {
-                    msg.push_str(format!(" pid={}", event.pid).as_str());
-                    msg.push_str(format!(" process={}", get_process_name(event.pid)).as_str());
+                
+                if convert_protocol(event.protocol) == "tcp" {
+                    msg.push_str(&format!(" tcp_flags={}", event.tcp_flags));
                 }
-
+                
                 match log_format.as_str() {
                     "json" => {
                         info!(
@@ -75,8 +74,6 @@ pub async fn process_event(
                             dst_ip = %to_ipaddr(event.dst_ip, 4),
                             src_port = event.src_port,
                             dst_port = event.dst_port,
-                            pid = if event.direction == 1 { event.pid } else { 0 },
-                            process = if event.direction ==1 { get_process_name(event.pid) } else { "N/A".to_string() },
                         );
                     }
                     _ => {
