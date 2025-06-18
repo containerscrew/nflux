@@ -6,7 +6,7 @@ use std::{
 use default_net::interface::get_default_interface_name;
 use dns_lookup::lookup_addr;
 use libc::{c_char, c_int, getservbyport, ntohs, servent, setrlimit};
-use nflux_common::utils::is_private_ip;
+use nflux_common::{utils::is_private_ip, TcpFlags};
 use sysinfo::{Pid, System};
 use tokio::signal;
 use tracing::{debug, warn};
@@ -22,12 +22,9 @@ pub fn check_is_root_user(uid: u32) -> Result<(), String> {
 
 pub fn set_default_iface() -> String {
     match get_default_interface_name() {
-        Some(iface) => {
-            return iface
-        }
-        None => {
-            return "No default interface found. Are you connected? Try: $ nflux netrace -i iface-name".to_string()
-        }
+        Some(iface) => iface,
+        None => "No default interface found. Are you connected? Try: $ nflux netrace -i iface-name"
+            .to_string(),
     }
 }
 
@@ -50,6 +47,37 @@ pub async fn wait_for_shutdown() -> anyhow::Result<()> {
     ctrl_c.await?;
     warn!("You press Ctrl-C, shutting down nflux...");
     Ok(())
+}
+
+pub fn format_tcp_flags(flags: TcpFlags) -> String {
+    let mut out = String::from("");
+    let mut first = true;
+
+    if flags.syn != 0 {
+        out.push_str("SYN");
+        first = false;
+    }
+    if flags.ack != 0 {
+        if !first {
+            out.push_str(",");
+        }
+        out.push_str("ACK");
+        first = false;
+    }
+    if flags.fin != 0 {
+        if !first {
+            out.push_str(",");
+        }
+        out.push_str("FIN");
+        first = false;
+    }
+    if flags.rst != 0 {
+        if !first {
+            out.push_str(",");
+        }
+        out.push_str("RST");
+    }
+    out
 }
 
 pub fn _lookup_address(ip: u32) -> String {

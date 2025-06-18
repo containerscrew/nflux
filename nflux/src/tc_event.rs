@@ -5,7 +5,7 @@ use nflux_common::TcEvent;
 use tokio::sync::watch;
 use tracing::info;
 
-use crate::utils::{convert_direction, convert_protocol};
+use crate::utils::{convert_direction, convert_protocol, format_tcp_flags};
 
 fn _format_mac(mac: &[u8; 6]) -> String {
     mac.iter()
@@ -13,7 +13,6 @@ fn _format_mac(mac: &[u8; 6]) -> String {
         .collect::<Vec<_>>()
         .join(":")
 }
-
 fn to_ipaddr(ip: [u8; 16], ip_family: u8) -> IpAddr {
     match ip_family {
         4 => IpAddr::V4(Ipv4Addr::new(ip[12], ip[13], ip[14], ip[15])),
@@ -59,7 +58,7 @@ pub async fn process_event(
                 );
 
                 if convert_protocol(event.protocol) == "tcp" {
-                    msg.push_str(&format!(" tcp_flags={}", event.tcp_flags));
+                    msg.push_str(&format!(" tcp_flags={}", format_tcp_flags(event.tcp_flags)));
                 }
 
                 match log_format.as_str() {
