@@ -60,7 +60,7 @@ fn handle_ports(
                 let is_ack = ack != 0;
                 let is_fin = fin != 0;
                 let is_rst = rst != 0;
-                
+
                 let tcp_flags = TcpFlags {
                     syn: is_syn as u8,
                     ack: is_ack as u8,
@@ -121,7 +121,7 @@ pub fn handle_packet(
 
             let (src_port, dst_port, Tcp_flags) =
                 handle_ports(ctx, protocol, l2, IpFamily::Ipv4).unwrap_or((0, 0, None));
-            
+
             // Mount data into the TcEvent struct
             let event = TcEvent {
                 src_ip,
@@ -133,7 +133,7 @@ pub fn handle_packet(
                 protocol: protocol as u8,
                 direction,
                 ip_family: IpFamily::Ipv4,
-                tcp_flags: Tcp_flags.unwrap_or_default()
+                tcp_flags: Tcp_flags.unwrap_or_default(),
             };
 
             // Sniff specific port
@@ -166,7 +166,7 @@ pub fn handle_packet(
                 protocol: proto as u8,
                 direction,
                 ip_family: IpFamily::Ipv6,
-                tcp_flags: Tcp_flags.unwrap_or_default()
+                tcp_flags: Tcp_flags.unwrap_or_default(),
             };
 
             unsafe {
