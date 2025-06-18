@@ -1,6 +1,10 @@
 use aya_ebpf::{
     macros::map,
-    maps::{Array, LruHashMap, RingBuf},
+    maps::{
+        Array,
+        LruHashMap,
+        RingBuf,
+    },
 };
 use nflux_common::Configmap;
 

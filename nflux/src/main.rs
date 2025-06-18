@@ -1,14 +1,27 @@
-use std::{process, process::exit};
+use std::{
+    process,
+    process::exit,
+};
 
 use clap::Parser;
 use libc::getuid;
 use logger::LoggerConfig;
 use nflux_common::Configmap;
-use tracing::{error, info};
+use tracing::{
+    error,
+    info,
+};
 use try_nflux::start_nflux;
-use utils::{is_true, set_mem_limit};
+use utils::{
+    is_true,
+    set_mem_limit,
+};
 
-use crate::{cli::NfluxCliArgs, logger::init_logger, utils::check_is_root_user};
+use crate::{
+    cli::NfluxCliArgs,
+    logger::init_logger,
+    utils::check_is_root_user,
+};
 
 mod logger;
 mod tc_event;

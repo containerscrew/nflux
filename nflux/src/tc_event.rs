@@ -1,11 +1,22 @@
-use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+use std::net::{
+    IpAddr,
+    Ipv4Addr,
+    Ipv6Addr,
+};
 
-use aya::maps::{MapData, RingBuf};
+use aya::maps::{
+    MapData,
+    RingBuf,
+};
 use nflux_common::TcEvent;
 use tokio::sync::watch;
 use tracing::info;
 
-use crate::utils::{convert_direction, convert_protocol, format_tcp_flags};
+use crate::utils::{
+    convert_direction,
+    convert_protocol,
+    format_tcp_flags,
+};
 
 fn _format_mac(mac: &[u8; 6]) -> String {
     mac.iter()

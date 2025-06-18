@@ -1,13 +1,24 @@
 use anyhow::Context;
 use aya::{
     include_bytes_aligned,
-    maps::{Array, RingBuf},
-    programs::{tc, SchedClassifier, TcAttachType},
+    maps::{
+        Array,
+        RingBuf,
+    },
+    programs::{
+        tc,
+        SchedClassifier,
+        TcAttachType,
+    },
     Ebpf,
 };
 use nflux_common::Configmap;
 use tokio::sync::watch;
-use tracing::{debug, error, info};
+use tracing::{
+    debug,
+    error,
+    info,
+};
 
 use super::tc_event::process_event;
 use crate::utils::wait_for_shutdown;

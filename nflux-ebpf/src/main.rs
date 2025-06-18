@@ -7,7 +7,11 @@ mod maps;
 mod tc_event;
 mod try_tc;
 
-use aya_ebpf::{bindings::TC_ACT_SHOT, macros::classifier, programs::TcContext};
+use aya_ebpf::{
+    bindings::TC_ACT_SHOT,
+    macros::classifier,
+    programs::TcContext,
+};
 use try_tc::try_tc;
 
 #[classifier]
