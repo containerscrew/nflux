@@ -16,7 +16,7 @@ RUN cargo build --release
 # Strip debugging symbols to reduce binary size
 RUN strip target/release/nflux
 
-FROM gcr.io/distroless/cc-debian12 as release
+FROM gcr.io/distroless/cc-debian12:debug as release
 
 COPY --from=build-env /app/target/release/nflux /app/nflux
 

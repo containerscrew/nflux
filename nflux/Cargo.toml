@@ -12,19 +12,16 @@ nflux-common = { path = "../nflux-common/", features = ["user"] }
 
 anyhow = { workspace = true, default-features = true }
 aya = { workspace = true }
-aya-log = { workspace = true }
 libc = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tracing-subscriber = { version = "0.3.18", features = ["json"] }
 tracing = "0.1.40"
-bytes = "1.10.1"
 dns-lookup = "2.0.4"
 sysinfo = "0.35.2"
 clap = { version = "4.5.40", features = ["derive"] }
 chrono = "0.4.41"
 default-net = "0.22.0"
 colored = "3.0.0"
-serde_json = "1.0.140"
 
 [build-dependencies]
 anyhow = { workspace = true }
@@ -47,3 +44,6 @@ cargo_metadata = { workspace = true }
 [[bin]]
 name = "nflux"
 path = "src/main.rs"
+
+[profile.release]
+strip = "debuginfo"

@@ -17,7 +17,10 @@ pub enum IpHeader {
 }
 
 #[inline]
-fn ptr_at<T>(ctx: &TcContext, offset: usize) -> Result<*const T, ()> {
+fn ptr_at<T>(
+    ctx: &TcContext,
+    offset: usize,
+) -> Result<*const T, ()> {
     let start = ctx.data();
     let end = ctx.data_end();
     let len = mem::size_of::<T>();
@@ -85,7 +88,10 @@ fn handle_ports(
 
 // Process the protocol before sending data to ebpf map
 // Handle flags --disable-tcp, --disable-udp, --disable-icmp
-fn is_protocol_enabled(protocol: IpProto, configmap: &Configmap) -> bool {
+fn is_protocol_enabled(
+    protocol: IpProto,
+    configmap: &Configmap,
+) -> bool {
     match protocol {
         IpProto::Tcp => configmap.disable_tcp == 0,
         IpProto::Udp => configmap.disable_udp == 0,

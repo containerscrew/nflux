@@ -10,7 +10,10 @@ pub struct MyTimer;
 
 /// Implement the FormatTime trait for MyTimer.
 impl FormatTime for MyTimer {
-    fn format_time(&self, w: &mut Writer<'_>) -> std::fmt::Result {
+    fn format_time(
+        &self,
+        w: &mut Writer<'_>,
+    ) -> std::fmt::Result {
         let now = Local::now();
         write!(w, "{}", now.format("%Y-%m-%d %H:%M:%S%.3f"))
     }

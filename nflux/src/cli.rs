@@ -126,7 +126,10 @@ pub struct NfluxCliArgs {
 
 // Custom implementation of Display trait for the Structure NfluxCliArgs
 impl fmt::Display for NfluxCliArgs {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut fmt::Formatter,
+    ) -> fmt::Result {
         write!(
             f,
             "log_level: {}, log_format: {}, interface: {}, \

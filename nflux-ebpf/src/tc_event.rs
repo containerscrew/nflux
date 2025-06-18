@@ -4,7 +4,10 @@ use nflux_common::{Configmap, TcEvent};
 use crate::maps::{ActiveConnectionKey, ACTIVE_CONNECTIONS, TC_EVENT};
 
 #[inline]
-pub unsafe fn log_connection(event: &TcEvent, configmap: Configmap) {
+pub unsafe fn log_connection(
+    event: &TcEvent,
+    configmap: Configmap,
+) {
     if configmap.disable_full_log == 0 {
         if let Some(mut data) = TC_EVENT.reserve::<TcEvent>(0) {
             unsafe { *data.as_mut_ptr() = *event }

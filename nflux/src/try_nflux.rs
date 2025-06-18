@@ -134,7 +134,10 @@ fn attach_tc_program(
     Ok(())
 }
 
-fn populate_configmap(bpf: &mut Ebpf, config: Configmap) -> anyhow::Result<()> {
+fn populate_configmap(
+    bpf: &mut Ebpf,
+    config: Configmap,
+) -> anyhow::Result<()> {
     let mut tc_config = Array::<_, Configmap>::try_from(
         bpf.map_mut("TC_CONFIG")
             .context("Failed to find TC_CONFIG map")?,
