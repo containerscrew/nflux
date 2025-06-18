@@ -9,8 +9,10 @@
   - [Exclude ports from the log](#exclude-ports-from-the-log)
   - [Available procotols](#available-procotols)
   - [Enable timestamp in log output](#enable-timestamp-in-log-output)
+  - [Redirect nflux log to a file](#redirect-nflux-log-to-a-file)
   - [Examples](#examples)
 <!-- END OF TOC -->
+
 # Usage
 
 Global flags:
@@ -58,7 +60,9 @@ sudo nflux --disable-egress
 
 ## Packet logging
 
-By default `nflux` will log **all packets** (egress/ingress) entering the NIC (Network Interface or virtual interface (like tun0)). If you use `--disable-full-log`, you can use `--log-interval` to set the time interval in which the same `ip->port` connection will be logged.
+By default `nflux` will log **all packets** (egress/ingress) entering the NIC (Network Interface or virtual interface (
+like tun0)). If you use `--disable-full-log`, you can use `--log-interval` to set the time interval in which the same
+`ip->port` connection will be logged.
 
 For example:
 
@@ -120,9 +124,32 @@ sufo nflux --disable-ingress --with-timer
 
 > Timestamp is disabled in the logger by default for brevity
 
+## Redirect nflux log to a file
+
+`nflux` doesn't have the ability to redirect logs to a file, because it's designed to work in a container (
+stdout/stderr). However, you can do something like this:
+
+```shell
+sudo nflux --disable-ingress --disable-full-log --log-format json --log-interval 10 > /tmp/nflux.log 2>&1
+```
+
+Then, in other terminal:
+
+```shell
+tail -f /tmp/nflux.log
+```
+
+Parse `dst_ip` using `jq`:
+
+```shell
+cat /tmp/nflux.log | jq -r '.dst_ip'
+```
+
 ## Examples
 
 ```shell
 sudo nflux --disable-full-log --log-interval 10 --exclude-ports 22 --disable-udp --with-timer
 sudo nflux --disable-egress --with-timer
+sudo nflux --disable-egress --listen-port 3306
+sudo nflux --disable-ingress --disable-full-log --log-format json --log-interval 10 > /tmp/nflux.log 2>&1
 ```
