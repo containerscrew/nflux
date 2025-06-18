@@ -13,7 +13,10 @@ fn _format_mac(mac: &[u8; 6]) -> String {
         .collect::<Vec<_>>()
         .join(":")
 }
-fn to_ipaddr(ip: [u8; 16], ip_family: u8) -> IpAddr {
+fn to_ipaddr(
+    ip: [u8; 16],
+    ip_family: u8,
+) -> IpAddr {
     match ip_family {
         4 => IpAddr::V4(Ipv4Addr::new(ip[12], ip[13], ip[14], ip[15])),
         6 => IpAddr::V6(Ipv6Addr::from(ip)),
@@ -63,6 +66,7 @@ pub async fn process_event(
 
                 match log_format.as_str() {
                     "json" => {
+                        let tcp_flags_str = format_tcp_flags(event.tcp_flags);
                         info!(
                             dir = %convert_direction(event.direction),
                             ip_family = %event.ip_family.as_str(),
@@ -73,6 +77,11 @@ pub async fn process_event(
                             dst_ip = %to_ipaddr(event.dst_ip, 4),
                             src_port = event.src_port,
                             dst_port = event.dst_port,
+                            tcp_flags = if !tcp_flags_str.is_empty() {
+                                Some(tcp_flags_str)
+                            } else {
+                                None
+                            },
                         );
                     }
                     _ => {

@@ -9,7 +9,10 @@ use network_types::{
 use crate::handle_packet::{handle_packet, IpHeader};
 
 #[inline]
-fn ptr_at<T>(ctx: &TcContext, offset: usize) -> Result<*const T, ()> {
+fn ptr_at<T>(
+    ctx: &TcContext,
+    offset: usize,
+) -> Result<*const T, ()> {
     let start = ctx.data();
     let end = ctx.data_end();
     let len = mem::size_of::<T>();
@@ -29,7 +32,10 @@ fn ptr_at<T>(ctx: &TcContext, offset: usize) -> Result<*const T, ()> {
 /// This function is called from the eBPF program to process packets
 /// It tries to parse the packet as an Ethernet frame first, then as a raw IP packet
 /// It returns a result indicating whether the packet should be dropped or allowed to pass
-pub fn try_tc(ctx: TcContext, direction: u8) -> Result<i32, ()> {
+pub fn try_tc(
+    ctx: TcContext,
+    direction: u8,
+) -> Result<i32, ()> {
     // Try to parse Ethernet header from offset 0 (standard L2 packet)
     if let Ok(ethhdr) = ctx.load::<EthHdr>(0) {
         // Ethernet header is 14 bytes (6 dst MAC + 6 src MAC + 2 EtherType)
