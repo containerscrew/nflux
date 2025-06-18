@@ -1,6 +1,7 @@
 <!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
 **Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
 - [Changelog](#changelog)
+  - [[0.8.0] - 2025-06-18](#080---2025-06-18)
   - [[0.7.0] - 2025-06-18](#070---2025-06-18)
   - [[0.6.1] - 2025-06-17](#061---2025-06-17)
   - [[0.6.0] - 2025-06-17](#060---2025-06-17)
@@ -13,6 +14,20 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+
+## [0.8.0] - 2025-06-18
+
+- Update CHANGELOG.md for release v0.7.0
+
+- Update example images
+
+- Change fn_params_layout carfo fmt to Vertical
+
+- Update rustfmt.toml
+
+- Update usage.md
+
+- Update Cargo.toml version
 
 ## [0.7.0] - 2025-06-18
 
