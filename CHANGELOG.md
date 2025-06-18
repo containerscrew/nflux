@@ -1,6 +1,7 @@
 <!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
 **Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
 - [Changelog](#changelog)
+  - [[0.7.0] - 2025-06-18](#070---2025-06-18)
   - [[0.6.1] - 2025-06-17](#061---2025-06-17)
   - [[0.6.0] - 2025-06-17](#060---2025-06-17)
   - [[0.5.0] - 2025-06-17](#050---2025-06-17)
@@ -12,6 +13,18 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+
+## [0.7.0] - 2025-06-18
+
+- Update CHANGELOG.md for release v0.6.1
+
+- Feat(tcp_flags): implement tcp flags & remove pid and command track for egress connections
+
+- Fmt code
+
+- Fix: nostd alloc for impl Display in TcpFlags struct
+
+- Update Cargo.toml version
 
 ## [0.6.1] - 2025-06-17
 
