@@ -57,11 +57,11 @@ pub async fn process_event(
                     event.total_len,
                     event.ttl,
                 );
-                
+
                 if convert_protocol(event.protocol) == "tcp" {
                     msg.push_str(&format!(" tcp_flags={}", event.tcp_flags));
                 }
-                
+
                 match log_format.as_str() {
                     "json" => {
                         info!(
