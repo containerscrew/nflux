@@ -4,15 +4,15 @@ use aya_ebpf::{
 };
 use nflux_common::Configmap;
 
-// Define a struct for the key: (pid, destination IP)
+// Define a struct for the key of the active connections map
 #[repr(C)]
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
 pub struct ActiveConnectionKey {
-    pub pid: u64,
     pub protocol: u8,
-    pub direction: u8,
-    pub port: u16,
-    pub ip: [u8; 16],
+    pub src_port: u16,
+    pub dst_port: u16,
+    pub src_ip: [u8; 16],
+    pub dst_ip: [u8; 16],
 }
 
 #[map]

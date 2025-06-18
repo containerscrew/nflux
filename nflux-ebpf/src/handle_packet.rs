@@ -1,13 +1,13 @@
 use core::mem;
 
-use aya_ebpf::{bindings::TC_ACT_PIPE, helpers::bpf_get_current_pid_tgid, programs::TcContext};
+use aya_ebpf::{bindings::TC_ACT_PIPE, programs::TcContext};
 use network_types::{
     eth::EthHdr,
     ip::{IpProto, Ipv4Hdr, Ipv6Hdr},
     tcp::TcpHdr,
     udp::UdpHdr,
 };
-use nflux_common::{Configmap, IpFamily, TcEvent};
+use nflux_common::{Configmap, IpFamily, TcEvent, TcpFlags};
 
 use crate::{maps::TC_CONFIG, tc_event::log_connection};
 
@@ -36,7 +36,7 @@ fn handle_ports(
     protocol: IpProto,
     is_ether: bool,
     ip_family: IpFamily,
-) -> Result<(u16, u16), ()> {
+) -> Result<(u16, u16, Option<TcpFlags>), ()> {
     // Determine the offset based on whether it's an Ethernet frame and the IP family
     let offset = match (is_ether, ip_family) {
         (true, IpFamily::Ipv4) => EthHdr::LEN + Ipv4Hdr::LEN,
@@ -51,17 +51,24 @@ fn handle_ports(
             unsafe {
                 let src_port = u16::from_be((*tcphdr).source);
                 let dst_port = u16::from_be((*tcphdr).dest);
-                // let syn = (*tcphdr).syn();
-                // let ack = (*tcphdr).ack();
-                // let fin = (*tcphdr).fin();
-                // let rst = (*tcphdr).rst();
+                let syn = (*tcphdr).syn();
+                let ack = (*tcphdr).ack();
+                let fin = (*tcphdr).fin();
+                let rst = (*tcphdr).rst();
 
-                // let is_syn = syn != 0;
-                // let is_ack = ack != 0;
-                // let is_fin = fin != 0;
-                // let is_rst = rst != 0;
+                let is_syn = syn != 0;
+                let is_ack = ack != 0;
+                let is_fin = fin != 0;
+                let is_rst = rst != 0;
+                
+                let tcp_flags = TcpFlags {
+                    syn: is_syn as u8,
+                    ack: is_ack as u8,
+                    fin: is_fin as u8,
+                    rst: is_rst as u8,
+                };
 
-                Ok((src_port, dst_port))
+                Ok((src_port, dst_port, Some(tcp_flags)))
             }
         }
         IpProto::Udp => {
@@ -69,10 +76,10 @@ fn handle_ports(
             unsafe {
                 let src_port = u16::from_be_bytes((*udphdr).source);
                 let dst_port = u16::from_be_bytes((*udphdr).dest);
-                Ok((src_port, dst_port))
+                Ok((src_port, dst_port, None))
             }
         }
-        _ => Ok((0, 0)), // ICMP
+        _ => Ok((0, 0, None)), // ICMP
     }
 }
 
@@ -112,9 +119,9 @@ pub fn handle_packet(
             let total_len = u16::from_be_bytes(ipv4hdr.tot_len);
             let ttl = ipv4hdr.ttl;
 
-            let (src_port, dst_port) =
-                handle_ports(ctx, protocol, l2, IpFamily::Ipv4).unwrap_or((0, 0));
-
+            let (src_port, dst_port, Tcp_flags) =
+                handle_ports(ctx, protocol, l2, IpFamily::Ipv4).unwrap_or((0, 0, None));
+            
             // Mount data into the TcEvent struct
             let event = TcEvent {
                 src_ip,
@@ -126,11 +133,7 @@ pub fn handle_packet(
                 protocol: protocol as u8,
                 direction,
                 ip_family: IpFamily::Ipv4,
-                pid: if direction == 1 {
-                    bpf_get_current_pid_tgid() >> 32
-                } else {
-                    0
-                },
+                tcp_flags: Tcp_flags.unwrap_or_default()
             };
 
             // Sniff specific port
@@ -150,8 +153,8 @@ pub fn handle_packet(
             let source = ipv6hdr.src_addr().octets(); // header already has 128 bits (16 bytes)
             let destination = ipv6hdr.dst_addr().octets();
             let proto = ipv6hdr.next_hdr;
-            let (src_port, dst_port) =
-                handle_ports(ctx, proto, l2, IpFamily::Ipv6).unwrap_or((0, 0));
+            let (src_port, dst_port, Tcp_flags) =
+                handle_ports(ctx, proto, l2, IpFamily::Ipv6).unwrap_or((0, 0, None));
 
             let event = TcEvent {
                 src_ip: source,
@@ -163,11 +166,7 @@ pub fn handle_packet(
                 protocol: proto as u8,
                 direction,
                 ip_family: IpFamily::Ipv6,
-                pid: if direction == 1 {
-                    bpf_get_current_pid_tgid() >> 32
-                } else {
-                    0
-                },
+                tcp_flags: Tcp_flags.unwrap_or_default()
             };
 
             unsafe {

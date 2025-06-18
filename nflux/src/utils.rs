@@ -103,7 +103,7 @@ pub fn _get_service_name(port: u16, proto: &'static str) -> String {
     }
 }
 
-pub fn get_process_name(pid: u64) -> String {
+pub fn _get_process_name(pid: u64) -> String {
     let mut s = System::new_all();
 
     // Is this causing overhead?

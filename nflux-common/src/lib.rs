@@ -1,4 +1,8 @@
 #![no_std]
+extern crate alloc;
+
+use alloc::vec::Vec;
+use core::fmt;
 
 pub mod utils;
 
@@ -49,7 +53,36 @@ pub struct TcEvent {
     pub protocol: u8,
     pub direction: u8, // 0: ingress, 1: egress
     pub ip_family: IpFamily,
-    pub pid: u64,
+    pub tcp_flags: TcpFlags,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
+pub struct TcpFlags {
+    pub syn: u8,
+    pub ack: u8,
+    pub fin: u8,
+    pub rst: u8,
+}
+
+impl fmt::Display for TcpFlags {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut parts = Vec::new();
+        if self.syn != 0 {
+            parts.push("SYN");
+        }
+        if self.ack != 0 {
+            parts.push("ACK");
+        }
+        if self.fin != 0 {
+            parts.push("FIN");
+        }
+        if self.rst != 0 {
+            parts.push("RST");
+        }
+
+        write!(f, "{}", parts.join(","))
+    }
 }
 
 // #[repr(C)]

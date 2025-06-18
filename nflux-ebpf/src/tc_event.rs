@@ -15,19 +15,11 @@ pub unsafe fn log_connection(event: &TcEvent, configmap: Configmap) {
         let current_time = bpf_ktime_get_ns();
 
         let key = ActiveConnectionKey {
-            pid: event.pid,
             protocol: event.protocol,
-            direction: event.direction,
-            port: if event.direction == 1 {
-                event.src_port
-            } else {
-                event.dst_port
-            },
-            ip: if event.direction == 1 {
-                event.dst_ip
-            } else {
-                event.src_ip
-            },
+            src_port: event.src_port,
+            dst_port: event.dst_port,
+            src_ip: event.src_ip,
+            dst_ip: event.dst_ip,
         };
 
         // If the connection (src_port, dst_ip) is already tracked, return
