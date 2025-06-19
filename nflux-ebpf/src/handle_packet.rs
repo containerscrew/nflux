@@ -47,8 +47,8 @@ fn ptr_at<T>(
     Ok((start + offset) as *const T)
 }
 
-/// function to extract the source and destination ports from the TCP/UDP headers
-/// So redundant code by the moment, but works
+/// parse the procotol (TCP/UDP) to extract src and dst ports
+/// and TCP flags if applicable
 fn handle_ports(
     ctx: &TcContext,
     protocol: IpProto,
@@ -65,14 +65,14 @@ fn handle_ports(
 
     match protocol {
         IpProto::Tcp => {
-            let tcphdr: *const TcpHdr = ptr_at(ctx, offset)?;
+            let tcp_hdr: *const TcpHdr = ptr_at(ctx, offset)?;
             unsafe {
-                let src_port = u16::from_be((*tcphdr).source);
-                let dst_port = u16::from_be((*tcphdr).dest);
-                let syn = (*tcphdr).syn();
-                let ack = (*tcphdr).ack();
-                let fin = (*tcphdr).fin();
-                let rst = (*tcphdr).rst();
+                let src_port = u16::from_be((*tcp_hdr).source);
+                let dst_port = u16::from_be((*tcp_hdr).dest);
+                let syn = (*tcp_hdr).syn();
+                let ack = (*tcp_hdr).ack();
+                let fin = (*tcp_hdr).fin();
+                let rst = (*tcp_hdr).rst();
 
                 let is_syn = syn != 0;
                 let is_ack = ack != 0;
@@ -90,14 +90,14 @@ fn handle_ports(
             }
         }
         IpProto::Udp => {
-            let udphdr: *const UdpHdr = ptr_at(ctx, offset)?;
+            let udp_hdr: *const UdpHdr = ptr_at(ctx, offset)?;
             unsafe {
-                let src_port = u16::from_be_bytes((*udphdr).source);
-                let dst_port = u16::from_be_bytes((*udphdr).dest);
+                let src_port = u16::from_be_bytes((*udp_hdr).source);
+                let dst_port = u16::from_be_bytes((*udp_hdr).dest);
                 Ok((src_port, dst_port, None))
             }
         }
-        _ => Ok((0, 0, None)), // ICMP
+        _ => Ok((0, 0, None)), // ICMP or other protocols
     }
 }
 
@@ -128,13 +128,12 @@ pub fn handle_packet(
         IpHeader::V4(ipv4hdr) => {
             let protocol = ipv4hdr.proto;
 
-            // Skip logging if protocol is disabled
             if !is_protocol_enabled(protocol, tc_config) {
                 return Ok(TC_ACT_PIPE);
             }
 
             let mut src_ip = [0u8; 16];
-            src_ip[12..].copy_from_slice(&ipv4hdr.src_addr); // header only has 32 bits (4ytes)
+            src_ip[12..].copy_from_slice(&ipv4hdr.src_addr);
             let mut dst_ip = [0u8; 16];
             dst_ip[12..].copy_from_slice(&ipv4hdr.dst_addr);
             let total_len = u16::from_be_bytes(ipv4hdr.tot_len);
@@ -143,7 +142,6 @@ pub fn handle_packet(
             let (src_port, dst_port, Tcp_flags) =
                 handle_ports(ctx, protocol, l2, IpFamily::Ipv4).unwrap_or((0, 0, None));
 
-            // Mount data into the TcEvent struct
             let event = TcEvent {
                 src_ip,
                 dst_ip,
@@ -157,7 +155,6 @@ pub fn handle_packet(
                 tcp_flags: Tcp_flags.unwrap_or_default(),
             };
 
-            // Sniff specific port
             if tc_config.listen_port != 0
                 && (src_port != tc_config.listen_port && dst_port != tc_config.listen_port)
             {
@@ -171,7 +168,7 @@ pub fn handle_packet(
             Ok(TC_ACT_PIPE)
         }
         IpHeader::V6(ipv6hdr) => {
-            let source = ipv6hdr.src_addr().octets(); // header already has 128 bits (16 bytes)
+            let source = ipv6hdr.src_addr().octets();
             let destination = ipv6hdr.dst_addr().octets();
             let proto = ipv6hdr.next_hdr;
             let (src_port, dst_port, Tcp_flags) =
