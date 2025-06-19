@@ -41,7 +41,7 @@ Quick installation:
 curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/nflux/main/scripts/install.sh | sh
 ```
 
-Read the [installation](./docs/installation.md) doc.
+Read the [installation](https://github.com/containerscrew/nflux/wiki/Installation) doc.
 
 # Usage
 
@@ -49,7 +49,11 @@ Read the [installation](./docs/installation.md) doc.
 sudo nflux # log everything, which means: ingress/egress traffic, tcp,udp,icmp protocols, ipv4/ipv6
 ```
 
-Read the [usage](./docs/usage.md) doc for more options.
+Read the [usage](https://github.com/containerscrew/nflux/wiki/Usage) doc for more options.
+
+# Wiki
+
+Read the [wiki](https://github.com/containerscrew/nflux/wiki)
 
 # License
 
