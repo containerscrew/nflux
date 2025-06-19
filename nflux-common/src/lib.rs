@@ -5,13 +5,12 @@ pub mod utils;
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Configmap {
-    pub disable_private_ips: u8, // 0 = no, 1 = yes
-    pub disable_udp: u8,         // 0 = no, 1 = yes
-    pub disable_icmp: u8,        // 0 = no, 1 = yes
-    pub disable_tcp: u8,         // 0 = no, 1 = yes
-    pub log_interval: u64,       // Log connection of same ip --> port every X seconds
-    pub disable_full_log: u8,    // Disable full packet log
-    pub listen_port: u16,        // Filter port to sniff.
+    pub disable_udp: u8,      // 0 = no, 1 = yes
+    pub disable_icmp: u8,     // 0 = no, 1 = yes
+    pub disable_tcp: u8,      // 0 = no, 1 = yes
+    pub log_interval: u64,    // Log connection of same ip --> port every X seconds
+    pub disable_full_log: u8, // Disable full packet log
+    pub listen_port: u16,     // Filter port to sniff.
 }
 
 #[repr(C)]
