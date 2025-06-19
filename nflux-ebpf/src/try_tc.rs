@@ -1,24 +1,12 @@
 use core::mem;
 
-use aya_ebpf::{
-    bindings::TC_ACT_PIPE,
-    programs::TcContext,
-};
+use aya_ebpf::{bindings::TC_ACT_PIPE, programs::TcContext};
 use network_types::{
-    eth::{
-        EthHdr,
-        EtherType,
-    },
-    ip::{
-        Ipv4Hdr,
-        Ipv6Hdr,
-    },
+    eth::{EthHdr, EtherType},
+    ip::{Ipv4Hdr, Ipv6Hdr},
 };
 
-use crate::handle_packet::{
-    handle_packet,
-    IpHeader,
-};
+use crate::handle_packet::{handle_packet, IpHeader};
 
 #[inline]
 fn ptr_at<T>(

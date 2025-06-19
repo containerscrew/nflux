@@ -1,14 +1,7 @@
 use aya_ebpf::helpers::r#gen::bpf_ktime_get_ns;
-use nflux_common::{
-    Configmap,
-    TcEvent,
-};
+use nflux_common::{Configmap, TcEvent};
 
-use crate::maps::{
-    ActiveConnectionKey,
-    ACTIVE_CONNECTIONS,
-    TC_EVENT,
-};
+use crate::maps::{ActiveConnectionKey, ACTIVE_CONNECTIONS, TC_EVENT};
 
 #[inline]
 pub unsafe fn log_connection(

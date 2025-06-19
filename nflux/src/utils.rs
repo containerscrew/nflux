@@ -1,34 +1,15 @@
 use std::{
     ffi::CString,
-    net::{
-        IpAddr,
-        Ipv4Addr,
-    },
+    net::{IpAddr, Ipv4Addr},
 };
 
 use default_net::interface::get_default_interface_name;
 use dns_lookup::lookup_addr;
-use libc::{
-    c_char,
-    c_int,
-    getservbyport,
-    ntohs,
-    servent,
-    setrlimit,
-};
-use nflux_common::{
-    utils::is_private_ip,
-    TcpFlags,
-};
-use sysinfo::{
-    Pid,
-    System,
-};
+use libc::{c_char, c_int, getservbyport, ntohs, servent, setrlimit};
+use nflux_common::{utils::is_private_ip, TcpFlags};
+use sysinfo::{Pid, System};
 use tokio::signal;
-use tracing::{
-    debug,
-    warn,
-};
+use tracing::{debug, warn};
 
 /// is_root_user checks if the current user who runs the program is root.
 /// Avoid running nflux as uid != 0 (root). Ebpf requires privileges

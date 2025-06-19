@@ -1,10 +1,7 @@
 use chrono::Local;
 use tracing::Level;
 use tracing_subscriber::fmt::{
-    format::{
-        FmtSpan,
-        Writer,
-    },
+    format::{FmtSpan, Writer},
     time::FormatTime,
 };
 
