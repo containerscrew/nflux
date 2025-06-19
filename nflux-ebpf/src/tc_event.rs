@@ -15,13 +15,15 @@ pub unsafe fn log_connection(
     event: &TcEvent,
     configmap: Configmap,
 ) {
+    // By default, we log all events
     if configmap.disable_full_log == 0 {
         if let Some(mut data) = TC_EVENT.reserve::<TcEvent>(0) {
             unsafe { *data.as_mut_ptr() = *event }
             data.submit(0);
         }
     } else {
-        // Get current time
+        // If user decide to stop logging all events, using --disable-full-log
+        // Log connections based on the time --log-interval. Data is saved in ACTIVE_CONNECTIONS map
         let current_time = bpf_ktime_get_ns();
 
         let key = ActiveConnectionKey {
@@ -32,21 +34,18 @@ pub unsafe fn log_connection(
             dst_ip: event.dst_ip,
         };
 
-        // If the connection (src_port, dst_ip) is already tracked, return
         if let Some(last_log_time) = ACTIVE_CONNECTIONS.get(&key) {
-            // Check if the timestamp is less than 10 seconds
             if current_time - *last_log_time < configmap.log_interval {
                 return;
             }
         }
 
-        // Log the connection event
         if let Some(mut data) = TC_EVENT.reserve::<TcEvent>(0) {
             unsafe { *data.as_mut_ptr() = *event }
             data.submit(0);
         }
 
-        // Store the active connection: (PID, Destination IP) -> 1 (dummy value)
+        // Track the last log time for this connection
         ACTIVE_CONNECTIONS.insert(&key, &current_time, 0).ok();
     }
 }

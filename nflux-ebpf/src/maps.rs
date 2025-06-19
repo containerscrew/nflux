@@ -8,7 +8,6 @@ use aya_ebpf::{
 };
 use nflux_common::Configmap;
 
-// Define a struct for the key of the active connections map
 #[repr(C)]
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
 pub struct ActiveConnectionKey {
