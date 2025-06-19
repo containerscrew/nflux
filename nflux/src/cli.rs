@@ -1,9 +1,6 @@
 use std::fmt;
 
-use clap::{
-    value_parser,
-    Parser,
-};
+use clap::{value_parser, Parser};
 use colored::Colorize;
 
 use crate::utils::set_default_iface;

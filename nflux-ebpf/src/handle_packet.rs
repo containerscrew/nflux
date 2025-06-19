@@ -1,30 +1,15 @@
 use core::mem;
 
-use aya_ebpf::{
-    bindings::TC_ACT_PIPE,
-    programs::TcContext,
-};
+use aya_ebpf::{bindings::TC_ACT_PIPE, programs::TcContext};
 use network_types::{
     eth::EthHdr,
-    ip::{
-        IpProto,
-        Ipv4Hdr,
-        Ipv6Hdr,
-    },
+    ip::{IpProto, Ipv4Hdr, Ipv6Hdr},
     tcp::TcpHdr,
     udp::UdpHdr,
 };
-use nflux_common::{
-    Configmap,
-    IpFamily,
-    TcEvent,
-    TcpFlags,
-};
+use nflux_common::{Configmap, IpFamily, TcEvent, TcpFlags};
 
-use crate::{
-    maps::TC_CONFIG,
-    tc_event::log_connection,
-};
+use crate::{maps::TC_CONFIG, tc_event::log_connection};
 
 pub enum IpHeader {
     V4(Ipv4Hdr),
