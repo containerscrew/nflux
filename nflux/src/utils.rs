@@ -166,13 +166,13 @@ mod tests {
 
     #[test]
     fn test_check_is_root_user_with_root_uid() {
-        let result = check_is_root_user(0);
+        let result = is_root_user(0);
         assert!(result.is_ok());
     }
 
     #[test]
     fn test_check_is_root_user_with_non_root_uid() {
-        let result = check_is_root_user(1000);
+        let result = is_root_user(1000);
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err(),
