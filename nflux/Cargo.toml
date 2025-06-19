@@ -44,6 +44,3 @@ cargo_metadata = { workspace = true }
 [[bin]]
 name = "nflux"
 path = "src/main.rs"
-
-[profile.release]
-strip = "debuginfo"
