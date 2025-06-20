@@ -26,6 +26,12 @@
 </p>
 
 ---
+<p align="center">
+    <h3 align="center">pkt-dropped feature is being implemented</h3>
+    <img src="./examples/example3.png" alt="example"/>
+</p>
+
+---
 
 # What is nflux?
 
