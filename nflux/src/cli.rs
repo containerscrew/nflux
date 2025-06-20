@@ -1,6 +1,6 @@
 use std::fmt;
 
-use clap::{value_parser, Parser};
+use clap::{value_parser, Parser, Subcommand};
 use colored::Colorize;
 
 use crate::utils::set_default_iface;
@@ -15,6 +15,8 @@ use crate::utils::set_default_iface;
     after_help = print_after_help_message(),
 )]
 pub struct NfluxCliArgs {
+    #[command(subcommand)]
+    pub command: Option<Commands>,
     #[arg(
         short = 'l',
         long = "log-level",
@@ -173,6 +175,12 @@ fn print_about() -> String {
 
 fn print_after_help_message() -> String {
     format!("Author: containerscrew \nWebsite: github.com/containerscrew/nflux\nLicense: GPL 3\nIssues: github.com/containerscrew/nflux/issues")
+}
+
+#[derive(Debug, Subcommand)]
+pub enum Commands {
+    /// Sniff dropped packets using tracepoint/skb/kfree_skb
+    PktDropped {},
 }
 
 #[cfg(test)]

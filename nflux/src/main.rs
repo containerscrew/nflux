@@ -1,14 +1,19 @@
 use std::{process, process::exit};
 
+use aya::programs::TracePoint;
 use clap::Parser;
 use libc::getuid;
 use logger::LoggerConfig;
 use nflux_common::Configmap;
-use tracing::{error, info};
+use tracing::{error, info, warn};
 use try_nflux::start_nflux;
 use utils::{is_true, set_mem_limit};
 
-use crate::{cli::NfluxCliArgs, logger::init_logger, utils::is_root_user};
+use crate::{
+    cli::NfluxCliArgs,
+    logger::init_logger,
+    utils::{is_root_user, wait_for_shutdown},
+};
 
 mod logger;
 mod tc_event;
@@ -37,6 +42,30 @@ async fn main() -> anyhow::Result<()> {
     set_mem_limit();
 
     info!("Starting nflux with pid {}", process::id());
+
+    // Match possible subcommands
+    // TODO: refactor this logic matching subcommands
+    match cli.command {
+        Some(cli::Commands::PktDropped {}) => {
+            info!("You are running the dropped subcommand!");
+            // Load the eBPF program for dropped packets
+            let mut ebpf = aya::Ebpf::load(aya::include_bytes_aligned!(concat!(
+                env!("OUT_DIR"),
+                "/nflux"
+            )))?;
+
+            if let Err(e) = aya_log::EbpfLogger::init(&mut ebpf) {
+                // This can happen if you remove all log statements from your eBPF program.
+                warn!("failed to initialize eBPF logger: {e}");
+            }
+            let program: &mut TracePoint =
+                ebpf.program_mut("dropped_packets").unwrap().try_into()?;
+            program.load()?;
+            program.attach("skb", "kfree_skb")?;
+            wait_for_shutdown().await?;
+        }
+        None => {}
+    }
 
     // If enable_egress and enable_ingress are both false, the app is doing nothing, exit
     if cli.disable_egress && cli.disable_ingress {
