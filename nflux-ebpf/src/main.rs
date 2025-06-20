@@ -7,8 +7,16 @@ mod maps;
 mod tc_event;
 mod try_tc;
 
-use aya_ebpf::{bindings::TC_ACT_SHOT, macros::classifier, programs::TcContext};
+mod dropped_packets;
+
+use aya_ebpf::{
+    bindings::TC_ACT_SHOT,
+    macros::{classifier, tracepoint},
+    programs::{TcContext, TracePointContext},
+};
 use try_tc::try_tc;
+
+use crate::dropped_packets::try_dropped_packets;
 
 #[classifier]
 pub fn tc_egress(ctx: TcContext) -> i32 {
@@ -24,8 +32,21 @@ pub fn tc_ingress(ctx: TcContext) -> i32 {
     try_tc(ctx, 0).unwrap_or_else(|_| TC_ACT_SHOT)
 }
 
+#[tracepoint]
+pub fn dropped_packets(ctx: TracePointContext) -> u32 {
+    // This function is called when a packet is dropped
+    match try_dropped_packets(ctx) {
+        Ok(ret) => ret,
+        Err(ret) => ret,
+    }
+}
+
 #[cfg(not(test))]
 #[panic_handler]
 fn panic(_info: &core::panic::PanicInfo) -> ! {
     loop {}
 }
+
+#[link_section = "license"]
+#[no_mangle]
+static LICENSE: [u8; 13] = *b"Dual MIT/GPL\0";
