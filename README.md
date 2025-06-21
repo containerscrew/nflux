@@ -22,13 +22,18 @@
 
 ---
 <p align="center">
-    <img src="./examples/example2.png" alt="example"/>
+    <img src="./examples/example2.png" alt="example2"/>
+</p>
+
+---
+<p align="center">
+    <img src="./examples/example4.png" alt="example4"/>
 </p>
 
 ---
 <p align="center">
     <h3 align="center">pkt-dropped feature is being implemented</h3>
-    <img src="./examples/example3.png" alt="example"/>
+    <img src="./examples/example3.png" alt="example3"/>
 </p>
 
 ---
@@ -37,8 +42,7 @@
 
 Nflux is an [`eBPF`](./docs/what_is_ebpf.md)-based tool that monitors `incoming/outgoing` traffic on a Linux system by
 attaching a `TC (Traffic Control)` program using eBPF technology. It can be attached to both physical and virtual
-interfaces, allowing us to obtain networking data at a very low level. Also supports the option to monitor dropped
-packets.
+interfaces, allowing us to obtain networking data at a very low level.
 
 # Installation
 
