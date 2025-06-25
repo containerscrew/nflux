@@ -1,18 +1,17 @@
 use std::{process, process::exit};
 
-use aya::programs::TracePoint;
+use aya::{include_bytes_aligned, Ebpf};
 use clap::Parser;
 use libc::getuid;
 use logger::LoggerConfig;
 use nflux_common::Configmap;
-use tracing::{error, info, warn};
+use tracing::{error, info};
 use try_nflux::start_nflux;
 use utils::{is_true, set_mem_limit};
 
 use crate::{
-    cli::NfluxCliArgs,
-    logger::init_logger,
-    utils::{is_root_user, wait_for_shutdown},
+    cli::NfluxCliArgs, logger::init_logger, start_dropped_packets::start_dropped_packets,
+    utils::is_root_user,
 };
 
 mod logger;
@@ -21,6 +20,7 @@ mod try_nflux;
 mod utils;
 
 mod cli;
+mod start_dropped_packets;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -43,26 +43,17 @@ async fn main() -> anyhow::Result<()> {
 
     info!("Starting nflux with pid {}", process::id());
 
+    // Load eBPF program
+    let mut ebpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/nflux")))?;
+
     // Match possible subcommands
     // TODO: refactor this logic matching subcommands
     match cli.command {
         Some(cli::Commands::PktDropped {}) => {
-            info!("You are running the dropped subcommand!");
-            // Load the eBPF program for dropped packets
-            let mut ebpf = aya::Ebpf::load(aya::include_bytes_aligned!(concat!(
-                env!("OUT_DIR"),
-                "/nflux"
-            )))?;
-
-            if let Err(e) = aya_log::EbpfLogger::init(&mut ebpf) {
-                // This can happen if you remove all log statements from your eBPF program.
-                warn!("failed to initialize eBPF logger: {e}");
-            }
-            let program: &mut TracePoint =
-                ebpf.program_mut("dropped_packets").unwrap().try_into()?;
-            program.load()?;
-            program.attach("skb", "kfree_skb")?;
-            wait_for_shutdown().await?;
+            info!("Sniffing dropped packets");
+            start_dropped_packets(&mut ebpf)
+                .await
+                .expect("Sniffing dropped packets failed");
         }
         None => {}
     }
@@ -91,6 +82,7 @@ async fn main() -> anyhow::Result<()> {
 
     // Start nflux
     start_nflux(
+        &mut ebpf,
         &cli.interface,
         cli.disable_egress,
         cli.disable_ingress,

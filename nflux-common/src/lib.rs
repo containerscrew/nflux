@@ -53,6 +53,16 @@ pub struct TcEvent {
 }
 
 #[repr(C)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct DroppedPacketEvent {
+    pub protocol: u16,
+    pub pid: u32,
+    pub reason_code: u32,
+    pub reason: [u8; 64],              // Human-readable reason
+    pub reason_description: [u8; 128], // Detailed description of the reason
+}
+
+#[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
 pub struct TcpFlags {
     pub syn: u8,

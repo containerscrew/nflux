@@ -1,6 +1,5 @@
 use anyhow::Context;
 use aya::{
-    include_bytes_aligned,
     maps::{Array, RingBuf},
     programs::{tc, SchedClassifier, TcAttachType},
     Ebpf,
@@ -13,6 +12,7 @@ use super::tc_event::process_event;
 use crate::utils::wait_for_shutdown;
 
 pub async fn start_nflux(
+    ebpf: &mut Ebpf,
     interface: &str,
     disable_egress: bool,
     disable_ingress: bool,
@@ -20,16 +20,7 @@ pub async fn start_nflux(
     log_format: String,
     exclude_ports: Option<Vec<u16>>,
 ) -> anyhow::Result<()> {
-    // Load eBPF program
-    let mut ebpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/nflux")))?;
-
-    try_traffic_control(
-        &mut ebpf,
-        interface,
-        disable_ingress,
-        disable_egress,
-        configmap,
-    )?;
+    try_traffic_control(ebpf, interface, disable_ingress, disable_egress, configmap)?;
 
     let tc_event_ring_map = ebpf
         .take_map("TC_EVENT")
