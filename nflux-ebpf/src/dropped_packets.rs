@@ -36,7 +36,7 @@ pub fn try_dropped_packets(ctx: TracePointContext) -> Result<u32, u32> {
     };
 
     // Skip reason NOT_SPECIFIED (0) and UNKNOWN_REASON
-    if reason_code >= 2 {
+    if reason_code <= 2 {
         return Ok(0);
     }
 
