@@ -1,7 +1,7 @@
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
 use aya::maps::{MapData, RingBuf};
-use nflux_common::TcEvent;
+use nflux_common::{DroppedPacketEvent, TcEvent};
 use tokio::sync::watch;
 use tracing::info;
 
@@ -23,8 +23,47 @@ fn to_ipaddr(
         _ => IpAddr::V4(Ipv4Addr::UNSPECIFIED),
     }
 }
+pub async fn dropped_packets_events(
+    mut ring_buf: RingBuf<MapData>,
+    mut shutdown: watch::Receiver<bool>,
+) -> Result<(), anyhow::Error> {
+    loop {
+        if *shutdown.borrow() {
+            break;
+        }
 
-pub async fn process_event(
+        while let Some(event) = ring_buf.next() {
+            let data = event.as_ref();
+
+            if data.len() == size_of::<DroppedPacketEvent>() {
+                let event: &DroppedPacketEvent =
+                    unsafe { &*(data.as_ptr() as *const DroppedPacketEvent) };
+
+                info!(
+                    "Dropped packet! Proto: {} Reason Code: {} Reason: {:?} PID: {} Human friendly: {:?}",
+                    event.protocol,
+                    event.reason_code,
+                    String::from_utf8_lossy(&event.reason).trim_end_matches('\0'),
+                    event.pid,
+                    String::from_utf8_lossy(&event.reason_description).trim_end_matches('\0'),
+                );
+            }
+        }
+
+        tokio::select! {
+            _ = tokio::time::sleep(std::time::Duration::from_millis(100)) => {},
+            _ = shutdown.changed() => {
+                if *shutdown.borrow() {
+                    break;
+                }
+            }
+        }
+    }
+
+    Ok(())
+}
+
+pub async fn tc_events(
     mut ring_buf: RingBuf<MapData>,
     log_format: String,
     exclude_ports: Option<Vec<u16>>,

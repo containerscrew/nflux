@@ -6,21 +6,21 @@ use libc::getuid;
 use logger::LoggerConfig;
 use nflux_common::Configmap;
 use tracing::{error, info};
-use try_nflux::start_nflux;
 use utils::{is_true, set_mem_limit};
 
 use crate::{
-    cli::NfluxCliArgs, logger::init_logger, start_dropped_packets::start_dropped_packets,
+    cli::NfluxCliArgs,
+    logger::init_logger,
+    programs::{start_dropped_packets, start_traffic_control},
     utils::is_root_user,
 };
 
+mod events;
 mod logger;
-mod tc_event;
-mod try_nflux;
+mod programs;
 mod utils;
 
 mod cli;
-mod start_dropped_packets;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -47,50 +47,61 @@ async fn main() -> anyhow::Result<()> {
     let mut ebpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/nflux")))?;
 
     // Match possible subcommands
-    // TODO: refactor this logic matching subcommands
     match cli.command {
-        Some(cli::Commands::PktDropped {}) => {
+        Some(cli::Commands::DroppedPkt {}) => {
             info!("Sniffing dropped packets");
-            start_dropped_packets(&mut ebpf)
-                .await
-                .expect("Sniffing dropped packets failed");
+            start_dropped_packets(&mut ebpf).await?;
         }
-        None => {}
+        Some(cli::Commands::TrafficControl {
+            interface,
+            disable_egress,
+            disable_ingress,
+            listen_port,
+            exclude_port,
+            disable_udp,
+            disable_icmp,
+            disable_tcp,
+            log_interval,
+            disable_full_log,
+        }) => {
+            info!("Sniffing traffic on interface: {}", interface);
+            let configmap = Configmap {
+                disable_udp: is_true(disable_udp), // 0 = no, 1 = yes
+                disable_icmp: is_true(disable_icmp),
+                disable_tcp: is_true(disable_tcp),
+                log_interval: log_interval as u64 * 1_000_000_000,
+                disable_full_log: is_true(disable_full_log),
+                listen_port: listen_port.unwrap_or(0), // Default to 0 if not provided
+            };
+
+            // If enable_egress and enable_ingress are both false, the app is doing nothing, exit
+            if disable_egress && disable_ingress {
+                error!("Can't disable both egress and ingress traffic, nothing to display :)");
+                exit(1)
+            }
+
+            // Also, if all protocols are disabled, exit
+            if disable_icmp && disable_tcp && disable_udp {
+                error!("You disabled all the protocols (tcp/udp/icmp), nothing to display :)");
+                exit(1)
+            }
+
+            // Start nflux
+            start_traffic_control(
+                &mut ebpf,
+                &interface,
+                disable_egress,
+                disable_ingress,
+                configmap,
+                cli.log_format,
+                exclude_port,
+            )
+            .await?;
+        }
+        None => {
+            // Unreachable: CLI shows help if no args are provided.
+        }
     }
 
-    // If enable_egress and enable_ingress are both false, the app is doing nothing, exit
-    if cli.disable_egress && cli.disable_ingress {
-        error!("Can't disable both egress and ingress traffic, nothing to display :)");
-        exit(1)
-    }
-
-    // Also, if all protocols are disabled, exit
-    if cli.disable_icmp && cli.disable_tcp && cli.disable_udp {
-        error!("You disabled all the protocols (tcp/udp/icmp), nothing to display :)");
-        exit(1)
-    }
-
-    // Prepare configmap data (data from user space to be processed in kernel space using eBPF maps)
-    let configmap = Configmap {
-        disable_udp: is_true(cli.disable_udp), // 0 = no, 1 = yes
-        disable_icmp: is_true(cli.disable_icmp),
-        disable_tcp: is_true(cli.disable_tcp),
-        log_interval: cli.log_interval as u64 * 1_000_000_000,
-        disable_full_log: is_true(cli.disable_full_log),
-        listen_port: cli.listen_port.unwrap_or(0), // Default to 0 if not provided
-    };
-
-    // Start nflux
-    start_nflux(
-        &mut ebpf,
-        &cli.interface,
-        cli.disable_egress,
-        cli.disable_ingress,
-        configmap,
-        cli.log_format,
-        cli.exclude_port,
-    )
-    .await
-    .expect("Failed to start nflux");
     Ok(())
 }
