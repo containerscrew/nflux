@@ -1,0 +1,64 @@
+services:
+  grafana:
+    image: docker.io/grafana/grafana
+    container_name: grafana
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    networks:
+      - monitoring
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=grafana
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=containerscrew
+      - GF_AUTH_DISABLE_LOGIN_FORM=false
+      - GF_FEATURE_TOGGLES_ENABLE=accessControlOnCall lokiLogsDataplane
+    volumes:
+      #      - grafana-datasources:/etc/grafana/provisioning/datasources
+      - grafana-storage:/var/lib/grafana
+      - ./data-sources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ./plugins.yaml:/etc/grafana/provisioning/plugins/app.yaml
+  #      - ./dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+  #      - ./dashboards:/var/lib/grafana/dashboards
+
+  minio:
+    image: docker.io/bitnami/minio:latest
+    container_name: minio
+    restart: unless-stopped
+    networks:
+      - monitoring
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - 'minio-data:/data'
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=minioadmin
+      - MINIO_DEFAULT_BUCKETS=loki
+
+  loki:
+    image: docker.io/grafana/loki:latest
+    container_name: loki
+    restart: unless-stopped
+    networks:
+      - monitoring
+    depends_on:
+      - minio
+    ports:
+      - 3100:3100
+    volumes:
+      - ./loki-config.yaml:/etc/loki/loki-config.yaml
+    command: -config.file=/etc/loki/loki-config.yaml
+
+
+volumes:
+  minio-data:
+  grafana-storage:
+
+networks:
+  monitoring:
+    external: false
+    driver: bridge
