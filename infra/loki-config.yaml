@@ -58,7 +58,6 @@ storage_config:
     active_index_directory: /home/loki/tsdb-index
     cache_location: /home/loki/tsdb-cache
     resync_interval: 5s
-    shared_store: s3
 
 ruler:
   alertmanager_url: http://localhost:9093
