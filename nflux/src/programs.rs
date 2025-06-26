@@ -8,10 +8,13 @@ use nflux_common::Configmap;
 use tokio::sync::watch;
 use tracing::{debug, error, info};
 
-use super::events::{dropped_packets_events, tc_events};
+use super::events::{process_dp_events, process_tc_events};
 use crate::utils::wait_for_shutdown;
 
-pub async fn start_dropped_packets(ebpf: &mut Ebpf) -> anyhow::Result<()> {
+pub async fn start_dropped_packets(
+    ebpf: &mut Ebpf,
+    log_format: String,
+) -> anyhow::Result<()> {
     let program: &mut TracePoint = ebpf.program_mut("dropped_packets").unwrap().try_into()?;
     program.load()?;
     program.attach("skb", "kfree_skb")?;
@@ -25,7 +28,7 @@ pub async fn start_dropped_packets(ebpf: &mut Ebpf) -> anyhow::Result<()> {
     let (shutdown_tx, shutdown_rx) = watch::channel(false);
 
     let handle = tokio::spawn(async move {
-        if let Err(e) = dropped_packets_events(ring_buf, shutdown_rx).await {
+        if let Err(e) = process_dp_events(ring_buf, shutdown_rx, log_format).await {
             error!("process_event failed: {:?}", e);
         }
     });
@@ -61,7 +64,7 @@ pub async fn start_traffic_control(
     let (shutdown_tx, shutdown_rx) = watch::channel(false);
 
     let handle = tokio::spawn(async move {
-        if let Err(e) = tc_events(ring_buf, log_format, exclude_ports, shutdown_rx).await {
+        if let Err(e) = process_tc_events(ring_buf, log_format, exclude_ports, shutdown_rx).await {
             error!("process_event failed: {:?}", e);
         }
     });

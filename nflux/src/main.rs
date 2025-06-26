@@ -50,7 +50,7 @@ async fn main() -> anyhow::Result<()> {
     match cli.command {
         Some(cli::Commands::DroppedPkt {}) => {
             info!("Sniffing dropped packets");
-            start_dropped_packets(&mut ebpf).await?;
+            start_dropped_packets(&mut ebpf, cli.log_format).await?;
         }
         Some(cli::Commands::TrafficControl {
             interface,
