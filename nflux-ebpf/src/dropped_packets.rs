@@ -14,6 +14,14 @@ const PROTO_OFFSET: usize = 32;
 
 const RX_SK_OFFSET: usize = 24;
 
+fn str_to_bytes<const N: usize>(s: &str) -> [u8; N] {
+    let mut buf = [0u8; N];
+    let bytes = s.as_bytes();
+    let len = bytes.len().min(N);
+    buf[..len].copy_from_slice(&bytes[..len]);
+    buf
+}
+
 // https://github.com/torvalds/linux/blob/master/include/net/dropreason-core.h
 // tracepoint format: sudo cat /sys/kernel/debug/tracing/events/skb/kfree_skb/format
 pub fn try_dropped_packets(ctx: TracePointContext) -> Result<u32, u32> {
@@ -29,17 +37,14 @@ pub fn try_dropped_packets(ctx: TracePointContext) -> Result<u32, u32> {
     };
 
     let reason_description = reason_description(reason_code);
-    let reason_code = reason_code;
+    let reason_str = reason_to_str(reason_code);
 
     let event = DroppedPacketEvent {
-        protocol: protocol,
+        protocol,
         pid,
-        reason_code: reason_code,
-        reason: reason_to_str(reason_code)
-            .as_bytes()
-            .try_into()
-            .unwrap_or([0; 64]),
-        reason_description: reason_description.as_bytes().try_into().unwrap_or([0; 128]),
+        reason_code,
+        reason: str_to_bytes::<64>(reason_str),
+        reason_description: str_to_bytes::<128>(reason_description),
     };
 
     if let Some(mut data) = DROPPED_PACKETS_EVENT.reserve::<DroppedPacketEvent>(0) {
