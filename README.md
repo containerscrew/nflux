@@ -17,12 +17,6 @@
 [![GitHub Releases Stats](https://img.shields.io/github/downloads/containerscrew/nflux/total.svg?logo=github)](https://somsubhra.github.io/github-release-stats/?username=containerscrew&repository=nflux)
 ---
 <p align="center">
-    <img src="./examples/full-example.png" alt="example"/>
-</p>
-
----
-
-<p align="center">
     <img src="./examples/example.png" alt="example"/>
 </p>
 
@@ -47,9 +41,7 @@
 
 Nflux is an [`eBPF`](./docs/what_is_ebpf.md)-based tool that monitors `incoming/outgoing` traffic on a Linux system by
 attaching a `TC (Traffic Control)` program using eBPF technology. It can be attached to both physical and virtual
-interfaces, allowing us to obtain networking data at a very low level (L2/3). Supports filtering of dropped packets
-using `tracepoint/skb/kfree_skb` tracepoint.
-using
+interfaces, allowing us to obtain networking data at a very low level.
 
 # Installation
 
