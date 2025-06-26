@@ -58,7 +58,9 @@ Read the [installation](https://github.com/containerscrew/nflux/wiki/Installatio
 # Usage
 
 ```shell
-sudo nflux # log everything, which means: ingress/egress traffic, tcp,udp,icmp protocols, ipv4/ipv6
+sudo nflux --help
+sudo nflux traffic-control
+sudo nflux dropped-pkt
 ```
 
 Read the [usage](https://github.com/containerscrew/nflux/wiki/Usage) doc for more options.
