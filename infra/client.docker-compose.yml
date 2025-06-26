@@ -1,0 +1,12 @@
+services:
+  promtail:
+    image: grafana/promtail:latest
+    restart: unless-stopped
+    security_opt:
+      - seccomp=unconfined
+    network_mode: host
+    volumes:
+      - ${PWD}/promtail/config.yml:/etc/promtail/config.yml:z
+      - /tmp/nflux.log:/tmp/nflux.log:z
+    container_name: promtail
+    command: -config.file=/etc/promtail/config.yml

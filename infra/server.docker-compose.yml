@@ -18,9 +18,9 @@ services:
     volumes:
       #      - grafana-datasources:/etc/grafana/provisioning/datasources
       - grafana-storage:/var/lib/grafana
-      - ./data-sources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
-      - ./plugins.yaml:/etc/grafana/provisioning/plugins/app.yaml
-  #      - ./dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+      - ./grafana/data-sources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ./grafana/plugins.yaml:/etc/grafana/provisioning/plugins/app.yaml
+      - ./grafana/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
   #      - ./dashboards:/var/lib/grafana/dashboards
 
   minio:
@@ -50,7 +50,7 @@ services:
     ports:
       - 3100:3100
     volumes:
-      - ./loki-config.yaml:/etc/loki/loki-config.yaml
+      - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml
     command: -config.file=/etc/loki/loki-config.yaml
 
 
