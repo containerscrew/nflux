@@ -1,13 +1,12 @@
 use aya_ebpf::{
     bindings::socket, helpers::gen::bpf_get_current_pid_tgid, programs::TracePointContext,
 };
-use aya_log_ebpf::info;
 use nflux_common::{
     skb_reason::{reason_description, reason_to_str},
-    DroppedPacketEvent, TcEvent,
+    DroppedPacketEvent,
 };
 
-use crate::maps::{DROPPED_PACKETS_EVENT, TC_EVENT};
+use crate::maps::DROPPED_PACKETS_EVENT;
 
 const REASON_OFFSET: usize = 36;
 const PROTO_OFFSET: usize = 32;
@@ -35,6 +34,11 @@ pub fn try_dropped_packets(ctx: TracePointContext) -> Result<u32, u32> {
         ctx.read_at::<*const socket>(RX_SK_OFFSET)
             .map_err(|_| 1u32)?
     };
+
+    // Skip reason NOT_SPECIFIED (0) and UNKNOWN_REASON
+    if reason_code >= 2 {
+        return Ok(0);
+    }
 
     let reason_description = reason_description(reason_code);
     let reason_str = reason_to_str(reason_code);
