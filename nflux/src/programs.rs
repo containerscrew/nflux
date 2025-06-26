@@ -6,7 +6,7 @@ use aya::{
 };
 use nflux_common::Configmap;
 use tokio::sync::watch;
-use tracing::{debug, error, info};
+use tracing::{debug, error};
 
 use super::events::{process_dp_events, process_tc_events};
 use crate::utils::wait_for_shutdown;
@@ -58,8 +58,6 @@ pub async fn start_traffic_control(
         .ok_or_else(|| anyhow::anyhow!("Failed to find ring buffer TC_EVENT map"))?;
 
     let ring_buf = RingBuf::try_from(tc_event_ring_map)?;
-
-    info!("listening on {}", interface);
 
     let (shutdown_tx, shutdown_rx) = watch::channel(false);
 
