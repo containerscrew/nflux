@@ -58,9 +58,9 @@ pub async fn process_dropped_packets(
                     "Dropped packet! Proto: {} Reason Code: {} Reason: {:?} PID: {} Human friendly: {:?}",
                     event.protocol,
                     event.reason_code,
-                    event.reason,
+                    String::from_utf8_lossy(&event.reason),
                     event.pid,
-                    event.reason_description,
+                    String::from_utf8_lossy(&event.reason_description),
                 );
             }
         }

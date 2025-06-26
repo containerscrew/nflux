@@ -24,9 +24,9 @@ mounts:
   mountPoint: "/tmp/lima"
   writable: false
 
-memory: "2GiB"
-cpus: 2
-disk: "15GiB"
+memory: "3GiB"
+cpus: 4
+disk: "20GiB"
 ssh:
   localPort: 2222
   loadDotSSHPubKeys: true
