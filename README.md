@@ -27,13 +27,12 @@
 
 ---
 <p align="center">
-    <img src="./examples/example4.png" alt="example4"/>
+    <img src="./examples/example3.png" alt="example3"/>
 </p>
 
 ---
 <p align="center">
-    <h3 align="center">pkt-dropped feature is being implemented</h3>
-    <img src="./examples/example3.png" alt="example3"/>
+    <img src="./examples/example4.png" alt="example4"/>
 </p>
 
 ---
