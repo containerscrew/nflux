@@ -1,6 +1,8 @@
 <!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
 **Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
 - [Changelog](#changelog)
+  - [[unreleased]](#unreleased)
+  - [[0.9.0] - 2025-06-26](#090---2025-06-26)
   - [[0.8.0] - 2025-06-18](#080---2025-06-18)
   - [[0.7.0] - 2025-06-18](#070---2025-06-18)
   - [[0.6.1] - 2025-06-17](#061---2025-06-17)
@@ -14,6 +16,50 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+
+## [unreleased]
+
+- New infra/ folder to store compose and docker files
+
+## [0.9.0] - 2025-06-26
+
+- Update CHANGELOG.md for release v0.8.0
+
+- Update code comments in nflux-ebpf
+
+- Remove docs/ folder in favour of Github Wiki
+
+- Change imports rustfmt
+
+- Refactor: rename some functions & delete comments in nflux/src/main.rs
+
+- Fix(test): is_root_user
+
+- Feat: implement new feature to detect dropped packets
+
+- Update doc and examples
+
+- Update README.md
+
+- Add new example
+
+- Wip: dropped packets feature
+
+- Fix event struct in nflux-ebpf
+
+- Refactor: cli subcommands & file structure
+
+- Json logging for dropped-pkt & skip unknown reasons
+
+- Feat: nflux subcommands & file and code refactor
+
+- Update examples
+
+- Add full example
+
+- Revert "Add full example"
+
+This reverts commit 4bd5bfb15f96a38fe805aa5d0499a5f22cce4659.
 
 ## [0.8.0] - 2025-06-18
 
