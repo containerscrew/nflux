@@ -5,7 +5,7 @@ use clap::Parser;
 use libc::getuid;
 use logger::LoggerConfig;
 use nflux_common::Configmap;
-use tracing::{error, info};
+use tracing::{error, info, warn};
 use utils::{is_true, set_mem_limit};
 
 use crate::{
@@ -45,6 +45,11 @@ async fn main() -> anyhow::Result<()> {
 
     // Load eBPF program
     let mut ebpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/nflux")))?;
+
+    if let Err(e) = aya_log::EbpfLogger::init(&mut ebpf) {
+        // This can happen if you remove all log statements from your eBPF program.
+        warn!("failed to initialize eBPF logger: {e}");
+    }
 
     // Match possible subcommands
     match cli.command {

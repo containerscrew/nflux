@@ -1,7 +1,7 @@
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
 use aya::maps::{MapData, RingBuf};
-use nflux_common::{DroppedPacketEvent, TcEvent};
+use nflux_common::{DroppedPacketEvent, IpFamily, TcEvent};
 use tokio::sync::watch;
 use tracing::info;
 
@@ -53,8 +53,9 @@ pub async fn process_dp_events(
                     }
                     _ => {
                         info!(
-                            "Dropped packet! Proto: {} Reason Code: {} Reason: {:?} PID: {} Human friendly: {:?}",
-                            event.protocol,
+                            "Dropped packet! SkProto: {} SkFamily: {} Reason Code: {} Reason: {:?} PID: {} Human friendly: {:?}",
+                            convert_protocol(event.protocol as u8),
+                            event.family,
                             event.reason_code,
                             String::from_utf8_lossy(&event.reason).trim_end_matches('\0'),
                             event.pid,

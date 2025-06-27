@@ -35,6 +35,13 @@ impl IpFamily {
             IpFamily::Ipv6 => 6,
         }
     }
+    pub fn from_u8(family: u8) -> Self {
+        match family {
+            4 => IpFamily::Ipv4,
+            6 => IpFamily::Ipv6,
+            _ => panic!("Invalid IP family"),
+        }
+    }
 }
 
 #[repr(C)]
@@ -60,6 +67,7 @@ pub struct DroppedPacketEvent {
     pub reason_code: u32,
     pub reason: [u8; 64],              // Human-readable reason
     pub reason_description: [u8; 128], // Detailed description of the reason
+    pub family: u16,                   // Address family (AF_INET, AF_INET6, etc.)
 }
 
 #[repr(C)]

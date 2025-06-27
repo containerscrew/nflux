@@ -23,3 +23,6 @@ lima.REJECTED.yaml
 
 # Zip packages
 *.zip
+
+# vmlinux.rs
+vmlinux.rs
