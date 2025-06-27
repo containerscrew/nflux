@@ -49,3 +49,6 @@ test: ## Run tests
 
 check-unused-deps: ## Check for unused dependencies. $ cargo install cargo-machete
 	cargo machete --with-metadata
+
+generate-vmlinux: ## Generate vmlinux for kernel data structures
+	aya-tool generate sock > nflux-ebpf/src/vmlinux.rs
