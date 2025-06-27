@@ -9,6 +9,8 @@ mod try_tc;
 
 mod dropped_packets;
 
+mod vmlinux;
+
 use aya_ebpf::{
     bindings::TC_ACT_SHOT,
     macros::{classifier, tracepoint},
