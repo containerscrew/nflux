@@ -4,7 +4,6 @@ use aya_ebpf::{
     helpers::gen::{bpf_get_current_pid_tgid, bpf_probe_read_kernel},
     programs::TracePointContext,
 };
-use aya_log_ebpf::info;
 use nflux_common::{
     skb_reason::{reason_description, reason_to_str},
     DroppedPacketEvent,
@@ -66,6 +65,7 @@ pub fn try_dropped_packets(ctx: TracePointContext) -> Result<u32, u32> {
     }
 
     // Data
+    // TODO: add more data like src/dst IP, ports, etc.
     let protocol = read_sock_field::<u16>(rx_sk, offset_of!(sock, sk_protocol))?;
     let family = read_sock_field::<u16>(rx_sk, offset_of!(sock, __sk_common.skc_family))?;
 
