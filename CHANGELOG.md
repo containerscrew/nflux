@@ -37,6 +37,10 @@ All notable changes to this project will be documented in this file.
 
 - Add vmlinux.rs & remove unused imports
 
+- Update CHANGELOG.md for release v0.10.0
+
+- New release v0.10.0
+
 ## [0.9.0] - 2025-06-26
 
 - Update CHANGELOG.md for release v0.8.0
