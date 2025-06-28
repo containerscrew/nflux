@@ -55,7 +55,7 @@ pub async fn process_dp_events(
                         info!(
                             "Dropped packet! SkProto: {} SkFamily: {} Reason Code: {} Reason: {:?} PID: {} Human friendly: {:?}",
                             convert_protocol(event.protocol as u8),
-                            event.family,
+                            IpFamily::from_u8(event.family as u8).map(|fam| fam.as_str()).unwrap_or("unknown"),
                             event.reason_code,
                             String::from_utf8_lossy(&event.reason).trim_end_matches('\0'),
                             event.pid,

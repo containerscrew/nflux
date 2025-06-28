@@ -7,7 +7,7 @@ use aya_ebpf::{
 use aya_log_ebpf::info;
 use nflux_common::{
     skb_reason::{reason_description, reason_to_str},
-    DroppedPacketEvent, IpFamily,
+    DroppedPacketEvent,
 };
 
 use crate::{maps::DROPPED_PACKETS_EVENT, vmlinux::sock};
