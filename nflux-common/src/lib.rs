@@ -31,15 +31,16 @@ impl IpFamily {
 
     pub fn to_owned(&self) -> u8 {
         match self {
-            IpFamily::Ipv4 => 4,
-            IpFamily::Ipv6 => 6,
+            IpFamily::Ipv4 => 2,  // AF_INET
+            IpFamily::Ipv6 => 10, // AF_INET6
         }
     }
-    pub fn from_u8(family: u8) -> Self {
+
+    pub fn from_u8(family: u8) -> Result<Self, u8> {
         match family {
-            4 => IpFamily::Ipv4,
-            6 => IpFamily::Ipv6,
-            _ => panic!("Invalid IP family"),
+            2 => Ok(IpFamily::Ipv4),  // AF_INET
+            10 => Ok(IpFamily::Ipv6), // AF_INET6
+            _ => Err(family),
         }
     }
 }
