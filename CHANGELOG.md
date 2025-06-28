@@ -1,7 +1,7 @@
 <!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
 **Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
 - [Changelog](#changelog)
-  - [[unreleased]](#unreleased)
+  - [[0.10.0] - 2025-06-28](#0100---2025-06-28)
   - [[0.9.0] - 2025-06-26](#090---2025-06-26)
   - [[0.8.0] - 2025-06-18](#080---2025-06-18)
   - [[0.7.0] - 2025-06-18](#070---2025-06-18)
@@ -17,9 +17,25 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [0.10.0] - 2025-06-28
 
 - New infra/ folder to store compose and docker files
+
+- Update CHANGELOG.md for release v0.9.0
+
+- Fix loki config
+
+- Setup monitoring stack
+
+- Update README.md
+
+- Adding more socket information in dropped-pkt
+
+- Update Makefile
+
+- Fix SkFamily data in dropped-pkt
+
+- Add vmlinux.rs & remove unused imports
 
 ## [0.9.0] - 2025-06-26
 
