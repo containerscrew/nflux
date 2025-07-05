@@ -1,4 +1,7 @@
-use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+use std::{
+    net::{IpAddr, Ipv4Addr, Ipv6Addr},
+    time::Duration,
+};
 
 use aya::maps::{MapData, RingBuf};
 use nflux_common::{DroppedPacketEvent, IpFamily, TcEvent};
@@ -125,9 +128,10 @@ pub async fn process_tc_events(
                 }
             }
         }
-    }
 
-    Ok(())
+        // Avoid busy-loop when no events are arriving
+        tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+    }
 }
 
 #[cfg(test)]
