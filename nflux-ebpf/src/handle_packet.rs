@@ -68,9 +68,9 @@ fn handle_ports(
                 let is_fin = fin != 0;
                 let is_rst = rst != 0;
                 let is_psh = psh != 0;
-                // let is_urg = urg != 0;
-                // let is_ece = ece != 0;
-                // let is_cwr = cwr != 0;
+                let is_urg = urg != 0;
+                let is_ece = ece != 0;
+                let is_cwr = cwr != 0;
 
                 let tcp_flags = TcpFlags {
                     syn: is_syn as u8,
@@ -78,9 +78,9 @@ fn handle_ports(
                     fin: is_fin as u8,
                     rst: is_rst as u8,
                     psh: is_psh as u8,
-                    // urg: is_urg as u8,
-                    // ece: is_ece as u8,
-                    // cwr: is_cwr as u8,
+                    urg: is_urg as u8,
+                    ece: is_ece as u8,
+                    cwr: is_cwr as u8,
                 };
 
                 Ok((src_port, dst_port, Some(tcp_flags)))
@@ -134,6 +134,7 @@ pub fn handle_packet(
             let mut dst_ip = [0u8; 16];
             dst_ip[12..].copy_from_slice(&ipv4hdr.dst_addr);
             let total_len = u16::from_be_bytes(ipv4hdr.tot_len);
+
             let ttl = ipv4hdr.ttl;
 
             let (src_port, dst_port, Tcp_flags) =

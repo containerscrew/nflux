@@ -5,8 +5,7 @@ use aya::{
     Ebpf,
 };
 use nflux_common::Configmap;
-use tokio::{select, sync::watch};
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error, warn};
 
 use super::events::{process_dp_events, process_tc_events};
 use crate::utils::wait_for_shutdown;
@@ -25,13 +24,16 @@ pub async fn start_dropped_packets(
 
     let ring_buf = RingBuf::try_from(dropped_packets_ring_map)?;
 
-    let handle = tokio::spawn(async move {
-        if let Err(e) = process_dp_events(ring_buf, log_format).await {
-            error!("process_event failed: {:?}", e);
+    tokio::select! {
+        res = process_dp_events(ring_buf, log_format) => {
+            if let Err(e) = res {
+                error!("process_dp_events failed: {:?}", e);
+            }
+        },
+        _ = wait_for_shutdown() => {
+            warn!("You press Ctrl-C, shutting down nflux...");
         }
-    });
-
-    handle.await?;
+    }
 
     Ok(())
 }
@@ -52,8 +54,6 @@ pub async fn start_traffic_control(
         .ok_or_else(|| anyhow::anyhow!("Failed to find ring buffer TC_EVENT map"))?;
 
     let ring_buf = RingBuf::try_from(tc_event_ring_map)?;
-
-    info!("Starting traffic control");
 
     tokio::select! {
         res = process_tc_events(ring_buf, log_format, exclude_ports) => {

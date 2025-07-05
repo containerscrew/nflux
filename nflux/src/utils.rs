@@ -8,7 +8,7 @@ use dns_lookup::lookup_addr;
 use libc::{c_char, c_int, getservbyport, ntohs, servent, setrlimit};
 use nflux_common::{utils::is_private_ip, TcpFlags};
 use sysinfo::{Pid, System};
-use tokio::{signal, sync::watch};
+use tokio::signal;
 use tracing::{debug, warn};
 
 /// is_root_user checks if the current user who runs the program is root.
@@ -84,24 +84,24 @@ pub fn format_tcp_flags(flags: TcpFlags) -> String {
         }
         out.push_str("PSH");
     }
-    // if flags.urg != 0 {
-    //     if !first {
-    //         out.push_str(",");
-    //     }
-    //     out.push_str("URG");
-    // }
-    // if flags.ece != 0 {
-    //     if !first {
-    //         out.push_str(",");
-    //     }
-    //     out.push_str("ECE");
-    // }
-    // if flags.cwr != 0 {
-    //     if !first {
-    //         out.push_str(",");
-    //     }
-    //     out.push_str("CWR");
-    // }
+    if flags.urg != 0 {
+        if !first {
+            out.push_str(",");
+        }
+        out.push_str("URG");
+    }
+    if flags.ece != 0 {
+        if !first {
+            out.push_str(",");
+        }
+        out.push_str("ECE");
+    }
+    if flags.cwr != 0 {
+        if !first {
+            out.push_str(",");
+        }
+        out.push_str("CWR");
+    }
     out
 }
 

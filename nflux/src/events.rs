@@ -1,12 +1,8 @@
-use std::{
-    net::{IpAddr, Ipv4Addr, Ipv6Addr},
-    time::Duration,
-};
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
 use aya::maps::{MapData, RingBuf};
 use nflux_common::{DroppedPacketEvent, IpFamily, TcEvent};
-use tokio::sync::watch;
-use tracing::info;
+use tracing::{info, warn};
 
 use crate::utils::{convert_direction, convert_protocol, format_tcp_flags};
 
@@ -16,16 +12,21 @@ fn _format_mac(mac: &[u8; 6]) -> String {
         .collect::<Vec<_>>()
         .join(":")
 }
+
 fn to_ipaddr(
     ip: [u8; 16],
     ip_family: u8,
 ) -> IpAddr {
     match ip_family {
-        4 => IpAddr::V4(Ipv4Addr::new(ip[12], ip[13], ip[14], ip[15])),
-        6 => IpAddr::V6(Ipv6Addr::from(ip)),
-        _ => IpAddr::V4(Ipv4Addr::UNSPECIFIED),
+        2 => IpAddr::V4(Ipv4Addr::new(ip[12], ip[13], ip[14], ip[15])), // AF_INET
+        10 => IpAddr::V6(Ipv6Addr::from(ip)),                           // AF_INET6
+        _ => {
+            warn!("Unknown ip_family: {}", ip_family);
+            IpAddr::V4(Ipv4Addr::UNSPECIFIED)
+        }
     }
 }
+
 pub async fn process_dp_events(
     mut ring_buf: RingBuf<MapData>,
     log_format: String,
@@ -63,8 +64,9 @@ pub async fn process_dp_events(
                 }
             }
         }
+        // Avoid busy-loop when no events are arriving
+        tokio::time::sleep(std::time::Duration::from_millis(100)).await;
     }
-    Ok(())
 }
 
 pub async fn process_tc_events(
