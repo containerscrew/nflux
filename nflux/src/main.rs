@@ -5,7 +5,7 @@ use clap::Parser;
 use libc::getuid;
 use logger::LoggerConfig;
 use nflux_common::Configmap;
-use tracing::{error, info, warn};
+use tracing::{error, info};
 use utils::{is_true, set_mem_limit};
 
 use crate::{
