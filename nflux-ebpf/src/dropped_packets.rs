@@ -68,6 +68,13 @@ pub fn try_dropped_packets(ctx: TracePointContext) -> Result<u32, u32> {
     // TODO: add more data like src/dst IP, ports, etc.
     let protocol = read_sock_field::<u16>(rx_sk, offset_of!(sock, sk_protocol))?;
     let family = read_sock_field::<u16>(rx_sk, offset_of!(sock, __sk_common.skc_family))?;
+    let _src_ip =
+        read_sock_field::<[u8; 16]>(rx_sk, offset_of!(sock, __sk_common.skc_v6_rcv_saddr))?;
+
+    // info!(
+    //     &ctx,
+    //     "src ip address: {}.{}.{}.{}", src_ip[12], src_ip[13], src_ip[14], src_ip[15]
+    // );
 
     let reason_description = reason_description(reason_code);
     let reason_str = reason_to_str(reason_code);
