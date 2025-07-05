@@ -1,6 +1,7 @@
 <!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
 **Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
 - [Changelog](#changelog)
+  - [[0.11.0] - 2025-07-05](#0110---2025-07-05)
   - [[0.10.0] - 2025-06-28](#0100---2025-06-28)
   - [[0.9.0] - 2025-06-26](#090---2025-06-26)
   - [[0.8.0] - 2025-06-18](#080---2025-06-18)
@@ -16,6 +17,66 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+
+## [0.11.0] - 2025-07-05
+
+- Update CHANGELOG.md for release v0.10.0
+
+- Bump tokio from 1.45.1 to 1.46.0
+
+Bumps [tokio](https://github.com/tokio-rs/tokio) from 1.45.1 to 1.46.0.
+- [Release notes](https://github.com/tokio-rs/tokio/releases)
+- [Commits](https://github.com/tokio-rs/tokio/compare/tokio-1.45.1...tokio-1.46.0)
+
+---
+updated-dependencies:
+- dependency-name: tokio
+  dependency-version: 1.46.0
+  dependency-type: direct:production
+  update-type: version-update:semver-minor
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+- Merge pull request #64 from containerscrew/dependabot/cargo/tokio-1.46.0
+
+Bump tokio from 1.45.1 to 1.46.0
+
+- Bump tokio from 1.46.0 to 1.46.1
+
+Bumps [tokio](https://github.com/tokio-rs/tokio) from 1.46.0 to 1.46.1.
+- [Release notes](https://github.com/tokio-rs/tokio/releases)
+- [Commits](https://github.com/tokio-rs/tokio/compare/tokio-1.46.0...tokio-1.46.1)
+
+---
+updated-dependencies:
+- dependency-name: tokio
+  dependency-version: 1.46.1
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+
+- Merge pull request #65 from containerscrew/dependabot/cargo/tokio-1.46.1
+
+Bump tokio from 1.46.0 to 1.46.1
+
+- Change subcommands
+
+- Remove tokio thread in function process_tc_events
+
+- Update dependency
+
+- Add more tcp flags & IpFamily impl
+
+- Update examples
+
+- Rename example2
+
+- Update pre-commit
+
+- Update README.md
 
 ## [0.10.0] - 2025-06-28
 
