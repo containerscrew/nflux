@@ -78,6 +78,10 @@ Bump tokio from 1.46.0 to 1.46.1
 
 - Update README.md
 
+- Update CHANGELOG.md for release v0.11.0
+
+- New nflux version v0.11.0
+
 ## [0.10.0] - 2025-06-28
 
 - New infra/ folder to store compose and docker files
