@@ -42,11 +42,11 @@ repos:
   #        description: "Generate a CHANGELOG.md file using git-cliff"
   #        pass_filenames: false
 
-  - repo: local
-    hooks:
-      - id: cargo-fix-unused-imports
-        name: "cargo fix unused imports"
-        entry: cargo fix --allow-dirty --allow-staged --quiet
-        language: system
-        pass_filenames: false
-        stages: [pre-commit]
+  # - repo: local
+  #   hooks:
+  #     - id: cargo-fix-unused-imports
+  #       name: "cargo fix unused imports"
+  #       entry: cargo fix --allow-dirty --allow-staged --quiet
+  #       language: system
+  #       pass_filenames: false
+  #       stages: [pre-commit]
