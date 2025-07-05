@@ -26,16 +26,6 @@
 </p>
 
 ---
-<p align="center">
-    <img src="./examples/example3.png" alt="example3"/>
-</p>
-
----
-<p align="center">
-    <img src="./examples/example4.png" alt="example4"/>
-</p>
-
----
 
 # What is nflux?
 
