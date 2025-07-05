@@ -25,17 +25,11 @@ pub async fn start_dropped_packets(
 
     let ring_buf = RingBuf::try_from(dropped_packets_ring_map)?;
 
-    let (shutdown_tx, shutdown_rx) = watch::channel(false);
-
     let handle = tokio::spawn(async move {
-        if let Err(e) = process_dp_events(ring_buf, shutdown_rx, log_format).await {
+        if let Err(e) = process_dp_events(ring_buf, log_format).await {
             error!("process_event failed: {:?}", e);
         }
     });
-
-    wait_for_shutdown().await?;
-
-    let _ = shutdown_tx.send(true);
 
     handle.await?;
 
@@ -59,19 +53,9 @@ pub async fn start_traffic_control(
 
     let ring_buf = RingBuf::try_from(tc_event_ring_map)?;
 
-    let (shutdown_tx, shutdown_rx) = watch::channel(false);
-
-    let handle = tokio::spawn(async move {
-        if let Err(e) = process_tc_events(ring_buf, log_format, exclude_ports, shutdown_rx).await {
-            error!("process_event failed: {:?}", e);
-        }
-    });
+    process_tc_events(ring_buf, log_format, exclude_ports).await?;
 
     wait_for_shutdown().await?;
-
-    let _ = shutdown_tx.send(true);
-
-    handle.await?;
 
     Ok(())
 }

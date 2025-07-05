@@ -55,7 +55,7 @@ fn print_after_help_message() -> String {
 #[derive(Debug, Subcommand)]
 pub enum Commands {
     /// Sniff packets in L2/3 using traffic control (TC)
-    TrafficControl {
+    Tc {
         #[arg(
             short = 'i',
             long = "interface",
@@ -140,7 +140,7 @@ pub enum Commands {
         disable_full_log: bool,
     },
     /// Sniff dropped packets using tracepoint/skb/kfree_skb
-    DroppedPkt {},
+    Dpkt {},
 }
 
 #[cfg(test)]

@@ -1,0 +1,3 @@
+[toolchain]
+components = ["clippy-preview", "rustfmt-preview", "rust-src"]
+channel = "nightly"

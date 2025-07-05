@@ -15,12 +15,11 @@ use crate::{
     utils::is_root_user,
 };
 
+mod cli;
 mod events;
 mod logger;
 mod programs;
 mod utils;
-
-mod cli;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -53,11 +52,11 @@ async fn main() -> anyhow::Result<()> {
 
     // Match possible subcommands
     match cli.command {
-        Some(cli::Commands::DroppedPkt {}) => {
+        Some(cli::Commands::Dpkt {}) => {
             info!("Sniffing dropped packets");
             start_dropped_packets(&mut ebpf, cli.log_format).await?;
         }
-        Some(cli::Commands::TrafficControl {
+        Some(cli::Commands::Tc {
             interface,
             disable_egress,
             disable_ingress,
@@ -81,17 +80,17 @@ async fn main() -> anyhow::Result<()> {
 
             // If enable_egress and enable_ingress are both false, the app is doing nothing, exit
             if disable_egress && disable_ingress {
-                error!("Can't disable both egress and ingress traffic, nothing to display :)");
+                error!("Can't disable both egress and ingress traffic, nothing to display.");
                 exit(1)
             }
 
             // Also, if all protocols are disabled, exit
             if disable_icmp && disable_tcp && disable_udp {
-                error!("You disabled all the protocols (tcp/udp/icmp), nothing to display :)");
+                error!("You disabled all the protocols (tcp/udp/icmp), nothing to display.");
                 exit(1)
             }
 
-            // Start nflux
+            // Start nflux tc
             start_traffic_control(
                 &mut ebpf,
                 &interface,

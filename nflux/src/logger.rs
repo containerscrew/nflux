@@ -47,6 +47,7 @@ pub fn init_logger(logger_config: LoggerConfig) {
         .with_thread_names(false)
         .with_span_events(FmtSpan::FULL)
         .with_file(false)
+        .with_writer(std::io::stdout)
         .with_target(false);
 
     match (logger_config.format.as_str(), logger_config.with_timer) {
