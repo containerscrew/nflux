@@ -17,7 +17,7 @@ repos:
     rev: v0.5.0
     hooks:
       - id: mtoc
-        args: [ "-e", ".target/", "-e", "./README.md" ]
+        args: ["-e", ".target/", "-e", "./README.md"]
   # - repo: local
   #   hooks:
   #     - id: cargo-test
@@ -29,7 +29,7 @@ repos:
     rev: v1.0
     hooks:
       - id: fmt
-        args: [ '--all', '--' ]
+        args: ["--all", "--"]
       # - id: cargo-check
       # - id: clippy
       #   args: ["--", "-D", "warnings", "-D", "unused-imports"]
@@ -44,9 +44,9 @@ repos:
 
   - repo: local
     hooks:
-      - id: check-cargo-version-tag
-        name: "Check Git tag matches Cargo.toml version"
-        entry: ./scripts/check-version-tag.sh
-        language: script
+      - id: cargo-fix-unused-imports
+        name: "cargo fix unused imports"
+        entry: cargo fix --allow-dirty --allow-staged --quiet
+        language: system
         pass_filenames: false
-        stages: [ pre-push ]
+        stages: [pre-commit]
