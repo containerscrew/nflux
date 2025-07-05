@@ -49,8 +49,8 @@ Read the [installation](https://github.com/containerscrew/nflux/wiki/Installatio
 
 ```shell
 sudo nflux --help
-sudo nflux traffic-control
-sudo nflux dropped-pkt
+sudo nflux tc
+sudo nflux dpkt
 ```
 
 Read the [usage](https://github.com/containerscrew/nflux/wiki/Usage) doc for more options.
