@@ -8,7 +8,7 @@ use dns_lookup::lookup_addr;
 use libc::{c_char, c_int, getservbyport, ntohs, servent, setrlimit};
 use nflux_common::{utils::is_private_ip, TcpFlags};
 use sysinfo::{Pid, System};
-use tokio::signal;
+use tokio::{signal, sync::watch};
 use tracing::{debug, warn};
 
 /// is_root_user checks if the current user who runs the program is root.
@@ -47,7 +47,6 @@ pub async fn wait_for_shutdown() -> Result<(), anyhow::Error> {
     let ctrl_c = signal::ctrl_c();
     debug!("Waiting for Ctrl-C...");
     ctrl_c.await?;
-    warn!("You press Ctrl-C, shutting down nflux...");
     Ok(())
 }
 

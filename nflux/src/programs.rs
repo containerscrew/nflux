@@ -5,8 +5,8 @@ use aya::{
     Ebpf,
 };
 use nflux_common::Configmap;
-use tokio::sync::watch;
-use tracing::{debug, error};
+use tokio::{select, sync::watch};
+use tracing::{debug, error, info, warn};
 
 use super::events::{process_dp_events, process_tc_events};
 use crate::utils::wait_for_shutdown;
@@ -53,9 +53,18 @@ pub async fn start_traffic_control(
 
     let ring_buf = RingBuf::try_from(tc_event_ring_map)?;
 
-    process_tc_events(ring_buf, log_format, exclude_ports).await?;
+    info!("Starting traffic control");
 
-    wait_for_shutdown().await?;
+    tokio::select! {
+        res = process_tc_events(ring_buf, log_format, exclude_ports) => {
+            if let Err(e) = res {
+                error!("process_tc_events failed: {:?}", e);
+            }
+        },
+        _ = wait_for_shutdown() => {
+            warn!("You press Ctrl-C, shutting down nflux...");
+        }
+    }
 
     Ok(())
 }
