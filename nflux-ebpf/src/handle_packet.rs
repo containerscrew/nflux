@@ -58,17 +58,29 @@ fn handle_ports(
                 let ack = (*tcp_hdr).ack();
                 let fin = (*tcp_hdr).fin();
                 let rst = (*tcp_hdr).rst();
+                let psh = (*tcp_hdr).psh();
+                let urg = (*tcp_hdr).urg();
+                let ece = (*tcp_hdr).ece();
+                let cwr = (*tcp_hdr).cwr();
 
                 let is_syn = syn != 0;
                 let is_ack = ack != 0;
                 let is_fin = fin != 0;
                 let is_rst = rst != 0;
+                let is_psh = psh != 0;
+                // let is_urg = urg != 0;
+                // let is_ece = ece != 0;
+                // let is_cwr = cwr != 0;
 
                 let tcp_flags = TcpFlags {
                     syn: is_syn as u8,
                     ack: is_ack as u8,
                     fin: is_fin as u8,
                     rst: is_rst as u8,
+                    psh: is_psh as u8,
+                    // urg: is_urg as u8,
+                    // ece: is_ece as u8,
+                    // cwr: is_cwr as u8,
                 };
 
                 Ok((src_port, dst_port, Some(tcp_flags)))

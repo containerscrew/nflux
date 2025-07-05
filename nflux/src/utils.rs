@@ -12,19 +12,21 @@ use tokio::signal;
 use tracing::{debug, warn};
 
 /// is_root_user checks if the current user who runs the program is root.
-/// Avoid running nflux as uid != 0 (root). Ebpf requires privileges
+/// Avoid running nflux as uid != 0 (root). eBPF requires privileges
 pub fn is_root_user(uid: u32) -> Result<(), String> {
     if uid != 0 {
-        return Err("This program must be run as root. Try: $ sudo nflux".to_string());
+        return Err(
+            "This program must be run as root. Try: $ sudo nflux subcommands [flags]".to_string(),
+        );
     }
     Ok(())
 }
 
+/// set_default_iface returns the default interface name.
 pub fn set_default_iface() -> String {
     match get_default_interface_name() {
         Some(iface) => iface,
-        None => "No default interface found. Are you connected? Try: $ nflux netrace -i iface-name"
-            .to_string(),
+        None => "No default interface found. Are you connected?".to_string(),
     }
 }
 
@@ -41,7 +43,7 @@ pub fn set_mem_limit() {
     }
 }
 
-pub async fn wait_for_shutdown() -> anyhow::Result<()> {
+pub async fn wait_for_shutdown() -> Result<(), anyhow::Error> {
     let ctrl_c = signal::ctrl_c();
     debug!("Waiting for Ctrl-C...");
     ctrl_c.await?;
@@ -77,6 +79,30 @@ pub fn format_tcp_flags(flags: TcpFlags) -> String {
         }
         out.push_str("RST");
     }
+    if flags.psh != 0 {
+        if !first {
+            out.push_str(",");
+        }
+        out.push_str("PSH");
+    }
+    // if flags.urg != 0 {
+    //     if !first {
+    //         out.push_str(",");
+    //     }
+    //     out.push_str("URG");
+    // }
+    // if flags.ece != 0 {
+    //     if !first {
+    //         out.push_str(",");
+    //     }
+    //     out.push_str("ECE");
+    // }
+    // if flags.cwr != 0 {
+    //     if !first {
+    //         out.push_str(",");
+    //     }
+    //     out.push_str("CWR");
+    // }
     out
 }
 
@@ -176,7 +202,7 @@ mod tests {
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err(),
-            "This program must be run as root. Try: $ sudo nflux"
+            "This program must be run as root. Try: $ sudo nflux subcommands [flags]"
         );
     }
 

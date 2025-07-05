@@ -78,6 +78,10 @@ pub struct TcpFlags {
     pub ack: u8,
     pub fin: u8,
     pub rst: u8,
+    pub psh: u8,
+    // pub urg: u8,
+    // pub ece: u8,
+    // pub cwr: u8,
 }
 
 // #[repr(C)]

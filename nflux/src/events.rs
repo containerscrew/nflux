@@ -25,14 +25,9 @@ fn to_ipaddr(
 }
 pub async fn process_dp_events(
     mut ring_buf: RingBuf<MapData>,
-    mut shutdown: watch::Receiver<bool>,
     log_format: String,
 ) -> Result<(), anyhow::Error> {
     loop {
-        if *shutdown.borrow() {
-            break;
-        }
-
         while let Some(event) = ring_buf.next() {
             let data = event.as_ref();
 
@@ -65,17 +60,7 @@ pub async fn process_dp_events(
                 }
             }
         }
-
-        tokio::select! {
-            _ = tokio::time::sleep(std::time::Duration::from_millis(100)) => {},
-            _ = shutdown.changed() => {
-                if *shutdown.borrow() {
-                    break;
-                }
-            }
-        }
     }
-
     Ok(())
 }
 
@@ -83,13 +68,8 @@ pub async fn process_tc_events(
     mut ring_buf: RingBuf<MapData>,
     log_format: String,
     exclude_ports: Option<Vec<u16>>,
-    mut shutdown: watch::Receiver<bool>,
 ) -> Result<(), anyhow::Error> {
     loop {
-        if *shutdown.borrow() {
-            break;
-        }
-
         while let Some(event) = ring_buf.next() {
             let data = event.as_ref();
 
@@ -142,15 +122,6 @@ pub async fn process_tc_events(
                     _ => {
                         info!("{}", msg);
                     }
-                }
-            }
-        }
-
-        tokio::select! {
-            _ = tokio::time::sleep(std::time::Duration::from_millis(100)) => {},
-            _ = shutdown.changed() => {
-                if *shutdown.borrow() {
-                    break;
                 }
             }
         }
