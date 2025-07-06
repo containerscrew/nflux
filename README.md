@@ -1,6 +1,6 @@
 <p align="center">
     <h1 align="center">The nflux project</h1>
-    <p align="center">eBPF network monitoring tool 🐝</p>
+    <p align="center">Simple network monitoring tool. Powered by eBPF 🐝</p>
     <p align="center">Kernel and user space code written entirely in Rust ❤</p>
 </p>
 
