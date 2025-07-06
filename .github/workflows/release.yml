@@ -68,11 +68,6 @@ jobs:
         run: |
           zip -j nflux-${{ matrix.platform.release_for }}-${{ env.TAG_NAME }}.zip target/release/nflux
 
-      - name: Update CHANGELOG.md in main branch
-        run: |
-          git cliff -o CHANGELOG.md
-          mtoc -f CHANGELOG.md
-
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
@@ -81,5 +76,5 @@ jobs:
           files: |
             CHANGELOG.md
             LICENSE
-            *.deb
+            target/debian/*.deb
             *.zip

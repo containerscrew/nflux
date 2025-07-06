@@ -1,8 +1,7 @@
 <!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
 **Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
 - [Changelog](#changelog)
-  - [[unreleased]](#unreleased)
-  - [[0.12.0] - 2025-07-06](#0120---2025-07-06)
+  - [[0.12.1] - 2025-07-06](#0121---2025-07-06)
   - [[0.12.0] - 2025-07-06](#0120---2025-07-06)
   - [[0.11.0] - 2025-07-05](#0110---2025-07-05)
   - [[0.10.0] - 2025-06-28](#0100---2025-06-28)
@@ -21,15 +20,27 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
-
-- Creating .deb package with cargo-deb
-
-## [0.12.0] - 2025-07-06
+## [0.12.1] - 2025-07-06
 
 - Update CHANGELOG.md for release v0.12.0
 
+- Update CHANGELOG.md
+
+- Update build.yml pipeline
+
+- Update cargo deb metadata
+
+- New version v0.12.1 including .deb package
+
+- Update handle TcpFlags
+
+- Add cargo deb in release pipeline
+
 ## [0.12.0] - 2025-07-06
+
+- Update CHANGELOG.md for release v0.11.0
+
+- Update release pipeline
 
 - Update git hooks
 

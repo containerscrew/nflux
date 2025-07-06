@@ -741,6 +741,8 @@ dependencies = [
  "dns-lookup",
  "libc",
  "nflux-common",
+ "nflux-ebpf-dpkt",
+ "nflux-ebpf-tc",
  "sysinfo",
  "tokio",
  "tracing",
