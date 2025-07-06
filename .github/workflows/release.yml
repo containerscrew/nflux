@@ -62,17 +62,17 @@ jobs:
         run: |
           zip -j nflux-${{ matrix.platform.release_for }}-${{ env.TAG_NAME }}.zip target/release/nflux
 
-      - name: Update CHANGELOG.md in main branch
-        run: |
-          git checkout main
-          git pull origin main
-          git config --global user.name 'containerscrew'
-          git config --global user.email 'containerscrew@users.noreply.github.com'
-          git cliff -o CHANGELOG.md
-          mtoc -e .target/ -e ./README.md
-          git add CHANGELOG.md
-          git commit -m "Update CHANGELOG.md for release ${{ env.TAG_NAME }}"
-          git push origin main
+      # - name: Update CHANGELOG.md in main branch
+      #   run: |
+      #     git checkout main
+      #     git pull origin main
+      #     git config --global user.name 'containerscrew'
+      #     git config --global user.email 'containerscrew@users.noreply.github.com'
+      #     git cliff -o CHANGELOG.md
+      #     mtoc -e .target/ -e ./README.md
+      #     git add CHANGELOG.md
+      #     git commit -m "Update CHANGELOG.md for release ${{ env.TAG_NAME }}"
+      #     git push origin main
 
       - name: Release
         uses: softprops/action-gh-release@v2
