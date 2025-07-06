@@ -4,4 +4,4 @@ Section: utils
 Priority: optional
 Architecture: arm64
 Maintainer: Daniels <info@containerscrew.com>
-Description: eBPF network monitoring tool🐝
+Description: Simple network monitoring tool. Powered by eBPF 🐝

@@ -45,3 +45,32 @@ cargo_metadata = { workspace = true }
 [[bin]]
 name = "nflux"
 path = "src/main.rs"
+
+
+[package.metadata.deb]
+maintainer = "Daniels <info@containerscrew.com>"
+copyright = "2025, Daniels <info@containerscrew.com>"
+license-file = ["../LICENSE"]
+extended-description = """
+Simple network monitoring tool. Powered by eBPF 🐝
+"""
+section = "utils"
+priority = "optional"
+assets = [
+    [
+        "target/release/nflux",
+        "/usr/local/bin/",
+        "755",
+    ],
+    [
+        "../LICENSE",
+        "/usr/share/doc/nflux/",
+        "644",
+    ],
+    # [
+    #     "docs/usage.md",
+    #     "/usr/share/doc/nflux/",
+    #     "644",
+    # ],
+]
+depends = "libc6 (>= 2.27)"
