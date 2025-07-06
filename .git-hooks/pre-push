@@ -4,15 +4,12 @@ set -euo pipefail
 
 echo "[pre-push] Generating CHANGELOG.md with git cliff before push..."
 
-current_branch=$(git symbolic-ref --short HEAD)
-
 git cliff -o CHANGELOG.md
 
 git add CHANGELOG.md
 
 if ! git diff --cached --quiet; then
     git commit -m "Update CHANGELOG.md"
-    git push origin "${current_branch}"
     mtoc -f CHANGELOG.md
 else
     echo "[pre-push] No changes in CHANGELOG.md to commit."
