@@ -12,6 +12,8 @@ All notable changes to this project will be documented in this file.
 
 - Temporary comment some Tcp flags to avoid stack limit size
 
+- Comment mtoc hook
+
 ## [0.12.1] - 2025-07-06
 
 - Update CHANGELOG.md for release v0.12.0
