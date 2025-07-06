@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+echo "[pre-push] Generating CHANGELOG.md with git cliff before push..."
+
+git cliff -o CHANGELOG.md
+
+git add CHANGELOG.md
+
+if ! git diff --cached --quiet; then
+    git commit -m "Update CHANGELOG.md"
+else
+    echo "[pre-push] No changes in CHANGELOG.md to commit."
+fi
+
+echo "[pre-push] Done. Proceeding with push..."
