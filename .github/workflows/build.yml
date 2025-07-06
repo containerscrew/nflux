@@ -8,8 +8,6 @@ on:
       - '.github/workflows/build.yml'
     branches:
       - '**'
-    tags:
-      - 'v*.*.*'
 
 env:
   CARGO_TERM_COLOR: always
@@ -45,8 +43,9 @@ jobs:
 
       - name: Rustup
         run: |
-          rustup install stable && rustup toolchain install nightly --component rust-src
-          rustup default nightly
+          rustup update
+          rustup install stable
+          rustup toolchain install nightly --component rust-src
 
       - name: Setup cargo dependencies
         run: |
@@ -55,7 +54,11 @@ jobs:
 
       - name: Run build
         run: |
-          cargo +nightly build --release --package nflux --locked
+          cargo build --release --package nflux --locked
+
+      - name: Generate deb package
+        run: |
+          cargo deb
 
       - name: Test package zip
         run: |
