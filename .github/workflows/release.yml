@@ -64,6 +64,7 @@ jobs:
 
       - name: Update CHANGELOG.md in main branch
         run: |
+          git fetch origin main
           git checkout main
           git pull origin main
           git config --global user.name 'containerscrew'
@@ -71,7 +72,6 @@ jobs:
           git cliff -o CHANGELOG.md
           mtoc -e .target/ -e ./README.md
           git add CHANGELOG.md
-          git fetch origin main
           git commit -m "Update CHANGELOG.md for release ${{ env.TAG_NAME }}"
           git push origin main
 
