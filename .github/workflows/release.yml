@@ -51,6 +51,8 @@ jobs:
       - name: Setup cargo dependencies
         run: |
           cargo install bpf-linker
+          cargo install git-cliff
+          cargo install mtoc
 
       - name: Run build
         run: |
@@ -59,40 +61,6 @@ jobs:
       - name: Package zip
         run: |
           zip -j nflux-${{ matrix.platform.release_for }}-${{ env.TAG_NAME }}.zip target/release/nflux
-
-      - name: Release
-        uses: softprops/action-gh-release@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          generate_release_notes: true
-          files: |
-            CHANGELOG.md
-            LICENSE
-            *.zip
-
-  changelog:
-    name: Generate CHANGELOG
-    needs:
-      - release
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install git cliff
-        run: |
-          rustup default stable
-          cargo install git-cliff
-          cargo install mtoc
-
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set tag
-        id: set_tag
-        run: |
-          # Extract the tag name from the full reference
-          TAG_NAME=$(echo "${{ github.ref }}" | sed 's|.*/||')
-          echo "TAG_NAME=$TAG_NAME" >> "$GITHUB_ENV"
 
       - name: Update CHANGELOG.md in main branch
         run: |
@@ -105,3 +73,13 @@ jobs:
           git add CHANGELOG.md
           git commit -m "Update CHANGELOG.md for release ${{ env.TAG_NAME }}"
           git push origin main
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          generate_release_notes: true
+          files: |
+            CHANGELOG.md
+            LICENSE
+            *.zip
