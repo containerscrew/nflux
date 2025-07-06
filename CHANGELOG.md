@@ -12,6 +12,8 @@ All notable changes to this project will be documented in this file.
 
 - Update CHANGELOG.md
 
+- Update git hook pre-push
+
 ## [0.11.0] - 2025-07-05
 
 - Update CHANGELOG.md for release v0.10.0
