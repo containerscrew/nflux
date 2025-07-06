@@ -13,11 +13,11 @@ repos:
     rev: v8.18.0
     hooks:
       - id: gitleaks
-  - repo: https://github.com/containerscrew/mtoc
-    rev: v0.5.0
-    hooks:
-      - id: mtoc
-        args: ["-e", ".target/", "-e", "./README.md"]
+  # - repo: https://github.com/containerscrew/mtoc
+  #   rev: v0.5.0
+  #   hooks:
+  #     - id: mtoc
+  #       args: ["-e", ".target/", "-e", "./README.md"]
   # - repo: local
   #   hooks:
   #     - id: cargo-test
