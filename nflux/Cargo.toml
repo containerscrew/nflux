@@ -2,10 +2,10 @@
 name = "nflux"
 version = "0.12.1"
 edition = "2021"
-license-file = "../LICENSE"
 authors = ["containerscrew info@containerscrew.com"]
 description = "Network monitoring tool & TLS/SSL sniffer using eBPF 🐝"
 repository = "https://github.com/containerscrew/nflux"
+license.workspace = true
 
 [dependencies]
 nflux-common = { path = "../nflux-common/", features = ["user"] }
@@ -41,6 +41,8 @@ cargo_metadata = { workspace = true }
 # Finally note that *any* usage of `artifact = ...` in *any* Cargo.toml in the workspace breaks
 # workflows with stable cargo; stable cargo outright refuses to load manifests that use unstable
 # features.
+nflux-ebpf-dpkt = { path = "../nflux-ebpf-dpkt/" }
+nflux-ebpf-tc = { path = "../nflux-ebpf-tc/" }
 
 [[bin]]
 name = "nflux"
@@ -50,7 +52,7 @@ path = "src/main.rs"
 [package.metadata.deb]
 maintainer = "Daniels <info@containerscrew.com>"
 copyright = "2025, Daniels <info@containerscrew.com>"
-license-file = ["../LICENSE"]
+license = "MIT OR GPL-3.0"
 extended-description = """
 Simple network monitoring tool. Powered by eBPF 🐝
 """

@@ -49,7 +49,7 @@ fn print_about() -> String {
 }
 
 fn print_after_help_message() -> String {
-    format!("Author: containerscrew \nWebsite: github.com/containerscrew/nflux\nLicense: GPL 3\nIssues: github.com/containerscrew/nflux/issues")
+    format!("Author: containerscrew \nWebsite: github.com/containerscrew/nflux\nLicense: MIT or GPL3\nIssues: github.com/containerscrew/nflux/issues")
 }
 
 #[derive(Debug, Subcommand)]

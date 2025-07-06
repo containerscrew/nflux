@@ -61,4 +61,4 @@ Read the [wiki](https://github.com/containerscrew/nflux/wiki)
 
 # License
 
-**`nflux`** is distributed under the terms of the [GPL3](./LICENSE) license.
+**`nflux`** is distributed under the terms of the [GPL3](./LICENSE-GPL3) or [MIT](./LICENSE-MIT) license.

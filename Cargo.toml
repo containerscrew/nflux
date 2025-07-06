@@ -3,6 +3,9 @@ resolver = "2"
 members = ["nflux", "nflux-common", "nflux-ebpf-tc", "nflux-ebpf-dpkt"]
 default-members = ["nflux", "nflux-common"]
 
+[workspace.package]
+license = "MIT OR GPL-3.0"
+
 [workspace.dependencies]
 aya = { version = "0.13.0", default-features = false }
 aya-build = { version = "0.1.2", default-features = false }
