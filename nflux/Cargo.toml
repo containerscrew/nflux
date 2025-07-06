@@ -57,20 +57,11 @@ Simple network monitoring tool. Powered by eBPF 🐝
 section = "utils"
 priority = "optional"
 assets = [
-    [
-        "target/release/nflux",
-        "/usr/local/bin/",
-        "755",
-    ],
-    [
-        "../LICENSE",
-        "/usr/share/doc/nflux/",
-        "644",
-    ],
+    ["target/release/nflux", "/usr/local/bin/", "755"],
+    ["../LICENSE", "/usr/share/doc/nflux/", "644"],
     # [
     #     "docs/usage.md",
     #     "/usr/share/doc/nflux/",
     #     "644",
     # ],
 ]
-depends = "libc6 (>= 2.27)"
