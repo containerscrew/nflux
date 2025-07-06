@@ -157,14 +157,14 @@ mod tests {
         ip[14] = 1;
         ip[15] = 100;
 
-        let result = to_ipaddr(ip, 4);
+        let result = to_ipaddr(ip, 2);
         assert_eq!(result, IpAddr::V4(Ipv4Addr::new(192, 168, 1, 100)));
     }
 
     #[test]
     fn test_to_ipaddr_ipv6() {
         let ip = Ipv6Addr::new(0xfe80, 0, 0, 0, 0x0202, 0xb3ff, 0xfe1e, 0x8329).octets();
-        let result = to_ipaddr(ip, 6);
+        let result = to_ipaddr(ip, 10);
         assert_eq!(
             result,
             IpAddr::V6(Ipv6Addr::new(
