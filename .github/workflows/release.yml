@@ -45,18 +45,20 @@ jobs:
 
       - name: Rustup
         run: |
-          rustup install stable && rustup toolchain install nightly --component rust-src
-          rustup default nightly
+          rustup update
+          rustup install stable
+          rustup toolchain install nightly --component rust-src
 
       - name: Setup cargo dependencies
         run: |
           cargo install bpf-linker
           cargo install git-cliff
           cargo install mtoc
+          cargo install cargo-deb
 
       - name: Run build
         run: |
-          cargo +nightly build --release --locked
+          cargo build --release --locked
 
       - name: Package zip
         run: |
