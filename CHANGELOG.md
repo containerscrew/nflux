@@ -1,11 +1,16 @@
 <!-- START OF TOC !DO NOT EDIT THIS CONTENT MANUALLY-->
 **Table of Contents**  *generated with [mtoc](https://github.com/containerscrew/mtoc)*
 - [Changelog](#changelog)
+  - [[unreleased]](#unreleased)
   - [[0.12.0] - 2025-07-06](#0120---2025-07-06)
 <!-- END OF TOC -->
 # Changelog
 
 All notable changes to this project will be documented in this file.
+
+## [unreleased]
+
+- Update CHANGELOG.md for release v0.12.0
 
 ## [0.12.0] - 2025-07-06
 
