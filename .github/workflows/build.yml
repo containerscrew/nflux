@@ -51,6 +51,7 @@ jobs:
       - name: Setup cargo dependencies
         run: |
           cargo install bpf-linker
+          cargo install cargo-deb
 
       - name: Run build
         run: |
