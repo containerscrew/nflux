@@ -52,7 +52,7 @@ path = "src/main.rs"
 [package.metadata.deb]
 maintainer = "Daniels <info@containerscrew.com>"
 copyright = "2025, Daniels <info@containerscrew.com>"
-license-file = ["../LICENSE-GPL3", "../LICENSE-MIT"]
+license-file = ["../LICENSE-GPL3"]
 extended-description = """
 Simple network monitoring tool. Powered by eBPF 🐝
 """
