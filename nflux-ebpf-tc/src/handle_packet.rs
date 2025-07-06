@@ -61,9 +61,9 @@ fn handle_ports(
                     fin: ((*tcp_hdr).fin() != 0) as u8,
                     rst: ((*tcp_hdr).rst() != 0) as u8,
                     psh: ((*tcp_hdr).psh() != 0) as u8,
-                    urg: ((*tcp_hdr).urg() != 0) as u8,
-                    ece: ((*tcp_hdr).ece() != 0) as u8,
-                    cwr: ((*tcp_hdr).cwr() != 0) as u8,
+                    // urg: ((*tcp_hdr).urg() != 0) as u8,
+                    // ece: ((*tcp_hdr).ece() != 0) as u8,
+                    // cwr: ((*tcp_hdr).cwr() != 0) as u8,
                 };
 
                 Ok((src_port, dst_port, Some(tcp_flags)))
