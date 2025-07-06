@@ -61,4 +61,4 @@ tag: ## Generate a new tag
 	git add CHANGELOG.md
 	git commit -m "chore: update changelog for $(version)"
 	mtoc -f CHANGELOG.md
-	git tag -a $(version) -m $(message)
+	git tag -a $(version) -m "$(message)"
