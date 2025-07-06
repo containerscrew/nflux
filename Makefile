@@ -22,7 +22,7 @@ pre-commit-uninstall: ## Uninstall pre-commit
 run-pre-commit: ## Run pre-commit locally
 	pre-commit run -a
 
-generate-changelog: mtoc ## Generate changelog
+generate-changelog: ## Generate changelog
 	git cliff -o CHANGELOG.md
 
 init-gitmoji: ## Init gitmoji (sudo npm i -g gitmoji-cli)
