@@ -52,7 +52,7 @@ path = "src/main.rs"
 [package.metadata.deb]
 maintainer = "Daniels <info@containerscrew.com>"
 copyright = "2025, Daniels <info@containerscrew.com>"
-license = "MIT OR GPL-3.0"
+license-file = ["../LICENSE-GPL3", "../LICENSE-MIT"]
 extended-description = """
 Simple network monitoring tool. Powered by eBPF 🐝
 """
@@ -60,7 +60,8 @@ section = "utils"
 priority = "optional"
 assets = [
     ["target/release/nflux", "/usr/local/bin/", "755"],
-    ["../LICENSE", "/usr/share/doc/nflux/", "644"],
+    ["../LICENSE-GPL3", "/usr/share/doc/nflux/", "644"],
+    ["../LICENSE-MIT", "/usr/share/doc/nflux/", "644"],
     # [
     #     "docs/usage.md",
     #     "/usr/share/doc/nflux/",
