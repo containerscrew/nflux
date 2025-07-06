@@ -1,5 +1,5 @@
 [package]
-name = "nflux-ebpf"
+name = "nflux-ebpf-dpkt"
 version = "0.1.0"
 edition = "2021"
 
@@ -16,5 +16,5 @@ which = { workspace = true }
 
 
 [[bin]]
-name = "nflux"
+name = "ebpf-dpkt"
 path = "src/main.rs"

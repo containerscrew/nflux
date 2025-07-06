@@ -43,7 +43,11 @@ async fn main() -> anyhow::Result<()> {
     info!("Starting nflux with pid {}", process::id());
 
     // Load eBPF program
-    let mut ebpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/nflux")))?;
+    let mut bpf_tc = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/ebpf-tc")))?;
+    let mut bpf_dp = Ebpf::load(include_bytes_aligned!(concat!(
+        env!("OUT_DIR"),
+        "/ebpf-dpkt"
+    )))?;
 
     // if let Err(e) = aya_log::EbpfLogger::init(&mut ebpf) {
     //     // This can happen if you remove all log statements from your eBPF program.
@@ -54,7 +58,7 @@ async fn main() -> anyhow::Result<()> {
     match cli.command {
         Some(cli::Commands::Dpkt {}) => {
             info!("Sniffing dropped packets");
-            start_dropped_packets(&mut ebpf, cli.log_format).await?;
+            start_dropped_packets(&mut bpf_dp, cli.log_format).await?;
         }
         Some(cli::Commands::Tc {
             interface,
@@ -92,7 +96,7 @@ async fn main() -> anyhow::Result<()> {
 
             // Start nflux tc
             start_traffic_control(
-                &mut ebpf,
+                &mut bpf_tc,
                 &interface,
                 disable_egress,
                 disable_ingress,
