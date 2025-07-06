@@ -11,12 +11,12 @@ pub unsafe fn log_connection(
     // By default, we log all events
     if configmap.disable_full_log == 0 {
         if let Some(mut data) = TC_EVENT.reserve::<TcEvent>(0) {
-            unsafe { *data.as_mut_ptr() = *event }
+            unsafe {
+                core::ptr::write(data.as_mut_ptr(), *event);
+            }
             data.submit(0);
         }
     } else {
-        // If user decide to stop logging all events, using --disable-full-log
-        // Log connections based on the time --log-interval. Data is saved in ACTIVE_CONNECTIONS map
         let current_time = bpf_ktime_get_ns();
 
         let key = ActiveConnectionKey {
@@ -34,11 +34,20 @@ pub unsafe fn log_connection(
         }
 
         if let Some(mut data) = TC_EVENT.reserve::<TcEvent>(0) {
-            unsafe { *data.as_mut_ptr() = *event }
+            unsafe {
+                core::ptr::write(data.as_mut_ptr(), *event);
+            }
             data.submit(0);
         }
 
-        // Track the last log time for this connection
         ACTIVE_CONNECTIONS.insert(&key, &current_time, 0).ok();
     }
 }
+
+// if let Some(mut data) = TC_EVENT.reserve::<TcEvent>(0) {
+//     unsafe {
+//         let ptr = data.as_mut_ptr();
+//         core::ptr::write(ptr, TcEvent { ... });
+//     }
+//     data.submit(0);
+// }
