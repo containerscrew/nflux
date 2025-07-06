@@ -55,3 +55,10 @@ generate-vmlinux: ## Generate vmlinux for kernel data structures
 
 setup-hooks:
 	git config core.hooksPath .git-hooks
+
+tag: ## Generate a new tag
+	git-cliff -t $(version) -o CHANGELOG.md
+	git add CHANGELOG.md
+	git commit -m "chore: update changelog for $(version)"
+	mtoc -f CHANGELOG.md
+	git tag -a $(version) -m $(message)
