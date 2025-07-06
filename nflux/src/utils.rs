@@ -84,24 +84,24 @@ pub fn format_tcp_flags(flags: TcpFlags) -> String {
         }
         out.push_str("PSH");
     }
-    // if flags.urg != 0 {
-    //     if !first {
-    //         out.push_str(",");
-    //     }
-    //     out.push_str("URG");
-    // }
-    // if flags.ece != 0 {
-    //     if !first {
-    //         out.push_str(",");
-    //     }
-    //     out.push_str("ECE");
-    // }
-    // if flags.cwr != 0 {
-    //     if !first {
-    //         out.push_str(",");
-    //     }
-    //     out.push_str("CWR");
-    // }
+    if flags.urg != 0 {
+        if !first {
+            out.push_str(",");
+        }
+        out.push_str("URG");
+    }
+    if flags.ece != 0 {
+        if !first {
+            out.push_str(",");
+        }
+        out.push_str("ECE");
+    }
+    if flags.cwr != 0 {
+        if !first {
+            out.push_str(",");
+        }
+        out.push_str("CWR");
+    }
     out
 }
 
