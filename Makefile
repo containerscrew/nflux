@@ -58,7 +58,7 @@ setup-hooks:
 
 tag: ## Generate a new tag
 	git-cliff -t $(version) -o CHANGELOG.md
+	mtoc -f CHANGELOG.md
 	git add CHANGELOG.md
 	git commit -m "chore: update changelog for $(version)"
-	mtoc -f CHANGELOG.md
 	git tag -a $(version) -m "$(message)"
