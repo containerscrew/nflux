@@ -41,8 +41,6 @@ cargo_metadata = { workspace = true }
 # Finally note that *any* usage of `artifact = ...` in *any* Cargo.toml in the workspace breaks
 # workflows with stable cargo; stable cargo outright refuses to load manifests that use unstable
 # features.
-nflux-ebpf-dpkt = { path = "../nflux-ebpf-dpkt/" }
-nflux-ebpf-tc = { path = "../nflux-ebpf-tc/" }
 
 [[bin]]
 name = "nflux"

@@ -127,7 +127,6 @@ pub fn handle_packet(
                 return Ok(TC_ACT_PIPE);
             }
 
-            // 🚩 Preparar campos por separado sin crear TcEvent en stack
             unsafe {
                 log_connection_fields(
                     src_ip,
