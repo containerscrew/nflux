@@ -139,7 +139,8 @@ pub fn handle_packet(
                     direction,
                     IpFamily::Ipv4,
                     tcp_flags.unwrap_or_default(),
-                    *tc_config,
+                    tc_config.disable_full_log,
+                    tc_config.log_interval,
                 );
             }
 
@@ -165,7 +166,8 @@ pub fn handle_packet(
                     direction,
                     IpFamily::Ipv6,
                     tcp_flags.unwrap_or_default(),
-                    *tc_config,
+                    tc_config.disable_full_log,
+                    tc_config.log_interval,
                 );
             }
 
