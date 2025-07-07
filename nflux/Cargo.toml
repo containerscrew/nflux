@@ -51,6 +51,7 @@ path = "src/main.rs"
 maintainer = "Daniels <info@containerscrew.com>"
 copyright = "2025, Daniels <info@containerscrew.com>"
 license-file = ["../LICENSE-GPL3"]
+revision = 1
 extended-description = """
 Simple network monitoring tool. Powered by eBPF 🐝
 """
