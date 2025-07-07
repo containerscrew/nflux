@@ -48,7 +48,8 @@ _Quick installation:_
 curl -L https://github.com/containerscrew/nflux/releases/download/v0.12.3/nflux_0.12.3-1_amd64.deb -o nflux.deb && sudo apt install ./nflux.deb
 ```
 
-> [!NOTE] > `.rpm` package will come soon.
+> [!NOTE]
+> `.rpm` package will come soon.
 > Change also the version you need in the URL above.
 
 ---
