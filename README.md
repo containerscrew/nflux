@@ -5,6 +5,7 @@
 </p>
 
 ---
+
 ![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white)
 [![License - MIT](https://img.shields.io/github/license/containerscrew/nflux)](/LICENSE-MIT)
 [![License - GPL3](https://img.shields.io/github/license/containerscrew/nflux)](/LICENSE-GPL3)
@@ -16,12 +17,15 @@
 [![Release Pipeline](https://github.com/containerscrew/nflux/actions/workflows/release.yml/badge.svg?event=push)](https://github.com/containerscrew/nflux/actions/workflows/release.yml)
 [![Release](https://img.shields.io/github/release/containerscrew/nflux)](https://github.com/containerscrew/nflux/releases/latest)
 [![GitHub Releases Stats](https://img.shields.io/github/downloads/containerscrew/nflux/total.svg?logo=github)](https://somsubhra.github.io/github-release-stats/?username=containerscrew&repository=nflux)
+
 ---
+
 <p align="center">
     <img src="./examples/example.png" alt="example"/>
 </p>
 
 ---
+
 <p align="center">
     <img src="./examples/example2.png" alt="example2"/>
 </p>
@@ -38,7 +42,18 @@ tracepoint
 
 # Installation
 
-Quick installation:
+_Quick installation:_
+
+```shell
+curl -L https://github.com/containerscrew/nflux/releases/download/v0.12.3/nflux_0.12.3-1_amd64.deb -o nflux.deb && sudo apt install ./nflux.deb
+```
+
+> [!NOTE] > `.rpm` package will come soon.
+> Change also the version you need in the URL above.
+
+---
+
+_Use the generic binary instead:_
 
 ```shell
 curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/nflux/main/scripts/install.sh | sh
@@ -50,7 +65,7 @@ Read the [installation](https://github.com/containerscrew/nflux/wiki/Installatio
 
 ```shell
 sudo nflux --help
-sudo nflux tc
+sudo nflux tc # L2/L3 monitoring
 sudo nflux dpkt
 ```
 
@@ -58,8 +73,8 @@ Read the [usage](https://github.com/containerscrew/nflux/wiki/Usage) doc for mor
 
 # Wiki
 
-Read the [wiki](https://github.com/containerscrew/nflux/wiki)
+Read the [wiki](https://github.com/containerscrew/nflux/wiki) for more information about the project.
 
 # License
 
-**`nflux`** is distributed under the terms of the [GPL3](./LICENSE-GPL3) or [MIT](./LICENSE-MIT) license.
+**`nflux`** is distributed under the terms of the [GPL3](./LICENSE-GPL3) and [MIT](./LICENSE-MIT) license.
