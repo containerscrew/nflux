@@ -7,9 +7,9 @@ use network_types::{
     tcp::TcpHdr,
     udp::UdpHdr,
 };
-use nflux_common::{Configmap, IpFamily, TcEvent, TcpFlags};
+use nflux_common::{Configmap, IpFamily, TcpFlags};
 
-use crate::{maps::TC_CONFIG, tc_event::log_connection};
+use crate::{maps::TC_CONFIG, tc_event::log_connection_fields};
 
 pub enum IpHeader {
     V4(Ipv4Hdr),
@@ -101,7 +101,6 @@ pub fn handle_packet(
     header: IpHeader,
     l2: bool,
 ) -> Result<i32, ()> {
-    // Load runtime config from eBPF map
     let tc_config = TC_CONFIG.get(0).ok_or(())?;
 
     match header {
@@ -117,24 +116,10 @@ pub fn handle_packet(
             let mut dst_ip = [0u8; 16];
             dst_ip[12..].copy_from_slice(&ipv4hdr.dst_addr);
             let total_len = u16::from_be_bytes(ipv4hdr.tot_len);
-
             let ttl = ipv4hdr.ttl;
 
-            let (src_port, dst_port, Tcp_flags) =
+            let (src_port, dst_port, tcp_flags) =
                 handle_ports(ctx, protocol, l2, IpFamily::Ipv4).unwrap_or((0, 0, None));
-
-            let event = TcEvent {
-                src_ip,
-                dst_ip,
-                total_len,
-                ttl,
-                src_port,
-                dst_port,
-                protocol: protocol as u8,
-                direction,
-                ip_family: IpFamily::Ipv4,
-                tcp_flags: Tcp_flags.unwrap_or_default(),
-            };
 
             if tc_config.listen_port != 0
                 && (src_port != tc_config.listen_port && dst_port != tc_config.listen_port)
@@ -142,8 +127,21 @@ pub fn handle_packet(
                 return Ok(TC_ACT_PIPE);
             }
 
+            // 🚩 Preparar campos por separado sin crear TcEvent en stack
             unsafe {
-                log_connection(&event, *tc_config);
+                log_connection_fields(
+                    src_ip,
+                    dst_ip,
+                    total_len,
+                    ttl,
+                    src_port,
+                    dst_port,
+                    protocol as u8,
+                    direction,
+                    IpFamily::Ipv4,
+                    tcp_flags.unwrap_or_default(),
+                    *tc_config,
+                );
             }
 
             Ok(TC_ACT_PIPE)
@@ -152,24 +150,24 @@ pub fn handle_packet(
             let source = ipv6hdr.src_addr().octets();
             let destination = ipv6hdr.dst_addr().octets();
             let proto = ipv6hdr.next_hdr;
-            let (src_port, dst_port, Tcp_flags) =
+
+            let (src_port, dst_port, tcp_flags) =
                 handle_ports(ctx, proto, l2, IpFamily::Ipv6).unwrap_or((0, 0, None));
 
-            let event = TcEvent {
-                src_ip: source,
-                dst_ip: destination,
-                total_len: u16::from_be_bytes(ipv6hdr.payload_len),
-                ttl: ipv6hdr.hop_limit,
-                src_port,
-                dst_port,
-                protocol: proto as u8,
-                direction,
-                ip_family: IpFamily::Ipv6,
-                tcp_flags: Tcp_flags.unwrap_or_default(),
-            };
-
             unsafe {
-                log_connection(&event, *tc_config);
+                log_connection_fields(
+                    source,
+                    destination,
+                    u16::from_be_bytes(ipv6hdr.payload_len),
+                    ipv6hdr.hop_limit,
+                    src_port,
+                    dst_port,
+                    proto as u8,
+                    direction,
+                    IpFamily::Ipv6,
+                    tcp_flags.unwrap_or_default(),
+                    *tc_config,
+                );
             }
 
             Ok(TC_ACT_PIPE)
