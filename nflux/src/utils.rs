@@ -6,6 +6,7 @@ use std::{
 use default_net::interface::get_default_interface_name;
 use dns_lookup::lookup_addr;
 use libc::{c_char, c_int, getservbyport, ntohs, servent, setrlimit};
+use network_types::ip::IpProto;
 use nflux_common::{utils::is_private_ip, TcpFlags};
 use sysinfo::{Pid, System};
 use tokio::signal;
@@ -131,14 +132,9 @@ pub fn is_true(value: bool) -> u8 {
 
 /// convert_protocol converts the protocol number to a string.
 pub fn convert_protocol(protocol: u8) -> &'static str {
-    match protocol {
-        1 => "icmp",
-        6 => "tcp",
-        17 => "udp",
-        _ => IpProto::from_u8(protocol)
-            .map(|proto| proto.as_str())
-            .unwrap_or("unknown"),
-    }
+    IpProto::from_u8(protocol)
+        .map(|proto| proto.as_str())
+        .unwrap_or("unknown")
 }
 
 pub fn _get_service_name(
