@@ -727,7 +727,7 @@ checksum = "f2df15b1cb023b9d205ae287d5dbe74510ae4d62b5131ceec516f4913ed05230"
 
 [[package]]
 name = "nflux"
-version = "0.12.3"
+version = "0.12.4"
 dependencies = [
  "anyhow",
  "aya",
