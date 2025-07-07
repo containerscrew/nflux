@@ -39,6 +39,12 @@ All notable changes to this project will be documented in this file.
 
 - New v0.12.4
 
+- Chore: update changelog for v0.12.4
+
+- Update README
+
+- Fix: cargo deb metadata
+
 ## [0.12.3] - 2025-07-07
 
 - Add changelog
