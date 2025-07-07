@@ -17,7 +17,6 @@ pub unsafe fn log_connection_fields(
     tcp_flags: TcpFlags,
     configmap: Configmap,
 ) {
-    // Construir ActiveConnectionKey sin TcEvent completo
     let key = ActiveConnectionKey {
         protocol,
         src_port,
