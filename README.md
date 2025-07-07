@@ -49,7 +49,7 @@ curl -L https://github.com/containerscrew/nflux/releases/download/v0.12.3/nflux_
 ```
 
 > [!NOTE]
-> `.rpm` package will come soon.
+> RPM package will come soon.
 > Change also the [release version](https://github.com/containerscrew/nflux/releases) you need in the URL above.
 
 ---
@@ -73,6 +73,9 @@ sudo nflux dpkt
 Read the [usage](https://github.com/containerscrew/nflux/wiki/Usage) doc for more options.
 
 # Wiki
+
+> [!WARNING]
+> The wiki is still under construction, so some pages may not be complete
 
 Read the [wiki](https://github.com/containerscrew/nflux/wiki) for more information about the project.
 
