@@ -114,7 +114,7 @@ pub async fn process_tc_events(
                             pkt_len = event.total_len,
                             ttl = event.ttl,
                             src_ip = %to_ipaddr(event.src_ip, event.ip_family.to_owned()),
-                            dst_ip = %to_ipaddr(event.dst_ip, 4),
+                            dst_ip = %to_ipaddr(event.dst_ip, event.ip_family.to_owned()),
                             src_port = event.src_port,
                             dst_port = event.dst_port,
                             tcp_flags = if !tcp_flags_str.is_empty() {
