@@ -2,9 +2,37 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.12.2] - 2025-07-06
+## [unreleased]
+
+- Add cargo deb revision
+
+- Update README.md
+
+## [0.12.3] - 2025-07-07
 
 - Add changelog
+
+- Chore: update changelog for v0.12.2
+
+- Rollback: full tcpflags
+
+- Fix: test & update README.md
+
+- Remove unnecessary dependencies
+
+- Fix: test cli::test::test_print_help_message
+
+- Ebpf: refactor to eliminate TcEvent stack allocation, reducing verifier stack usage
+
+- Remove comments and unnecessary dependencies
+
+- Feat: refactor to eliminate high stack allocation, reducing verifier stack usage
+
+- Ebpf: refactor to eliminate tc_config stack allocation, reducing verifier stack usage
+
+- Merge branch 'feat/reduce-stack-size'
+
+- Release(v0.12.3): fix stack size allocation
 
 ## [0.12.2] - 2025-07-06
 
