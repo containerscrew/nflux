@@ -157,6 +157,6 @@ mod test {
 
     #[test]
     fn test_print_help_message() {
-        assert_eq!(print_after_help_message(), "Author: containerscrew \nWebsite: github.com/containerscrew/nflux\nLicense: GPL 3\nIssues: github.com/containerscrew/nflux/issues")
+        assert_eq!(print_after_help_message(), "Author: containerscrew \nWebsite: github.com/containerscrew/nflux\nLicense: MIT or GPL 3\nIssues: github.com/containerscrew/nflux/issues")
     }
 }

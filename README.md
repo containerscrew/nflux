@@ -6,7 +6,8 @@
 
 ---
 ![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white)
-[![License - MIT](https://img.shields.io/github/license/containerscrew/nflux)](/LICENSE)
+[![License - MIT](https://img.shields.io/github/license/containerscrew/nflux)](/LICENSE-MIT)
+[![License - GPL3](https://img.shields.io/github/license/containerscrew/nflux)](/LICENSE-GPL3)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 ![Code Size](https://img.shields.io/github/languages/code-size/containerscrew/nflux)
 [![Test Pipeline](https://github.com/containerscrew/nflux/actions/workflows/test.yml/badge.svg)](https://github.com/containerscrew/nflux/actions/workflows/test.yml)
