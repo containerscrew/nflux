@@ -50,7 +50,7 @@ curl -L https://github.com/containerscrew/nflux/releases/download/v0.12.3/nflux_
 
 > [!NOTE]
 > `.rpm` package will come soon.
-> Change also the version you need in the URL above.
+> Change also the [release version](https://github.com/containerscrew/nflux/releases) you need in the URL above.
 
 ---
 
