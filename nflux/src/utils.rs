@@ -135,10 +135,9 @@ pub fn convert_protocol(protocol: u8) -> &'static str {
         1 => "icmp",
         6 => "tcp",
         17 => "udp",
-        _ => {
-            warn!("Unknown protocol: {}", protocol);
-            "unknown"
-        }
+        _ => IpProto::from_u8(protocol)
+            .map(|proto| proto.as_str())
+            .unwrap_or("unknown"),
     }
 }
 
