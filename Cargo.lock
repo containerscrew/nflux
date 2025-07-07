@@ -740,7 +740,6 @@ dependencies = [
  "default-net",
  "dns-lookup",
  "libc",
- "network-types",
  "nflux-common",
  "sysinfo",
  "tokio",
