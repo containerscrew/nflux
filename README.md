@@ -45,7 +45,7 @@ tracepoint
 _Quick installation:_
 
 ```shell
-curl -L https://github.com/containerscrew/nflux/releases/download/v0.12.3/nflux_0.12.3-1_amd64.deb -o nflux.deb && sudo apt install ./nflux.deb
+curl -L https://github.com/containerscrew/nflux/releases/download/v0.12.4/nflux_0.12.4-1_amd64.deb -o nflux.deb && sudo apt install ./nflux.deb
 ```
 
 > [!NOTE]
