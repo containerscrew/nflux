@@ -75,7 +75,7 @@ Read the [usage](https://github.com/containerscrew/nflux/wiki/Usage) doc for mor
 # Wiki
 
 > [!WARNING]
-> The wiki is still under construction, so some pages may not be complete
+> The wiki is still under construction, so some pages may not be complete or outdated.
 
 Read the [wiki](https://github.com/containerscrew/nflux/wiki) for more information about the project.
 
