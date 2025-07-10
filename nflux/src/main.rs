@@ -1,6 +1,14 @@
-use std::{process, process::exit};
+use std::{
+    fs::File,
+    process::{self, exit},
+};
 
-use aya::{include_bytes_aligned, Ebpf};
+use anyhow::Context;
+use aya::{
+    include_bytes_aligned,
+    programs::{CgroupAttachMode, CgroupSkb, CgroupSkbAttachType},
+    Ebpf,
+};
 use clap::Parser;
 use containerd_client::connect;
 use libc::getuid;
@@ -107,9 +115,27 @@ async fn main() -> anyhow::Result<()> {
             )
             .await?;
         }
-        Some(cli::Commands::Cgroups { cgroup_path: _ }) => {
+        Some(cli::Commands::Cgroups { cgroup_path }) => {
             info!("Sniffing container traffic using cgroup skb");
-            let _channel = connect("/run/containerd/containerd.sock").await.unwrap();
+            // TODO: autodiscover cgroup path for containerd
+            // let _channel = connect("/run/containerd/containerd.sock").await.unwrap();
+
+            let mut ebpf = aya::Ebpf::load(aya::include_bytes_aligned!(concat!(
+                env!("OUT_DIR"),
+                "/ebpf-cgroups"
+            )))?;
+
+            let program: &mut CgroupSkb = ebpf.program_mut("csp").unwrap().try_into()?;
+            program.load()?;
+
+            let cgroup_file =
+                File::open(&cgroup_path).with_context(|| format!("{}", &cgroup_path))?;
+
+            program.attach(
+                &cgroup_file,
+                CgroupSkbAttachType::Egress,
+                CgroupAttachMode::default(),
+            )?;
         }
         None => {
             // Unreachable: CLI shows help if no args are provided.
