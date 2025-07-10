@@ -2,6 +2,7 @@ use std::{process, process::exit};
 
 use aya::{include_bytes_aligned, Ebpf};
 use clap::Parser;
+use containerd_client::connect;
 use libc::getuid;
 use logger::LoggerConfig;
 use nflux_common::Configmap;
@@ -105,6 +106,10 @@ async fn main() -> anyhow::Result<()> {
                 exclude_port,
             )
             .await?;
+        }
+        Some(cli::Commands::Cgroups { cgroup_path: _ }) => {
+            info!("Sniffing container traffic using cgroup skb");
+            let _channel = connect("/run/containerd/containerd.sock").await.unwrap();
         }
         None => {
             // Unreachable: CLI shows help if no args are provided.
