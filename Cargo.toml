@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["nflux", "nflux-common", "nflux-ebpf-tc", "nflux-ebpf-dpkt"]
+members = ["nflux", "nflux-common", "ebpf-tc", "ebpf-dpkt", "ebpf-cgroups"]
 default-members = ["nflux", "nflux-common"]
 
 [workspace.package]
