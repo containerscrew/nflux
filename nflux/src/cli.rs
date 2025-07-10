@@ -141,6 +141,17 @@ pub enum Commands {
     },
     /// Sniff dropped packets using tracepoint/skb/kfree_skb
     Dpkt {},
+    /// Sniff container traffic using cgroup skb
+    Cgroups {
+        #[arg(
+            short = 'c',
+            long = "cgroup-path",
+            help = "Cgroup path",
+            default_value = "text",
+            required = false
+        )]
+        cgroup_path: String,
+    },
 }
 
 #[cfg(test)]
