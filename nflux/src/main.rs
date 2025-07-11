@@ -1,16 +1,12 @@
 use std::{
-    fs::File,
     process::{self, exit},
 };
 
-use anyhow::Context;
 use aya::{
     include_bytes_aligned,
-    programs::{CgroupAttachMode, CgroupSkb, CgroupSkbAttachType},
     Ebpf,
 };
 use clap::Parser;
-use containerd_client::connect;
 use libc::getuid;
 use logger::LoggerConfig;
 use nflux_common::Configmap;
@@ -52,10 +48,10 @@ async fn main() -> anyhow::Result<()> {
     info!("Starting nflux with pid {}", process::id());
 
     // Load eBPF program
-    let mut bpf_tc = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/ebpf-tc")))?;
+    let mut bpf_tc = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/tc")))?;
     let mut bpf_dp = Ebpf::load(include_bytes_aligned!(concat!(
         env!("OUT_DIR"),
-        "/ebpf-dpkt"
+        "/dpkt"
     )))?;
 
     // if let Err(e) = aya_log::EbpfLogger::init(&mut ebpf) {

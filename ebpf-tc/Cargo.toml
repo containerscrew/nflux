@@ -16,5 +16,5 @@ which = { workspace = true }
 
 
 [[bin]]
-name = "ebpf-tc"
+name = "tc"
 path = "src/main.rs"
