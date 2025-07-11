@@ -17,14 +17,25 @@ const ETH_P_IP: u16 = 0x0800;
 const ETH_P_IPV6: u16 = 0x86DD;
 
 #[cgroup_skb]
-pub fn cgroups_traffic(ctx: SkBuffContext) -> i32 {
-    match try_cgroups_traffic(ctx) {
+pub fn cgroups_traffic_egress(ctx: SkBuffContext) -> i32 {
+    match try_cgroups_traffic(ctx, 1) {
         Ok(ret) => ret,
         Err(ret) => ret,
     }
 }
 
-fn try_cgroups_traffic(ctx: SkBuffContext) -> Result<i32, i32> {
+#[cgroup_skb]
+pub fn cgroups_traffic_ingress(ctx: SkBuffContext) -> i32 {
+    match try_cgroups_traffic(ctx, 0) {
+        Ok(ret) => ret,
+        Err(ret) => ret,
+    }
+}
+
+fn try_cgroups_traffic(
+    ctx: SkBuffContext,
+    direction: u8,
+) -> Result<i32, i32> {
     let protocol = unsafe { (*ctx.skb.skb).protocol } as u16;
     let eth_proto = u16::from_be(protocol);
 
@@ -65,7 +76,7 @@ fn try_cgroups_traffic(ctx: SkBuffContext) -> Result<i32, i32> {
                             src_port: 0,
                             dst_port: 0,
                             protocol: ipv4_hdr.proto as u8,
-                            direction: 1, // 0 for ingress, 1 for egress
+                            direction, // 0 for ingress, 1 for egress
                             ip_family: nflux_common::IpFamily::Ipv4,
                             tcp_flags: None, // No TCP flags for non-TCP packets
                         },
