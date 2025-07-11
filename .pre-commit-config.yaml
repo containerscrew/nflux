@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v5.0.0
     hooks:
       - id: fix-byte-order-marker
       - id: check-case-conflict
@@ -18,13 +18,6 @@ repos:
   #   hooks:
   #     - id: mtoc
   #       args: ["-e", ".target/", "-e", "./README.md"]
-  # - repo: local
-  #   hooks:
-  #     - id: cargo-test
-  #       name: "cargo test"
-  #       entry: cargo test --locked --no-default-features
-  #       language: system
-  #       description: "Run cargo test with no default features"
   - repo: https://github.com/doublify/pre-commit-rust
     rev: v1.0
     hooks:
@@ -33,14 +26,6 @@ repos:
       # - id: cargo-check
       # - id: clippy
       #   args: ["--", "-D", "warnings", "-D", "unused-imports"]
-  #  - repo: local
-  #    hooks:
-  #      - id: git-cliff
-  #        name: "CHANGELOG generator"
-  #        entry: git cliff --output CHANGELOG.md
-  #        language: system
-  #        description: "Generate a CHANGELOG.md file using git-cliff"
-  #        pass_filenames: false
 
   # - repo: local
   #   hooks:

@@ -13,14 +13,13 @@ post_bump_hooks = []
 pre_package_bump_hooks = []
 post_package_bump_hooks = []
 
-# [git_hooks]
-# [git_hooks.pre-commit]
-# script = "./scripts/pre-commit.sh"
+[git_hooks]
+[git_hooks.pre-commit]
+script = "./scripts/pre-commit.sh"
 
 # [commit_types]
 # feat = { changelog_title = "➕ Additional features" }
 # fix = { changelog_title = "🪲 Releases" }
-
 
 [changelog]
 path = "CHANGELOG.md"
@@ -31,4 +30,3 @@ authors = [
 [bump_profiles]
 
 [packages]
-
