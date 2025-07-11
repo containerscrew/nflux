@@ -1,6 +1,6 @@
 use std::{
     ffi::CString,
-    net::{IpAddr, Ipv4Addr},
+    net::{IpAddr, Ipv4Addr, Ipv6Addr},
 };
 
 use default_net::interface::get_default_interface_name;
@@ -10,6 +10,41 @@ use nflux_common::{utils::is_private_ip, TcpFlags};
 use sysinfo::{Pid, System};
 use tokio::signal;
 use tracing::{debug, warn};
+
+pub fn convert_direction(direction: u8) -> &'static str {
+    match direction {
+        0 => "ingress",
+        1 => "egress",
+        _ => "unknown",
+    }
+}
+
+/// convert_protocol converts the protocol number to a string.
+pub fn convert_protocol(protocol: u8) -> &'static str {
+    match protocol {
+        1 => "icmp",
+        6 => "tcp",
+        17 => "udp",
+        _ => {
+            warn!("Unknown protocol: {}", protocol);
+            "unknown"
+        }
+    }
+}
+
+pub fn to_ipaddr(
+    ip: [u8; 16],
+    ip_family: u8,
+) -> IpAddr {
+    match ip_family {
+        2 => IpAddr::V4(Ipv4Addr::new(ip[12], ip[13], ip[14], ip[15])), // AF_INET
+        10 => IpAddr::V6(Ipv6Addr::from(ip)),                           // AF_INET6
+        _ => {
+            warn!("Unknown ip_family: {}", ip_family);
+            IpAddr::V4(Ipv4Addr::UNSPECIFIED)
+        }
+    }
+}
 
 /// is_root_user checks if the current user who runs the program is root.
 /// Avoid running nflux as uid != 0 (root). eBPF requires privileges
@@ -129,19 +164,6 @@ pub fn is_true(value: bool) -> u8 {
     0
 }
 
-/// convert_protocol converts the protocol number to a string.
-pub fn convert_protocol(protocol: u8) -> &'static str {
-    match protocol {
-        1 => "icmp",
-        6 => "tcp",
-        17 => "udp",
-        _ => {
-            warn!("Unknown protocol: {}", protocol);
-            "unknown"
-        }
-    }
-}
-
 pub fn _get_service_name(
     port: u16,
     proto: &'static str,
@@ -177,14 +199,6 @@ pub fn _get_process_name(pid: u64) -> String {
                 .to_string()
         }
         None => "notfound".to_string(),
-    }
-}
-
-pub fn convert_direction(direction: u8) -> &'static str {
-    match direction {
-        0 => "ingress",
-        1 => "egress",
-        _ => "unknown",
     }
 }
 

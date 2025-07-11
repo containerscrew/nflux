@@ -147,10 +147,16 @@ pub enum Commands {
             short = 'c',
             long = "cgroup-path",
             help = "Cgroup path",
-            default_value = "text",
             required = false
         )]
-        cgroup_path: String,
+        cgroup_path: Option<String>,
+        #[arg(
+            long = "podman-socket-path",
+            help = "Podman socket path to use for listing containers",
+            default_value = "/run/user/1000/podman/podman.sock",
+            required = false
+        )]
+        podman_socket_path: String,
     },
 }
 

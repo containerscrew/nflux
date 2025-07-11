@@ -24,6 +24,8 @@ chrono = "0.4.41"
 default-net = "0.22.0"
 colored = "3.0.0"
 containerd-client = "0.8.0"
+podman-api = "0.10.0"
+async-trait = "0.1.88"
 
 [build-dependencies]
 anyhow = { workspace = true }
