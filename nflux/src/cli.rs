@@ -157,6 +157,13 @@ pub enum Commands {
             required = false
         )]
         podman_socket_path: String,
+        #[arg(
+            long = "containerd-socket-path",
+            help = "Containerd socket path to use for listing containers",
+            default_value = "/run/containerd/containerd.sock",
+            required = false
+        )]
+        containerd_socket_path: String,
     },
 }
 

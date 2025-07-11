@@ -120,6 +120,7 @@ async fn main() -> anyhow::Result<()> {
         Some(cli::Commands::Cgroups {
             cgroup_path: _,
             podman_socket_path,
+            containerd_socket_path,
         }) => {
             info!("Sniffing container traffic using cgroup skb");
 
@@ -141,7 +142,7 @@ async fn start_cgroups_traffic(
     // First of all, list containers
     let podman = PodmanRuntime::new(&podman_socket_path);
 
-    let podman_containers = podman.list_containers(false).await?;
+    let podman_containers = podman.list_containers().await?;
 
     for contaiener in podman_containers {
         info!("Attachingf eBPF program to container: {}", contaiener.name);
