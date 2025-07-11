@@ -1,3 +1,10 @@
+use containerd_client::{
+    connect,
+    services::v1::{
+        containers_client::ContainersClient, version_client::VersionClient, ListContainersRequest,
+    },
+    tonic::transport::Channel,
+};
 use podman_api::{opts::ContainerListOpts, Podman};
 
 #[derive(Debug)]
@@ -10,10 +17,7 @@ pub struct ContainerData {
 
 #[async_trait::async_trait]
 pub trait ContainerRuntime {
-    async fn list_containers(
-        &self,
-        all: bool,
-    ) -> Result<Vec<ContainerData>, anyhow::Error>;
+    async fn list_containers(&self) -> Result<Vec<ContainerData>, anyhow::Error>;
 }
 pub struct PodmanRuntime {
     client: Podman,
@@ -28,11 +32,8 @@ impl PodmanRuntime {
 
 #[async_trait::async_trait]
 impl ContainerRuntime for PodmanRuntime {
-    async fn list_containers(
-        &self,
-        all: bool,
-    ) -> Result<Vec<ContainerData>, anyhow::Error> {
-        let opts = ContainerListOpts::builder().all(all).build();
+    async fn list_containers(&self) -> Result<Vec<ContainerData>, anyhow::Error> {
+        let opts = ContainerListOpts::builder().all(true).build();
         let containers = self.client.containers().list(&opts).await?;
 
         let mut available_containers = Vec::new();
@@ -53,5 +54,43 @@ impl ContainerRuntime for PodmanRuntime {
             }
         }
         Ok(available_containers)
+    }
+}
+
+pub struct ContainerdRuntime {
+    client: ContainersClient<Channel>,
+}
+impl ContainerdRuntime {
+    pub async fn new(containerd_socket_path: &str) -> Self {
+        let channel = connect(containerd_socket_path).await.unwrap();
+        let client = ContainersClient::<Channel>::new(channel);
+        Self { client }
+    }
+}
+
+#[async_trait::async_trait]
+impl ContainerRuntime for ContainerdRuntime {
+    async fn list_containers(&self) -> Result<Vec<ContainerData>, anyhow::Error> {
+        let request = ListContainersRequest {
+            ..Default::default()
+        };
+
+        let response = self.client.clone().list(request).await?;
+        let containers = response.into_inner().containers;
+
+        let mut result = Vec::new();
+        for c in containers {
+            let id = c.id;
+            let name = "unknown".to_string();
+            let cgroup_path = format!("/sys/fs/cgroup/{}", id);
+
+            result.push(ContainerData {
+                id,
+                name,
+                cgroup_path,
+            });
+        }
+
+        Ok(result)
     }
 }
