@@ -3,15 +3,10 @@ ignore_merge_commits = true
 ignore_fixup_commits = true
 disable_changelog = false
 disable_bump_commit = false
-generate_mono_repository_global_tag = true
-generate_mono_repository_package_tags = true
-branch_whitelist = []
-skip_ci = "[skip ci]"
+branch_whitelist = ["main"]
 skip_untracked = false
-pre_bump_hooks = []
-post_bump_hooks = []
-pre_package_bump_hooks = []
-post_package_bump_hooks = []
+
+pre_bump_hooks = ["cog changelog"]
 
 [git_hooks]
 [git_hooks.pre-commit]
@@ -23,9 +18,7 @@ script = "./scripts/pre-commit.sh"
 
 [changelog]
 path = "CHANGELOG.md"
-authors = [
-      { username = "containerscrew", signature = "dcrookie" }
-]
+authors = [{ username = "containerscrew", signature = "dcrookie" }]
 
 [bump_profiles]
 
