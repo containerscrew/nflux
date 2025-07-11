@@ -47,7 +47,6 @@ cargo_metadata = { workspace = true }
 name = "nflux"
 path = "src/main.rs"
 
-
 [package.metadata.deb]
 maintainer = "Daniels <info@containerscrew.com>"
 copyright = "2025, Daniels <info@containerscrew.com>"

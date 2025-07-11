@@ -14,5 +14,5 @@ network-types = "0.0.8"
 which = { workspace = true }
 
 [[bin]]
-name = "ebpf-cgroups"
+name = "cgroups"
 path = "src/main.rs"
