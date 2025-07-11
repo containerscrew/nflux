@@ -1,5 +1,4 @@
 use std::{
-    fmt::{self, Display},
     fs::File,
     process::{self, exit},
 };
@@ -7,14 +6,14 @@ use std::{
 use anyhow::Context;
 use aya::{
     include_bytes_aligned,
-    maps::{MapData, RingBuf},
+    maps::RingBuf,
     programs::{CgroupAttachMode, CgroupSkb, CgroupSkbAttachType},
     Ebpf,
 };
 use clap::Parser;
 use libc::getuid;
 use logger::LoggerConfig;
-use nflux_common::{Configmap, NetworkEvent};
+use nflux_common::Configmap;
 use tracing::{error, info, warn};
 use utils::{is_true, set_mem_limit};
 
@@ -22,19 +21,18 @@ use crate::{
     cli::NfluxCliArgs,
     containers::{ContainerRuntime, PodmanRuntime},
     logger::init_logger,
+    network_event::{process_ring_buffer, DisplayNetworkEvent},
     programs::{start_dropped_packets, start_traffic_control},
-    utils::{convert_direction, convert_protocol, is_root_user, to_ipaddr, wait_for_shutdown},
+    utils::{is_root_user, wait_for_shutdown},
 };
 
 mod cli;
 mod containers;
 mod events;
 mod logger;
+mod network_event;
 mod programs;
 mod utils;
-
-// Supertrait to convert NetworkEvent to a Displayable format
-struct DisplayNetworkEvent(pub NetworkEvent);
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -124,8 +122,6 @@ async fn main() -> anyhow::Result<()> {
             podman_socket_path,
         }) => {
             info!("Sniffing container traffic using cgroup skb");
-            // TODO: autodiscover cgroup path for containerd
-            // let _channel = connect("/run/containerd/containerd.sock").await.unwrap();
 
             start_cgroups_traffic(&mut bpf_cgroups, podman_socket_path).await?;
         }
@@ -141,13 +137,11 @@ async fn start_cgroups_traffic(
     ebpf: &mut Ebpf,
     podman_socket_path: String,
 ) -> anyhow::Result<()> {
+    // TODO: containerd support
     // First of all, list containers
     let podman = PodmanRuntime::new(&podman_socket_path);
 
     let podman_containers = podman.list_containers(false).await?;
-
-    let program: &mut CgroupSkb = ebpf.program_mut("cgroups_traffic").unwrap().try_into()?;
-    program.load()?;
 
     for contaiener in podman_containers {
         info!("Attachingf eBPF program to container: {}", contaiener.name);
@@ -157,11 +151,21 @@ async fn start_cgroups_traffic(
         let cgroup_file = File::open(&cgroup_path)
             .with_context(|| format!("Failed to open cgroup file: {}", &cgroup_path))?;
 
-        program.attach(
-            &cgroup_file,
+        attach_skb_program(
+            ebpf,
+            "cgroups_traffic_egress",
             CgroupSkbAttachType::Egress,
-            CgroupAttachMode::default(),
-        )?;
+            &cgroup_file,
+        )
+        .await?;
+
+        attach_skb_program(
+            ebpf,
+            "cgroups_traffic_ingress",
+            CgroupSkbAttachType::Ingress,
+            &cgroup_file,
+        )
+        .await?;
     }
 
     let network_event = ebpf
@@ -173,7 +177,7 @@ async fn start_cgroups_traffic(
     tokio::select! {
         res = process_ring_buffer::<DisplayNetworkEvent>(ring_buf) => {
             if let Err(e) = res {
-                error!("process_dp_events failed: {:?}", e);
+                error!("Processing cgroup packets {:?}", e);
             }
         },
         _ = wait_for_shutdown() => {
@@ -184,53 +188,16 @@ async fn start_cgroups_traffic(
     Ok(())
 }
 
-impl fmt::Display for DisplayNetworkEvent {
-    fn fmt(
-        &self,
-        f: &mut fmt::Formatter,
-    ) -> fmt::Result {
-        let event = &self.0;
-        write!(
-            f,
-            "[{}][{}][{}] {}:{} -> {}:{} pkt_len={} ttl={}",
-            convert_direction(event.direction),
-            convert_protocol(event.protocol),
-            event.ip_family.as_str(),
-            to_ipaddr(event.src_ip, event.ip_family.to_owned()),
-            event.src_port,
-            to_ipaddr(event.dst_ip, event.ip_family.to_owned()),
-            event.dst_port,
-            event.total_len,
-            event.ttl,
-        )?;
+async fn attach_skb_program(
+    ebpf: &mut Ebpf,
+    program_name: &str,
+    attach_type: CgroupSkbAttachType,
+    cgroup_file: &File,
+) -> anyhow::Result<()> {
+    let program: &mut CgroupSkb = ebpf.program_mut(program_name).unwrap().try_into()?;
+    program.load()?;
 
-        if let Some(flags) = event.tcp_flags {
-            write!(f, ", tcp_flags: {:?}", flags)?;
-        }
+    program.attach(cgroup_file, attach_type, CgroupAttachMode::default())?;
 
-        write!(f, " }}")
-    }
-}
-
-async fn process_ring_buffer<T>(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow::Error>
-where
-    T: Display,
-{
-    loop {
-        while let Some(event) = ring_buf.next() {
-            let data = event.as_ref();
-
-            if data.len() == std::mem::size_of::<T>() {
-                let event: &T = unsafe { &*(data.as_ptr() as *const T) };
-                info!("{}", event);
-            } else {
-                warn!(
-                    "Event size mismatch: expected {}, got {}",
-                    std::mem::size_of::<T>(),
-                    data.len()
-                );
-            }
-        }
-        tokio::time::sleep(std::time::Duration::from_millis(100)).await;
-    }
+    Ok(())
 }
