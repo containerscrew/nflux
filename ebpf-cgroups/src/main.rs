@@ -8,41 +8,23 @@ use aya_ebpf::{
 };
 use aya_log_ebpf::{info, warn};
 use network_types::ip::Ipv4Hdr;
-
-#[repr(C)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct NetworkEventIpv4 {
-    pub src_addr: u32,
-    pub dst_addr: u32,
-    pub protocol: u8,
-}
-
-#[repr(C)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct NetworkEventIpv6 {
-    pub src_addr: u128,
-    pub dst_addr: u128,
-    pub protocol: u8,
-}
+use nflux_common::NetworkEvent;
 
 #[map]
-pub static NETWORK_EVENT_IPV4: RingBuf = RingBuf::with_byte_size(4096, 0);
-
-// #[map]
-// pub static NETWORK_EVENT_IPV6: RingBuf = RingBuf::with_byte_size(4096, 0);
+pub static CGROUP_NETWORK_EVENT: RingBuf = RingBuf::with_byte_size(4096, 0);
 
 const ETH_P_IP: u16 = 0x0800;
 const ETH_P_IPV6: u16 = 0x86DD;
 
 #[cgroup_skb]
-pub fn csp(ctx: SkBuffContext) -> i32 {
-    match try_csp(ctx) {
+pub fn cgroups_traffic(ctx: SkBuffContext) -> i32 {
+    match try_cgroups_traffic(ctx) {
         Ok(ret) => ret,
         Err(ret) => ret,
     }
 }
 
-fn try_csp(ctx: SkBuffContext) -> Result<i32, i32> {
+fn try_cgroups_traffic(ctx: SkBuffContext) -> Result<i32, i32> {
     let protocol = unsafe { (*ctx.skb.skb).protocol } as u16;
     let eth_proto = u16::from_be(protocol);
 
@@ -60,20 +42,36 @@ fn try_csp(ctx: SkBuffContext) -> Result<i32, i32> {
             // further into the networking stack, where layer 2 (Ethernet) data is no longer
             // present. Therefore, we start reading directly from offset 0, which
             // corresponds to the IP header.
-            let ip_hdr = ctx.load::<Ipv4Hdr>(0).map_err(|_| {
+            let ipv4_hdr = ctx.load::<Ipv4Hdr>(0).map_err(|_| {
                 warn!(&ctx, "Error loading Ipv4Hdr");
                 0
             })?;
 
-            let network_event = NetworkEventIpv4 {
-                src_addr: ip_hdr.src_addr().to_bits(),
-                dst_addr: ip_hdr.dst_addr().to_bits(),
-                protocol: ip_hdr.proto as u8,
-            };
+            let mut src_ip = [0u8; 16];
+            src_ip[12..].copy_from_slice(&ipv4_hdr.src_addr);
+            let mut dst_ip = [0u8; 16];
+            dst_ip[12..].copy_from_slice(&ipv4_hdr.dst_addr);
 
-            if let Some(mut data) = NETWORK_EVENT_IPV4.reserve::<NetworkEventIpv4>(0) {
-                unsafe { *data.as_mut_ptr() = network_event }
-                data.submit(0);
+            unsafe {
+                if let Some(mut data) = CGROUP_NETWORK_EVENT.reserve::<NetworkEvent>(0) {
+                    let ptr = data.as_mut_ptr();
+                    core::ptr::write(
+                        ptr,
+                        NetworkEvent {
+                            src_ip,
+                            dst_ip,
+                            total_len: ipv4_hdr.total_len(),
+                            ttl: ipv4_hdr.ttl,
+                            src_port: 0,
+                            dst_port: 0,
+                            protocol: ipv4_hdr.proto as u8,
+                            direction: 1, // 0 for ingress, 1 for egress
+                            ip_family: nflux_common::IpFamily::Ipv4,
+                            tcp_flags: None, // No TCP flags for non-TCP packets
+                        },
+                    );
+                    data.submit(0);
+                }
             }
         }
         ETH_P_IPV6 => {

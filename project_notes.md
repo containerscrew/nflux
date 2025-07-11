@@ -2,7 +2,7 @@ Everything I’ve learned about eBPF, aya-rs, and Rust, shared in my own tool fo
 
 * Network traffic monitoring at L2/L3 using traffic control
 
-* Dropped packets monitoring using the kernel tracepoint → tracepoint/skb/kfree_skb
+* Linux dropped packets monitoring using the kernel tracepoint → tracepoint/skb/kfree_skb
 
 * Cgroups network monitoring using cgroups skb, for example to monitor containers. Supports container autodiscovery for containerd and Podman.
 

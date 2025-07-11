@@ -62,6 +62,20 @@ pub struct TcEvent {
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct NetworkEvent {
+    pub src_ip: [u8; 16],
+    pub dst_ip: [u8; 16],
+    pub total_len: u16,
+    pub ttl: u8,
+    pub src_port: u16,
+    pub dst_port: u16,
+    pub protocol: u8,  // 1: ICMP, 6: TCP, 17: UDP
+    pub direction: u8, // 0: ingress, 1: egress
+    pub ip_family: IpFamily,
+    pub tcp_flags: Option<TcpFlags>,
+}
+#[repr(C)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct DroppedPacketEvent {
     pub protocol: u16,
     pub pid: u32,
