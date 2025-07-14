@@ -41,7 +41,7 @@ jobs:
 
       - name: System dependencies
         run: |
-          sudo apt-get -y install linux-headers-$(uname -r) make
+          sudo apt-get -y install linux-headers-$(uname -r) make protobuf-compiler
 
       - name: Rustup
         run: |
