@@ -33,6 +33,7 @@ jobs:
 
       - name: System dependencies
         run: |
+          sudo apt-get update
           sudo apt-get -y install linux-headers-$(uname -r) make protobuf-compiler
 
       - uses: Swatinem/rust-cache@v2
