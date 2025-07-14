@@ -36,7 +36,7 @@ jobs:
 
       - name: Dependencies
         run: |
-          sudo apt-get install -y protobuf-compiler
+          sudo apt-get update && apt-get -y install -y protobuf-compiler
           rustup install stable && rustup toolchain install nightly --component rust-src
           rustup target add ${{ matrix.target }} --toolchain nightly
           rustup default nightly
