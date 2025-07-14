@@ -27,14 +27,16 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-            # https://github.com/Swatinem/rust-cache
+
       - uses: Swatinem/rust-cache@v2
         with:
           prefix-key: "nflux-ebpf-v1"
           cache-all-crates: true
           save-if: ${{ github.ref == 'refs/heads/main' }}
+
       - name: Dependencies
         run: |
+          sudo apt-get install -y protobuf-compiler
           rustup install stable && rustup toolchain install nightly --component rust-src
           rustup target add ${{ matrix.target }} --toolchain nightly
           rustup default nightly
