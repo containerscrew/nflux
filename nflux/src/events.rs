@@ -87,14 +87,17 @@ pub async fn process_tc_events(
                     }
                 }
 
+                let src_ip = to_ipaddr(event.src_ip, event.ip_family.to_owned());
+                let dst_ip = to_ipaddr(event.dst_ip, event.ip_family.to_owned());
+
                 let mut msg = format!(
                     "[{}][{}][{}] {}:{} -> {}:{} pkt_len={} ttl={}",
                     convert_direction(event.direction),
                     convert_protocol(event.protocol),
                     event.ip_family.as_str(),
-                    to_ipaddr(event.src_ip, event.ip_family.to_owned()),
+                    src_ip,
                     event.src_port,
-                    to_ipaddr(event.dst_ip, event.ip_family.to_owned()),
+                    dst_ip,
                     event.dst_port,
                     event.total_len,
                     event.ttl,

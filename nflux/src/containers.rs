@@ -1,8 +1,6 @@
 use containerd_client::{
     connect,
-    services::v1::{
-        containers_client::ContainersClient, version_client::VersionClient, ListContainersRequest,
-    },
+    services::v1::{containers_client::ContainersClient, ListContainersRequest},
     tonic::transport::Channel,
 };
 use podman_api::{opts::ContainerListOpts, Podman};

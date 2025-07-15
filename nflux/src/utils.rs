@@ -6,7 +6,7 @@ use std::{
 use default_net::interface::get_default_interface_name;
 use dns_lookup::lookup_addr;
 use libc::{c_char, c_int, getservbyport, ntohs, servent, setrlimit};
-use nflux_common::{utils::is_private_ip, TcpFlags};
+use nflux_common::{utils::is_ipv4_private_address, TcpFlags};
 use sysinfo::{Pid, System};
 use tokio::signal;
 use tracing::{debug, warn};
@@ -140,19 +140,16 @@ pub fn format_tcp_flags(flags: TcpFlags) -> String {
     out
 }
 
-pub fn _lookup_address(ip: u32) -> String {
-    match is_private_ip(ip) {
-        true => "Private IP".to_string(),
-        false => {
-            // Convert the u32 IP address to Ipv4Addr
-            let ip = Ipv4Addr::from(ip);
-
-            // Convert to IpAddr for compatibility with lookup_addr
-            let ip = IpAddr::V4(ip);
-
-            // Perform the reverse DNS lookup
-            lookup_addr(&ip).unwrap_or_else(|_| "Unknown host".to_string())
+pub fn _lookup_ipv4_address(ip: IpAddr) -> String {
+    match ip {
+        IpAddr::V4(ipv4) => {
+            if is_ipv4_private_address(ipv4) {
+                "Private IP".to_string()
+            } else {
+                lookup_addr(&IpAddr::V4(ipv4)).unwrap_or_else(|_| "unknown".to_string())
+            }
         }
+        IpAddr::V6(_) => "IPv6 not supported".to_string(),
     }
 }
 
