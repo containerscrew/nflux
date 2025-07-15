@@ -19,7 +19,7 @@ use utils::{is_true, set_mem_limit};
 
 use crate::{
     cli::NfluxCliArgs,
-    containers::{ContainerRuntime, PodmanRuntime},
+    containers::{ContainerRuntime, ContainerdRuntime, PodmanRuntime},
     logger::init_logger,
     network_event::{process_ring_buffer, DisplayNetworkEvent},
     programs::{start_dropped_packets, start_traffic_control},
@@ -124,7 +124,8 @@ async fn main() -> anyhow::Result<()> {
         }) => {
             info!("Sniffing container traffic using cgroup skb");
 
-            start_cgroups_traffic(&mut bpf_cgroups, podman_socket_path).await?;
+            start_cgroups_traffic(&mut bpf_cgroups, podman_socket_path, containerd_socket_path)
+                .await?;
         }
         None => {
             // Unreachable: CLI shows help if no args are provided.
@@ -137,12 +138,14 @@ async fn main() -> anyhow::Result<()> {
 async fn start_cgroups_traffic(
     ebpf: &mut Ebpf,
     podman_socket_path: String,
+    containerd_socket_path: String,
 ) -> anyhow::Result<()> {
     // TODO: containerd support
     // First of all, list containers
     let podman = PodmanRuntime::new(&podman_socket_path);
-
     let podman_containers = podman.list_containers().await?;
+    let containerd = ContainerdRuntime::new(&containerd_socket_path).await;
+    let _containerd_containers = containerd.list_containers().await?;
 
     for contaiener in podman_containers {
         info!("Attachingf eBPF program to container: {}", contaiener.name);
