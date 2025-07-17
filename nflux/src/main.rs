@@ -142,16 +142,22 @@ async fn start_cgroups_traffic(
 ) -> anyhow::Result<()> {
     // TODO: containerd support
     // First of all, list containers
+    let containerd = ContainerdRuntime::new(&containerd_socket_path).await;
+    let containerd_containers = containerd.list_containers().await?;
+
+    for container in containerd_containers {
+        println!("{}", container.name);
+        println!("{}", container.cgroup_path);
+    }
+
     let podman = PodmanRuntime::new(&podman_socket_path);
     let podman_containers = podman.list_containers().await?;
-    let containerd = ContainerdRuntime::new(&containerd_socket_path).await;
-    let _containerd_containers = containerd.list_containers().await?;
 
-    for contaiener in podman_containers {
-        info!("Attachingf eBPF program to container: {}", contaiener.name);
+    for container in podman_containers {
+        info!("Attaching eBPF program to container: {}", container.name);
 
         // Attach the eBPF program to the cgroup path
-        let cgroup_path = contaiener.cgroup_path;
+        let cgroup_path = container.cgroup_path;
         let cgroup_file = File::open(&cgroup_path)
             .with_context(|| format!("Failed to open cgroup file: {}", &cgroup_path))?;
 

@@ -1,9 +1,9 @@
 images:
-- location: https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2
-  arch: x86_64
+  - location: https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2
+    arch: x86_64
 
-- location: https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-arm64.qcow2
-  arch: aarch64
+  - location: https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-arm64.qcow2
+    arch: aarch64
 
 vmType: "vz"
 
@@ -18,12 +18,12 @@ user:
   name: "ebpf"
 
 mounts:
-- location: "~/Documents/Code/Personal/nflux"
-  writable: true
+  - location: "~/Documents/Code/Personal/nflux"
+    writable: true
 
-- location: "~/.ssh/lima"
-  mountPoint: "/tmp/lima"
-  writable: false
+  - location: "~/.ssh/lima"
+    mountPoint: "/tmp/lima"
+    writable: false
 
 memory: "2GiB"
 cpus: 2
@@ -38,7 +38,9 @@ provision:
       #!/bin/bash
       set -eux -o pipefail
       apt update -y
-      apt install -y vim gcc make clang bpftool bpftrace linux-headers-$(uname -r)
+      apt install -y vim gcc make clang bpftool bpftrace linux-headers-$(uname -r) protobuf-compiler
+      systemctl start containerd
+      nerdctl run -d --name test docker.io/alpine:latest sh -c 'while true; do sleep 100; done'
 
   - mode: user
     script: |

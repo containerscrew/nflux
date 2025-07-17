@@ -1,7 +1,8 @@
 use containerd_client::{
     connect,
     services::v1::{containers_client::ContainersClient, ListContainersRequest},
-    tonic::transport::Channel,
+    tonic::{transport::Channel, Request},
+    with_namespace,
 };
 use podman_api::{opts::ContainerListOpts, Podman};
 
@@ -58,10 +59,14 @@ impl ContainerRuntime for PodmanRuntime {
 pub struct ContainerdRuntime {
     client: ContainersClient<Channel>,
 }
+
+const NAMESPACE: &str = "default";
+
 impl ContainerdRuntime {
     pub async fn new(containerd_socket_path: &str) -> Self {
-        let channel = connect(containerd_socket_path).await.unwrap();
-        let client = ContainersClient::<Channel>::new(channel);
+        let channel = connect(containerd_socket_path).await?;
+
+        let client = ContainersClient::new(channel.clone());
         Self { client }
     }
 }
@@ -69,15 +74,18 @@ impl ContainerdRuntime {
 #[async_trait::async_trait]
 impl ContainerRuntime for ContainerdRuntime {
     async fn list_containers(&self) -> Result<Vec<ContainerData>, anyhow::Error> {
-        let request = ListContainersRequest {
+        let req = ListContainersRequest {
             ..Default::default()
         };
 
-        let response = self.client.clone().list(request).await?;
+        let req = with_namespace!(req, NAMESPACE);
+
+        let response = self.client.clone().list(req).await?;
         let containers = response.into_inner().containers;
 
         let mut result = Vec::new();
         for c in containers {
+            println!("{:?}", c);
             let id = c.id;
             let name = "unknown".to_string();
             let cgroup_path = format!("/sys/fs/cgroup/{}", id);
