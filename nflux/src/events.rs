@@ -1,7 +1,7 @@
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
 use aya::maps::{MapData, RingBuf};
-use nflux_common::{DroppedPacketEvent, IpFamily, TcEvent};
+use nflux_common::dto::{DroppedPacketEvent, IpFamily, NetworkEvent};
 use tracing::{info, warn};
 
 use crate::utils::{convert_direction, convert_protocol, format_tcp_flags};
@@ -78,8 +78,8 @@ pub async fn process_tc_events(
         while let Some(event) = ring_buf.next() {
             let data = event.as_ref();
 
-            if data.len() == std::mem::size_of::<TcEvent>() {
-                let event: &TcEvent = unsafe { &*(data.as_ptr() as *const TcEvent) };
+            if data.len() == std::mem::size_of::<NetworkEvent>() {
+                let event: &NetworkEvent = unsafe { &*(data.as_ptr() as *const NetworkEvent) };
 
                 if let Some(ref ports) = exclude_ports {
                     if ports.contains(&event.src_port) || ports.contains(&event.dst_port) {

@@ -7,29 +7,12 @@ fn main() -> anyhow::Result<()> {
         .exec()
         .context("MetadataCommand::exec")?;
 
-    let ebpf_tc = packages
+    let nflux_ebpf = packages
         .iter()
-        .find(|pkg| pkg.name == "ebpf-tc")
-        .ok_or_else(|| anyhow!("nflux-ebpf-tc package not found"))?
+        .find(|pkg| pkg.name == "nflux-ebpf")
+        .ok_or_else(|| anyhow!("nflux-ebpf package not found"))?
         .clone();
 
-    aya_build::build_ebpf([ebpf_tc])?;
-
-    let ebpf_dp = packages
-        .iter()
-        .find(|pkg| pkg.name == "ebpf-dpkt")
-        .ok_or_else(|| anyhow!("nflux-ebpf-dpkt package not found"))?
-        .clone();
-
-    aya_build::build_ebpf([ebpf_dp])?;
-
-    let ebpf_cgroups = packages
-        .iter()
-        .find(|pkg| pkg.name == "ebpf-cgroups")
-        .ok_or_else(|| anyhow!("ebpf-cgroups package not found"))?
-        .clone();
-
-    aya_build::build_ebpf([ebpf_cgroups])?;
-
+    aya_build::build_ebpf([nflux_ebpf])?;
     Ok(())
 }
