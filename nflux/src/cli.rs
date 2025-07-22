@@ -139,32 +139,32 @@ pub enum Commands {
         )]
         disable_full_log: bool,
     },
-    /// Sniff dropped packets using tracepoint/skb/kfree_skb
-    Dpkt {},
-    /// Sniff container traffic using cgroup skb
-    Cgroups {
-        #[arg(
-            short = 'c',
-            long = "cgroup-path",
-            help = "Cgroup path",
-            required = false
-        )]
-        cgroup_path: Option<String>,
-        #[arg(
-            long = "podman-socket-path",
-            help = "Podman socket path to use for listing containers",
-            default_value = "/run/user/1000/podman/podman.sock",
-            required = false
-        )]
-        podman_socket_path: String,
-        #[arg(
-            long = "containerd-socket-path",
-            help = "Containerd socket path to use for listing containers",
-            default_value = "/run/containerd/containerd.sock",
-            required = false
-        )]
-        containerd_socket_path: String,
-    },
+    // /// Sniff dropped packets using tracepoint/skb/kfree_skb
+    // Dpkt {},
+    // /// Sniff container traffic using cgroup skb
+    // Cgroups {
+    //     #[arg(
+    //         short = 'c',
+    //         long = "cgroup-path",
+    //         help = "Cgroup path",
+    //         required = false
+    //     )]
+    //     cgroup_path: Option<String>,
+    //     #[arg(
+    //         long = "podman-socket-path",
+    //         help = "Podman socket path to use for listing containers",
+    //         default_value = "/run/user/1000/podman/podman.sock",
+    //         required = false
+    //     )]
+    //     podman_socket_path: String,
+    //     #[arg(
+    //         long = "containerd-socket-path",
+    //         help = "Containerd socket path to use for listing containers",
+    //         default_value = "/run/containerd/containerd.sock",
+    //         required = false
+    //     )]
+    //     containerd_socket_path: String,
+    // },
 }
 
 #[cfg(test)]

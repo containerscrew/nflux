@@ -13,13 +13,13 @@ use aya::{
 use clap::Parser;
 use libc::getuid;
 use logger::LoggerConfig;
-use nflux_common::Configmap;
+use nflux_common::dto::Configmap;
 use tracing::{error, info, warn};
 use utils::{is_true, set_mem_limit};
 
 use crate::{
     cli::NfluxCliArgs,
-    containers::{ContainerRuntime, ContainerdRuntime, PodmanRuntime},
+    containers::{ContainerRuntime, PodmanRuntime},
     logger::init_logger,
     network_event::{process_ring_buffer, DisplayNetworkEvent},
     programs::{start_dropped_packets, start_traffic_control},
@@ -53,12 +53,13 @@ async fn main() -> anyhow::Result<()> {
     // Set memory limit for eBPF maps
     set_mem_limit();
 
-    info!("Starting nflux with pid {}", process::id());
+    // Load eBPF programs
+    let mut ebpf = Ebpf::load(include_bytes_aligned!(concat!(
+        env!("OUT_DIR"),
+        "/nflux-ebpf"
+    )))?;
 
-    // Load eBPF program
-    let mut bpf_tc = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/tc")))?;
-    let mut bpf_dp = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/dpkt")))?;
-    let mut bpf_cgroups = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/cgroups")))?;
+    info!("Starting nflux with pid {}", process::id());
 
     // if let Err(e) = aya_log::EbpfLogger::init(&mut ebpf) {
     //     // This can happen if you remove all log statements from your eBPF program.
@@ -67,10 +68,6 @@ async fn main() -> anyhow::Result<()> {
 
     // Match possible subcommands
     match cli.command {
-        Some(cli::Commands::Dpkt {}) => {
-            info!("Sniffing dropped packets");
-            start_dropped_packets(&mut bpf_dp, cli.log_format).await?;
-        }
         Some(cli::Commands::Tc {
             interface,
             disable_egress,
@@ -117,16 +114,19 @@ async fn main() -> anyhow::Result<()> {
             )
             .await?;
         }
-        Some(cli::Commands::Cgroups {
-            cgroup_path: _,
-            podman_socket_path,
-            containerd_socket_path,
-        }) => {
-            info!("Sniffing container traffic using cgroup skb");
-
-            start_cgroups_traffic(&mut bpf_cgroups, podman_socket_path, containerd_socket_path)
-                .await?;
-        }
+        // Some(cli::Commands::Dpkt {}) => {
+        //     info!("Sniffing dropped packets");
+        //     start_dropped_packets(&mut ebpf, cli.log_format).await?;
+        // }
+        // Some(cli::Commands::Cgroups {
+        //     cgroup_path: _,
+        //     podman_socket_path,
+        //     containerd_socket_path,
+        // }) => {
+        //     info!("Sniffing container traffic using cgroup skb");
+        //     start_cgroups_traffic(&mut bpf_cgroups, podman_socket_path, containerd_socket_path)
+        //         .await?;
+        // }
         None => {
             // Unreachable: CLI shows help if no args are provided.
         }
@@ -138,14 +138,14 @@ async fn main() -> anyhow::Result<()> {
 async fn start_cgroups_traffic(
     ebpf: &mut Ebpf,
     podman_socket_path: String,
-    containerd_socket_path: String,
+    _containerd_socket_path: String,
 ) -> anyhow::Result<()> {
     // TODO: containerd support
     // First of all, list containers
     let podman = PodmanRuntime::new(&podman_socket_path);
     let podman_containers = podman.list_containers().await?;
-    let containerd = ContainerdRuntime::new(&containerd_socket_path).await;
-    let _containerd_containers = containerd.list_containers().await?;
+    // let containerd = ContainerdRuntime::new(&containerd_socket_path).await;
+    // let _containerd_containers = containerd.list_containers().await?;
 
     for contaiener in podman_containers {
         info!("Attachingf eBPF program to container: {}", contaiener.name);
