@@ -17,7 +17,7 @@ tokio = { workspace = true, features = ["full"] }
 tracing-subscriber = { version = "0.3.18", features = ["json"] }
 tracing = "0.1.40"
 aya-log = "0.2.1"
-dns-lookup = "2.0.4"
+dns-lookup = "2.1.0"
 sysinfo = "0.36.1"
 clap = { version = "4.5.42", features = ["derive"] }
 chrono = "0.4.41"
