@@ -18,7 +18,7 @@ tracing-subscriber = { version = "0.3.18", features = ["json"] }
 tracing = "0.1.40"
 aya-log = "0.2.1"
 dns-lookup = "2.1.0"
-sysinfo = "0.36.1"
+sysinfo = "0.37.0"
 clap = { version = "4.5.43", features = ["derive"] }
 chrono = "0.4.41"
 default-net = "0.22.0"
