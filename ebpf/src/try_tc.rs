@@ -4,7 +4,7 @@ use network_types::{
     ip::{Ipv4Hdr, Ipv6Hdr},
 };
 
-use crate::{dto::IpHeader, handle_packet::handle_packet};
+use crate::{dto::IpHeader, handle_packet::handle_packet, maps::ARP_EVENTS};
 
 pub fn try_tc(
     ctx: TcContext,
@@ -36,10 +36,37 @@ pub fn try_tc(
             }
 
             EtherType::Arp => {
-                // let _: ArpHdr = ctx.load(EthHdr::LEN).map_err(|_| ())?;
-                // Handle ARP packet, which is typically used for address resolution
+                let arp_hdr: ArpHdr = ctx.load(EthHdr::LEN).map_err(|_| ())?;
+                let op_code = u16::from_be(arp_hdr.oper);
 
-                // Default case: just let the packet pass through
+                let ip_family = match u16::from_be(arp_hdr.ptype) {
+                    0x0800 => IpFamily::Ipv4, // AF_INET
+                    0x86DD => IpFamily::Ipv6, // AF_INET6
+                    _ => IpFamily::Unknown,
+                };
+
+                let event = ArpEvent {
+                    op_code,
+                    ip_family,
+                    sha: arp_hdr.sha,
+                    spa: {
+                        let mut ip = [0u8; 16];
+                        ip[12..16].copy_from_slice(&arp_hdr.spa);
+                        ip
+                    },
+                    tha: arp_hdr.tha,
+                    tpa: {
+                        let mut ip = [0u8; 16];
+                        ip[12..16].copy_from_slice(&arp_hdr.tpa);
+                        ip
+                    },
+                };
+
+                if let Some(mut slot) = ARP_EVENTS.reserve(0) {
+                    slot.write(event);
+                    slot.submit(0);
+                }
+
                 return Ok(TC_ACT_PIPE);
             }
 

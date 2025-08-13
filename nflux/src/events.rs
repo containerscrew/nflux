@@ -1,12 +1,12 @@
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
 use aya::maps::{MapData, RingBuf};
-use nflux_common::dto::{DroppedPacketEvent, IpFamily, NetworkEvent};
+use nflux_common::dto::{ArpEvent, DroppedPacketEvent, IpFamily, NetworkEvent};
 use tracing::{info, warn};
 
 use crate::utils::{convert_direction, convert_protocol, format_tcp_flags};
 
-fn _format_mac(mac: &[u8; 6]) -> String {
+fn format_mac(mac: &[u8; 6]) -> String {
     mac.iter()
         .map(|b| format!("{:02x}", b))
         .collect::<Vec<_>>()
@@ -24,6 +24,14 @@ fn to_ipaddr(
             warn!("Unknown ip_family: {}", ip_family);
             IpAddr::V4(Ipv4Addr::UNSPECIFIED)
         }
+    }
+}
+
+fn ip_familiy_as_str(ip_family: u8) -> &'static str {
+    match ip_family {
+        2 => "IPv4",
+        10 => "IPv6",
+        _ => "Unknown",
     }
 }
 
@@ -104,12 +112,15 @@ pub async fn process_tc_events(
                 );
 
                 if convert_protocol(event.protocol) == "tcp" {
-                    msg.push_str(&format!(" tcp_flags={}", format_tcp_flags(event.tcp_flags)));
+                    msg.push_str(&format!(
+                        " tcp_flags={}",
+                        format_tcp_flags(event.tcp_flags.unwrap())
+                    ));
                 }
 
                 match log_format.as_str() {
                     "json" => {
-                        let tcp_flags_str = format_tcp_flags(event.tcp_flags);
+                        let tcp_flags_str = format_tcp_flags(event.tcp_flags.unwrap());
                         info!(
                             dir = %convert_direction(event.direction),
                             ip_family = %event.ip_family.as_str(),
@@ -139,6 +150,27 @@ pub async fn process_tc_events(
     }
 }
 
+pub async fn process_arp_events(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow::Error> {
+    loop {
+        while let Some(event) = ring_buf.next() {
+            let data = event.as_ref();
+            if data.len() == std::mem::size_of::<ArpEvent>() {
+                let event: &ArpEvent = unsafe { &*(data.as_ptr() as *const ArpEvent) };
+                info!(
+                    "[arp][{}][{}] {} ({}) -> {} ({})",
+                    event.arp_op_to_str(),
+                    event.ip_family.as_str(),
+                    format_mac(&event.sha),
+                    to_ipaddr(event.spa, event.ip_family.to_owned()),
+                    format_mac(&event.tha),
+                    to_ipaddr(event.tpa, event.ip_family.to_owned())
+                );
+            }
+        }
+        tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -146,7 +178,7 @@ mod tests {
     #[test]
     fn test_format_mac() {
         let mac = [0x00, 0x1A, 0x2B, 0x3C, 0x4D, 0x5E];
-        let formatted_mac = _format_mac(&mac);
+        let formatted_mac = format_mac(&mac);
         assert_eq!(formatted_mac, "00:1a:2b:3c:4d:5e");
     }
 

@@ -6,7 +6,7 @@ use std::{
 use default_net::interface::get_default_interface_name;
 use dns_lookup::lookup_addr;
 use libc::{c_char, c_int, getservbyport, ntohs, servent, setrlimit};
-use nflux_common::{utils::is_ipv4_private_address, TcpFlags};
+use nflux_common::{dto::TcpFlags, utils::is_ipv4_private_address};
 use sysinfo::{Pid, System};
 use tokio::signal;
 use tracing::{debug, warn};

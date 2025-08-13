@@ -3,6 +3,7 @@
 pub enum IpFamily {
     Ipv4,
     Ipv6,
+    Unknown,
 }
 
 #[repr(C)]
@@ -53,6 +54,29 @@ pub struct DroppedPacketEvent {
     pub reason: [u8; 64],              // Human-readable reason
     pub reason_description: [u8; 128], // Detailed description of the reason
     pub family: u16,                   // Address family (AF_INET, AF_INET6, etc.)
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct ArpEvent {
+    pub op_code: u16,
+    pub ip_family: IpFamily,
+    pub sha: [u8; 6],
+    pub spa: [u8; 16],
+    pub tha: [u8; 6],
+    pub tpa: [u8; 16],
+}
+
+impl ArpEvent {
+    pub fn arp_op_to_str(&self) -> &'static str {
+        match self.op_code {
+            1 => "request",
+            2 => "reply",
+            3 => "request reverse",
+            4 => "reply reverse",
+            _ => "unknown",
+        }
+    }
 }
 
 #[cfg(feature = "user")]

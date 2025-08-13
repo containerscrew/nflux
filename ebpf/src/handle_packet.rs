@@ -23,6 +23,8 @@ fn handle_ports(
         (true, IpFamily::Ipv6) => EthHdr::LEN + Ipv6Hdr::LEN,
         (false, IpFamily::Ipv4) => Ipv4Hdr::LEN,
         (false, IpFamily::Ipv6) => Ipv6Hdr::LEN,
+        (true, IpFamily::Unknown) => 0,
+        (false, IpFamily::Unknown) => 0,
     };
 
     match protocol {

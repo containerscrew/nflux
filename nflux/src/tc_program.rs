@@ -1,42 +1,14 @@
 use anyhow::Context;
 use aya::{
     maps::{Array, RingBuf},
-    programs::{tc, SchedClassifier, TcAttachType, TracePoint},
+    programs::{tc, SchedClassifier, TcAttachType},
     Ebpf,
 };
-use nflux_common::Configmap;
+use nflux_common::dto::Configmap;
 use tracing::{debug, error, warn};
 
-use super::events::{process_dp_events, process_tc_events};
-use crate::utils::wait_for_shutdown;
-
-pub async fn start_dropped_packets(
-    ebpf: &mut Ebpf,
-    log_format: String,
-) -> anyhow::Result<()> {
-    let program: &mut TracePoint = ebpf.program_mut("dropped_packets").unwrap().try_into()?;
-    program.load()?;
-    program.attach("skb", "kfree_skb")?;
-
-    let dropped_packets_ring_map = ebpf
-        .take_map("DROPPED_PACKETS_EVENT")
-        .ok_or_else(|| anyhow::anyhow!("Failed to find ring buffer DROPPED_PACKETS_EVENT map"))?;
-
-    let ring_buf = RingBuf::try_from(dropped_packets_ring_map)?;
-
-    tokio::select! {
-        res = process_dp_events(ring_buf, log_format) => {
-            if let Err(e) = res {
-                error!("process_dp_events failed: {:?}", e);
-            }
-        },
-        _ = wait_for_shutdown() => {
-            warn!("You press Ctrl-C, shutting down nflux...");
-        }
-    }
-
-    Ok(())
-}
+use super::events::process_tc_events;
+use crate::{events::process_arp_events, utils::wait_for_shutdown};
 
 pub async fn start_traffic_control(
     ebpf: &mut Ebpf,
@@ -47,22 +19,41 @@ pub async fn start_traffic_control(
     log_format: String,
     exclude_ports: Option<Vec<u16>>,
 ) -> anyhow::Result<()> {
+    // Attach TC programs
     try_traffic_control(ebpf, interface, disable_ingress, disable_egress, configmap)?;
 
     let tc_event_ring_map = ebpf
-        .take_map("TC_EVENT")
-        .ok_or_else(|| anyhow::anyhow!("Failed to find ring buffer TC_EVENT map"))?;
+        .take_map("NETWORK_EVENT")
+        .ok_or_else(|| anyhow::anyhow!("Failed to find ring buffer NETWORK_EVENT map"))?;
+    let ring_buf_net = RingBuf::try_from(tc_event_ring_map)?;
 
-    let ring_buf = RingBuf::try_from(tc_event_ring_map)?;
+    let arp_event_ring_map = ebpf
+        .take_map("ARP_EVENTS")
+        .ok_or_else(|| anyhow::anyhow!("Failed to find ring buffer ARP_EVENTS map"))?;
+    let ring_buf_arp = RingBuf::try_from(arp_event_ring_map)?;
 
+    let net_task = tokio::spawn(async move {
+        if let Err(e) = process_tc_events(ring_buf_net, log_format, exclude_ports).await {
+            error!("process_tc_events failed: {:?}", e);
+        }
+    });
+
+    let arp_task = tokio::spawn(async move {
+        if let Err(e) = process_arp_events(ring_buf_arp).await {
+            error!("process_arp_events failed: {:?}", e);
+        }
+    });
+
+    // Wait for shutdown signal or any task to end
     tokio::select! {
-        res = process_tc_events(ring_buf, log_format, exclude_ports) => {
-            if let Err(e) = res {
-                error!("process_tc_events failed: {:?}", e);
-            }
-        },
         _ = wait_for_shutdown() => {
-            warn!("You press Ctrl-C, shutting down nflux...");
+            warn!("You pressed Ctrl-C, shutting down nflux...");
+        }
+        _ = net_task => {
+            warn!("NETWORK_EVENT task ended");
+        }
+        _ = arp_task => {
+            warn!("ARP_EVENTS task ended");
         }
     }
 
