@@ -22,16 +22,17 @@ use crate::{
     containers::{ContainerRuntime, PodmanRuntime},
     logger::init_logger,
     network_event::{process_ring_buffer, DisplayNetworkEvent},
-    programs::{start_dropped_packets, start_traffic_control},
+    tc_program::start_traffic_control,
     utils::{is_root_user, wait_for_shutdown},
 };
 
 mod cli;
 mod containers;
+mod dpkt_program;
 mod events;
 mod logger;
 mod network_event;
-mod programs;
+mod tc_program;
 mod utils;
 
 #[tokio::main]
@@ -54,17 +55,15 @@ async fn main() -> anyhow::Result<()> {
     set_mem_limit();
 
     // Load eBPF programs
-    let mut ebpf = Ebpf::load(include_bytes_aligned!(concat!(
-        env!("OUT_DIR"),
-        "/nflux-ebpf"
-    )))?;
+    let mut ebpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/ebpf")))?;
 
     info!("Starting nflux with pid {}", process::id());
 
-    // if let Err(e) = aya_log::EbpfLogger::init(&mut ebpf) {
-    //     // This can happen if you remove all log statements from your eBPF program.
-    //     warn!("failed to initialize eBPF logger: {e}");
-    // }
+    // Uncomment the following line to enable eBPF logging
+    if let Err(e) = aya_log::EbpfLogger::init(&mut ebpf) {
+        // This can happen if you remove all log statements from your eBPF program.
+        warn!("failed to initialize eBPF logger: {e}");
+    }
 
     // Match possible subcommands
     match cli.command {
@@ -80,12 +79,13 @@ async fn main() -> anyhow::Result<()> {
             log_interval,
             disable_full_log,
         }) => {
+            // User data shared from the user space to the eBPF program
             info!("Sniffing traffic on interface: {}", interface);
             let configmap = Configmap {
                 disable_udp: is_true(disable_udp), // 0 = no, 1 = yes
                 disable_icmp: is_true(disable_icmp),
                 disable_tcp: is_true(disable_tcp),
-                log_interval: log_interval as u64 * 1_000_000_000,
+                log_interval: log_interval as u64 * 1_000_000_000, // Convert seconds to nanoseconds
                 disable_full_log: is_true(disable_full_log),
                 listen_port: listen_port.unwrap_or(0), // Default to 0 if not provided
             };
@@ -104,7 +104,7 @@ async fn main() -> anyhow::Result<()> {
 
             // Start nflux tc
             start_traffic_control(
-                &mut bpf_tc,
+                &mut ebpf,
                 &interface,
                 disable_egress,
                 disable_ingress,
