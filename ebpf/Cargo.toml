@@ -16,5 +16,5 @@ which = { workspace = true }
 
 
 [[bin]]
-name = "nflux-ebpf"
+name = "ebpf"
 path = "src/main.rs"

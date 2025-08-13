@@ -22,13 +22,15 @@ impl IpFamily {
         match self {
             IpFamily::Ipv4 => "IPv4",
             IpFamily::Ipv6 => "IPv6",
+            IpFamily::Unknown => "Unknown",
         }
     }
 
     pub fn to_owned(&self) -> u8 {
         match self {
-            IpFamily::Ipv4 => 2,  // AF_INET
-            IpFamily::Ipv6 => 10, // AF_INET6
+            IpFamily::Ipv4 => 2,    // AF_INET
+            IpFamily::Ipv6 => 10,   // AF_INET6
+            IpFamily::Unknown => 0, // Unknown
         }
     }
 
