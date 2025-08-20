@@ -8,7 +8,7 @@ nflux-common = { path = "../nflux-common" }
 
 aya-ebpf = { workspace = true }
 aya-log-ebpf = { workspace = true }
-network-types = "0.0.8"
+network-types = "0.1.0"
 
 [build-dependencies]
 which = { workspace = true }
