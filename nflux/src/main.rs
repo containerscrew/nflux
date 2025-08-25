@@ -51,17 +51,14 @@ async fn main() -> anyhow::Result<()> {
         exit(1);
     }
 
-    // Set memory limit for eBPF maps
     set_mem_limit();
 
-    // Load eBPF programs
     let mut ebpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/ebpf")))?;
 
     info!("Starting nflux with pid {}", process::id());
 
     // Uncomment the following line to enable eBPF logging
     if let Err(e) = aya_log::EbpfLogger::init(&mut ebpf) {
-        // This can happen if you remove all log statements from your eBPF program.
         warn!("failed to initialize eBPF logger: {e}");
     }
 
@@ -76,6 +73,7 @@ async fn main() -> anyhow::Result<()> {
             disable_udp,
             disable_icmp,
             disable_tcp,
+            disable_arp,
             log_interval,
             disable_full_log,
         }) => {
@@ -85,7 +83,8 @@ async fn main() -> anyhow::Result<()> {
                 disable_udp: is_true(disable_udp), // 0 = no, 1 = yes
                 disable_icmp: is_true(disable_icmp),
                 disable_tcp: is_true(disable_tcp),
-                log_interval: log_interval as u64 * 1_000_000_000, // Convert seconds to nanoseconds
+                disable_arp: is_true(disable_arp),
+                log_interval: log_interval as u64 * 1_000_000_000, 
                 disable_full_log: is_true(disable_full_log),
                 listen_port: listen_port.unwrap_or(0), // Default to 0 if not provided
             };

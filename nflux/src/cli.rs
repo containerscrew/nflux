@@ -124,6 +124,14 @@ pub enum Commands {
         disable_tcp: bool,
 
         #[arg(
+            long = "disable-arp",
+            help = "Disable arp protocol network monitoring. [default: false]",
+            default_value_t = false,
+            required = false
+        )]
+        disable_arp: bool,
+
+        #[arg(
             long = "log-interval",
             help = "How often same ip,port,pid,protocol will be logged. This flag is not used if you don't set --disable-full-log.",
             default_value_t = 5,
