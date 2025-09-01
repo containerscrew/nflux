@@ -1,15 +1,6 @@
-use std::{
-    fs::File,
-    process::{self, exit},
-};
+use std::process::{self, exit};
 
-use anyhow::Context;
-use aya::{
-    include_bytes_aligned,
-    maps::RingBuf,
-    programs::{CgroupAttachMode, CgroupSkb, CgroupSkbAttachType},
-    Ebpf,
-};
+use aya::{include_bytes_aligned, Ebpf};
 use clap::Parser;
 use libc::getuid;
 use logger::LoggerConfig;
@@ -18,15 +9,11 @@ use tracing::{error, info, warn};
 use utils::{is_true, set_mem_limit};
 
 use crate::{
-    cli::NfluxCliArgs,
-    containers::{ContainerRuntime, PodmanRuntime},
-    dpkt_program::start_dropped_packets,
-    logger::init_logger,
-    network_event::{process_ring_buffer, DisplayNetworkEvent},
-    tc_program::start_traffic_control,
-    utils::{is_root_user, wait_for_shutdown},
+    cli::NfluxCliArgs, dpkt_program::start_dropped_packets, logger::init_logger,
+    tc_program::start_traffic_control, utils::is_root_user,
 };
 
+mod cgroups_program;
 mod cli;
 mod containers;
 mod dpkt_program;
@@ -118,15 +105,15 @@ async fn main() -> anyhow::Result<()> {
             info!("Sniffing dropped packets");
             start_dropped_packets(&mut ebpf, cli.log_format).await?;
         }
-        // Some(cli::Commands::Cgroups {
-        //     cgroup_path: _,
-        //     podman_socket_path,
-        //     containerd_socket_path,
-        // }) => {
-        //     info!("Sniffing container traffic using cgroup skb");
-        //     start_cgroups_traffic(&mut bpf_cgroups, podman_socket_path, containerd_socket_path)
-        //         .await?;
-        // }
+        Some(cli::Commands::Cgroups {
+            cgroup_path: _,
+            podman_socket_path: _,
+            containerd_socket_path: _,
+        }) => {
+            warn!("By the moment this feature is being reworked, stay tunned!");
+            // warn!("Sniffing container traffic using cgroup skb");
+            // start_cgroups_traffic(&mut ebpf, podman_socket_path, containerd_socket_path).await?;
+        }
         None => {
             // Unreachable: CLI shows help if no args are provided.
         }
