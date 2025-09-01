@@ -1,4 +1,7 @@
 #### Miscellaneous Chores
+- 2ff6c05a2981617a0ab1368711409b260a191784 - **(version)** 0.12.6 - containerscrew
+- 4262ce2ede165701ddb4e72852936272bbc93da6 - add CHANGELOG.md - containerscrew
+
 - 5effb1b2a2e748c169eefc3f198a318741dd807f - delete changelog - containerscrew
 
 - 87a72d675dbf060d81c90fb6b8ed98ab6dfa081d - update CHANGELOG.md - containerscrew
@@ -8,16 +11,6 @@
 
 
 - - -
-## 0.12.6 - 2025-09-01
-#### Miscellaneous Chores
-- add CHANGELOG.md - (4262ce2) - containerscrew
-- delete changelog - (5effb1b) - containerscrew
-- update CHANGELOG.md - (87a72d6) - containerscrew
-#### Refactoring
-- formatting & fix aya helpers - (590cc4c) - containerscrew
-
-- - -
-
 
 #### Bug Fixes
 - e7fd1018839d8f700254ea94826e86bb55ade8de - **(cli)** help message in --log-inverval flag - containerscrew
