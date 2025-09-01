@@ -11,7 +11,7 @@ if not lines:
 subject = lines[0].strip()
 
 types = r"(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)"
-valid = re.compile(rf"^{types}(\([^)]*\))?:")  # ya correcto -> no tocar
+valid = re.compile(rf"^{types}(\([^)]*\))?:")
 if valid.match(subject):
     return
 
@@ -20,12 +20,10 @@ m = re.match(rf"^({types})\s+(?!\()(.+)$", subject)
 if m:
     new_subject = f"{m.group(1)}: {m.group(2).strip()}"
 else:
-    # Caso 2: no tiene tipo -> prefija chore:
     new_subject = f"chore: {subject}" if subject else "chore:"
 
 lines[0] = new_subject
 new_msg = "\n".join(lines)
-# preserva newline final si existía
 if msg.endswith("\n"):
     new_msg += "\n"
 commit.message = new_msg.encode("utf-8")
