@@ -20,6 +20,7 @@ use utils::{is_true, set_mem_limit};
 use crate::{
     cli::NfluxCliArgs,
     containers::{ContainerRuntime, PodmanRuntime},
+    dpkt_program::start_dropped_packets,
     logger::init_logger,
     network_event::{process_ring_buffer, DisplayNetworkEvent},
     tc_program::start_traffic_control,
@@ -84,7 +85,7 @@ async fn main() -> anyhow::Result<()> {
                 disable_icmp: is_true(disable_icmp),
                 disable_tcp: is_true(disable_tcp),
                 disable_arp: is_true(disable_arp),
-                log_interval: log_interval as u64 * 1_000_000_000, 
+                log_interval: log_interval as u64 * 1_000_000_000,
                 disable_full_log: is_true(disable_full_log),
                 listen_port: listen_port.unwrap_or(0), // Default to 0 if not provided
             };
@@ -96,8 +97,8 @@ async fn main() -> anyhow::Result<()> {
             }
 
             // Also, if all protocols are disabled, exit
-            if disable_icmp && disable_tcp && disable_udp {
-                error!("You disabled all the protocols (tcp/udp/icmp), nothing to display.");
+            if disable_icmp && disable_tcp && disable_udp && disable_arp {
+                error!("You disabled all the protocols (tcp/udp/icmp/arp), nothing to display.");
                 exit(1)
             }
 
@@ -113,10 +114,10 @@ async fn main() -> anyhow::Result<()> {
             )
             .await?;
         }
-        // Some(cli::Commands::Dpkt {}) => {
-        //     info!("Sniffing dropped packets");
-        //     start_dropped_packets(&mut ebpf, cli.log_format).await?;
-        // }
+        Some(cli::Commands::Dpkt {}) => {
+            info!("Sniffing dropped packets");
+            start_dropped_packets(&mut ebpf, cli.log_format).await?;
+        }
         // Some(cli::Commands::Cgroups {
         //     cgroup_path: _,
         //     podman_socket_path,
