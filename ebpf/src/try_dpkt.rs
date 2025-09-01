@@ -5,8 +5,8 @@ use aya_ebpf::{
     programs::TracePointContext,
 };
 use nflux_common::{
-    skb_reason::{reason_description, reason_to_str},
-    DroppedPacketEvent,
+    drop_skb_reason::{reason_description, reason_to_str},
+    dto::DroppedPacketEvent,
 };
 
 use crate::{maps::DROPPED_PACKETS_EVENT, vmlinux::sock};

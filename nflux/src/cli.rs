@@ -147,8 +147,8 @@ pub enum Commands {
         )]
         disable_full_log: bool,
     },
-    // /// Sniff dropped packets using tracepoint/skb/kfree_skb
-    // Dpkt {},
+    /// Sniff dropped packets using tracepoint/skb/kfree_skb
+    Dpkt {},
     // /// Sniff container traffic using cgroup skb
     // Cgroups {
     //     #[arg(
