@@ -5,8 +5,8 @@ separator() {
     echo -e "\n--- $1 ---\n"
 }
 
-# separator "Running pre-commit hooks"
-# pre-commit run -a --show-diff-on-failure
+separator "Running pre-commit hooks"
+pre-commit run -a --show-diff-on-failure
 
 separator "Formatting Rust code"
 cargo fmt --all > /dev/null
