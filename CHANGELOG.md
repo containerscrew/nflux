@@ -1,4 +1,4 @@
-## 0.12.5 - 2025-09-01
+## Unreleased (3aa007f..cafcbe8)
 #### Documentation
 - update project_notes.md - (afbfa5d) - containerscrew
 - new file project_notes.md - (a4deed9) - containerscrew
@@ -23,6 +23,7 @@
 - **(version)** 0.12.5 - (1887670) - containerscrew
 - **(version)** 0.12.5 - (a1b5496) - containerscrew
 - **(version)** 0.12.5 - (6d1c83f) - containerscrew
+- update CHANGELOG.md - (469c1bb) - containerscrew
 - add CHANGELOG.md - (1449af8) - containerscrew
 - delete changelog - (b5c0946) - containerscrew
 - add new script for git history rewrite - (a75dd55) - containerscrew
@@ -685,6 +686,7 @@
 - **(cli)** help message & cargo fmt - (edaf643) - containerscrew
 - **(cli)** help message & cargo fmt - (a3a1807) - containerscrew
 - **(ebpf-logger)** comment ebpf-logger - (4e64a0f) - containerscrew
+- changelog generation - (cafcbe8) - containerscrew
 - rewrite git history - (9026564) - containerscrew
 - rewrite git history - (c96e479) - containerscrew
 - update edition in Cargo.toml - (f152512) - containerscrew
