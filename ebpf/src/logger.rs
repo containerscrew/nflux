@@ -1,7 +1,10 @@
 use aya_ebpf::helpers::r#gen::bpf_ktime_get_ns;
 use nflux_common::dto::{IpFamily, NetworkEvent, TcpFlags};
 
-use crate::{dto::ActiveConnectionKey, maps::{ACTIVE_CONNECTIONS, NETWORK_EVENT}};
+use crate::{
+    dto::ActiveConnectionKey,
+    maps::{ACTIVE_CONNECTIONS, NETWORK_EVENT},
+};
 
 #[inline]
 pub unsafe fn log_connection_fields(
