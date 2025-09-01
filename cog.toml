@@ -10,6 +10,7 @@ pre_bump_hooks = ["cog changelog"]
 
 [git_hooks]
 [git_hooks.pre-commit]
+# cog install-hook --all
 script = "./scripts/pre-commit.sh"
 
 # [commit_types]
