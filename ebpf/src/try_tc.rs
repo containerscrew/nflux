@@ -1,8 +1,10 @@
 use aya_ebpf::{bindings::TC_ACT_PIPE, programs::TcContext};
 use network_types::{
+    arp::ArpHdr,
     eth::{EthHdr, EtherType},
     ip::{Ipv4Hdr, Ipv6Hdr},
 };
+use nflux_common::dto::{ArpEvent, IpFamily};
 
 use crate::{dto::IpHeader, handle_packet::handle_packet, maps::ARP_EVENTS};
 
