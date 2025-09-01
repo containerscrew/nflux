@@ -5,7 +5,7 @@ use clap::Parser;
 use libc::getuid;
 use logger::LoggerConfig;
 use nflux_common::dto::Configmap;
-use tracing::{error, info, warn};
+use tracing::{error, info};
 use utils::{is_true, set_mem_limit};
 
 use crate::{
@@ -13,9 +13,7 @@ use crate::{
     tc_program::start_traffic_control, utils::is_root_user,
 };
 
-mod cgroups_program;
 mod cli;
-mod containers;
 mod dpkt_program;
 mod events;
 mod logger;
@@ -46,9 +44,9 @@ async fn main() -> anyhow::Result<()> {
     info!("Starting nflux with pid {}", process::id());
 
     // Uncomment the following line to enable eBPF logging
-    if let Err(e) = aya_log::EbpfLogger::init(&mut ebpf) {
-        warn!("failed to initialize eBPF logger: {e}");
-    }
+    // if let Err(e) = aya_log::EbpfLogger::init(&mut ebpf) {
+    //     warn!("failed to initialize eBPF logger: {e}");
+    // }
 
     // Match possible subcommands
     match cli.command {
@@ -104,15 +102,6 @@ async fn main() -> anyhow::Result<()> {
         Some(cli::Commands::Dpkt {}) => {
             info!("Sniffing dropped packets");
             start_dropped_packets(&mut ebpf, cli.log_format).await?;
-        }
-        Some(cli::Commands::Cgroups {
-            cgroup_path: _,
-            podman_socket_path: _,
-            containerd_socket_path: _,
-        }) => {
-            warn!("By the moment this feature is being reworked, stay tunned!");
-            // warn!("Sniffing container traffic using cgroup skb");
-            // start_cgroups_traffic(&mut ebpf, podman_socket_path, containerd_socket_path).await?;
         }
         None => {
             // Unreachable: CLI shows help if no args are provided.
