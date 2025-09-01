@@ -1,15 +1,6 @@
-use std::{
-    fs::File,
-    process::{self, exit},
-};
+use std::process::{self, exit};
 
-use anyhow::Context;
-use aya::{
-    include_bytes_aligned,
-    maps::RingBuf,
-    programs::{CgroupAttachMode, CgroupSkb, CgroupSkbAttachType},
-    Ebpf,
-};
+use aya::{include_bytes_aligned, Ebpf};
 use clap::Parser;
 use libc::getuid;
 use logger::LoggerConfig;
@@ -18,15 +9,11 @@ use tracing::{error, info, warn};
 use utils::{is_true, set_mem_limit};
 
 use crate::{
-    cli::NfluxCliArgs,
-    containers::{ContainerRuntime, PodmanRuntime},
-    dpkt_program::start_dropped_packets,
-    logger::init_logger,
-    network_event::{process_ring_buffer, DisplayNetworkEvent},
-    tc_program::start_traffic_control,
-    utils::{is_root_user, wait_for_shutdown},
+    cli::NfluxCliArgs, dpkt_program::start_dropped_packets, logger::init_logger,
+    tc_program::start_traffic_control, utils::is_root_user,
 };
 
+mod cgroups_program;
 mod cli;
 mod containers;
 mod dpkt_program;
@@ -118,90 +105,19 @@ async fn main() -> anyhow::Result<()> {
             info!("Sniffing dropped packets");
             start_dropped_packets(&mut ebpf, cli.log_format).await?;
         }
-        // Some(cli::Commands::Cgroups {
-        //     cgroup_path: _,
-        //     podman_socket_path,
-        //     containerd_socket_path,
-        // }) => {
-        //     info!("Sniffing container traffic using cgroup skb");
-        //     start_cgroups_traffic(&mut bpf_cgroups, podman_socket_path, containerd_socket_path)
-        //         .await?;
-        // }
+        Some(cli::Commands::Cgroups {
+            cgroup_path: _,
+            podman_socket_path: _,
+            containerd_socket_path: _,
+        }) => {
+            warn!("By the moment this feature is being reworked, stay tunned!");
+            // warn!("Sniffing container traffic using cgroup skb");
+            // start_cgroups_traffic(&mut ebpf, podman_socket_path, containerd_socket_path).await?;
+        }
         None => {
             // Unreachable: CLI shows help if no args are provided.
         }
     }
-
-    Ok(())
-}
-
-async fn start_cgroups_traffic(
-    ebpf: &mut Ebpf,
-    podman_socket_path: String,
-    _containerd_socket_path: String,
-) -> anyhow::Result<()> {
-    // TODO: containerd support
-    // First of all, list containers
-    let podman = PodmanRuntime::new(&podman_socket_path);
-    let podman_containers = podman.list_containers().await?;
-    // let containerd = ContainerdRuntime::new(&containerd_socket_path).await;
-    // let _containerd_containers = containerd.list_containers().await?;
-
-    for contaiener in podman_containers {
-        info!("Attachingf eBPF program to container: {}", contaiener.name);
-
-        // Attach the eBPF program to the cgroup path
-        let cgroup_path = contaiener.cgroup_path;
-        let cgroup_file = File::open(&cgroup_path)
-            .with_context(|| format!("Failed to open cgroup file: {}", &cgroup_path))?;
-
-        attach_skb_program(
-            ebpf,
-            "cgroups_traffic_egress",
-            CgroupSkbAttachType::Egress,
-            &cgroup_file,
-        )
-        .await?;
-
-        attach_skb_program(
-            ebpf,
-            "cgroups_traffic_ingress",
-            CgroupSkbAttachType::Ingress,
-            &cgroup_file,
-        )
-        .await?;
-    }
-
-    let network_event = ebpf
-        .take_map("CGROUP_NETWORK_EVENT")
-        .ok_or_else(|| anyhow::anyhow!("Failed to find ring buffer CGROUP_NETWORK_EVENT map"))?;
-
-    let ring_buf = RingBuf::try_from(network_event)?;
-
-    tokio::select! {
-        res = process_ring_buffer::<DisplayNetworkEvent>(ring_buf) => {
-            if let Err(e) = res {
-                error!("Processing cgroup packets {:?}", e);
-            }
-        },
-        _ = wait_for_shutdown() => {
-            warn!("You press Ctrl-C, shutting down nflux...");
-        }
-    }
-
-    Ok(())
-}
-
-async fn attach_skb_program(
-    ebpf: &mut Ebpf,
-    program_name: &str,
-    attach_type: CgroupSkbAttachType,
-    cgroup_file: &File,
-) -> anyhow::Result<()> {
-    let program: &mut CgroupSkb = ebpf.program_mut(program_name).unwrap().try_into()?;
-    program.load()?;
-
-    program.attach(cgroup_file, attach_type, CgroupAttachMode::default())?;
 
     Ok(())
 }
