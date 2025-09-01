@@ -22,9 +22,6 @@ pre-commit-uninstall: ## Uninstall pre-commit
 run-pre-commit: ## Run pre-commit locally
 	pre-commit run -a
 
-generate-changelog: ## Generate changelog
-	git cliff -o CHANGELOG.md
-
 init-gitmoji: ## Init gitmoji (sudo npm i -g gitmoji-cli)
 	gitmoji --init
 
@@ -55,10 +52,3 @@ generate-vmlinux: ## Generate vmlinux for kernel data structures
 
 setup-hooks:
 	git config core.hooksPath .git-hooks
-
-tag: ## Generate a new tag
-	git-cliff -t $(version) -o CHANGELOG.md
-	mtoc -f CHANGELOG.md
-	git add CHANGELOG.md
-	git commit -m "feat: new version $(version)"
-	git tag -a $(version) -m "$(message)"

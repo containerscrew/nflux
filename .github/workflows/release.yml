@@ -52,8 +52,6 @@ jobs:
       - name: Setup cargo dependencies
         run: |
           cargo install bpf-linker
-          cargo install git-cliff
-          cargo install mtoc
           cargo install cargo-deb
 
       - name: Run build
@@ -63,7 +61,7 @@ jobs:
       - name: Generate deb package
         run: |
           cargo deb
-
+      
       - name: Package zip
         run: |
           zip -j nflux-${{ matrix.platform.release_for }}-${{ env.TAG_NAME }}.zip target/release/nflux
