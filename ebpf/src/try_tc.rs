@@ -1,5 +1,4 @@
 use aya_ebpf::{bindings::TC_ACT_PIPE, programs::TcContext};
-use aya_log_ebpf::info;
 use network_types::{
     arp::ArpHdr,
     eth::{EthHdr, EtherType},

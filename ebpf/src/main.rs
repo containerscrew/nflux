@@ -6,7 +6,6 @@ mod dto;
 mod handle_packet;
 mod logger;
 mod maps;
-mod try_cgroups;
 mod try_dpkt;
 mod try_tc;
 mod utils;
@@ -14,12 +13,12 @@ mod vmlinux;
 
 use aya_ebpf::{
     bindings::TC_ACT_SHOT,
-    macros::{cgroup_skb, classifier, tracepoint},
-    programs::{SkBuffContext, TcContext, TracePointContext},
+    macros::{classifier, tracepoint},
+    programs::{TcContext, TracePointContext},
 };
 use try_tc::try_tc;
 
-use crate::{try_cgroups::try_cgroups_traffic, try_dpkt::try_dropped_packets};
+use crate::try_dpkt::try_dropped_packets;
 
 #[classifier]
 pub fn tc_egress(ctx: TcContext) -> i32 {
@@ -39,22 +38,6 @@ pub fn tc_ingress(ctx: TcContext) -> i32 {
 pub fn dropped_packets(ctx: TracePointContext) -> u32 {
     // This function is called when a packet is dropped
     match try_dropped_packets(ctx) {
-        Ok(ret) => ret,
-        Err(ret) => ret,
-    }
-}
-
-#[cgroup_skb]
-pub fn cgroups_traffic_egress(ctx: SkBuffContext) -> i32 {
-    match try_cgroups_traffic(ctx, 1) {
-        Ok(ret) => ret,
-        Err(ret) => ret,
-    }
-}
-
-#[cgroup_skb]
-pub fn cgroups_traffic_ingress(ctx: SkBuffContext) -> i32 {
-    match try_cgroups_traffic(ctx, 0) {
         Ok(ret) => ret,
         Err(ret) => ret,
     }
