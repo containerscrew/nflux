@@ -1,18 +1,15 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
 
-echo "[pre-push] Generating CHANGELOG.md with git cliff before push..."
+separator() {
+    echo -e "\n--- $1 ---\n"
+}
 
-git cliff -o CHANGELOG.md
+separator "Running pre-commit hooks"
+pre-commit run -a --show-diff-on-failure
 
-git add CHANGELOG.md
+separator "Formatting Rust code"
+cargo fmt --all > /dev/null
 
-if ! git diff --cached --quiet; then
-    git commit -m "Update CHANGELOG.md"
-    mtoc -f CHANGELOG.md
-else
-    echo "[pre-push] No changes in CHANGELOG.md to commit."
-fi
-
-echo "[pre-push] Done. Proceeding with push..."
+separator "Running tests with nextest"
+cargo nextest run
