@@ -1,4 +1,4 @@
-## Unreleased (3aa007f..cafcbe8)
+## Unreleased (3aa007f..139a09d)
 #### Documentation
 - update project_notes.md - (afbfa5d) - containerscrew
 - new file project_notes.md - (a4deed9) - containerscrew
@@ -686,6 +686,7 @@
 - **(cli)** help message & cargo fmt - (edaf643) - containerscrew
 - **(cli)** help message & cargo fmt - (a3a1807) - containerscrew
 - **(ebpf-logger)** comment ebpf-logger - (4e64a0f) - containerscrew
+- add changelog - (139a09d) - containerscrew
 - changelog generation - (cafcbe8) - containerscrew
 - rewrite git history - (9026564) - containerscrew
 - rewrite git history - (c96e479) - containerscrew
