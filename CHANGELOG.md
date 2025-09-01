@@ -1,0 +1,670 @@
+## Unreleased (38fdc91..03865d9)
+#### Miscellaneous Chores
+- delete changelog - (112ff8e) - containerscrew
+- add new script for git history rewrite - (38fdc91) - containerscrew
+#### Refactoring
+- rewrite git history - (03865d9) - containerscrew
+
+- - -
+
+## 0.12.5 - 2025-09-01
+#### Documentation
+- update project_notes.md - (bca1382) - containerscrew
+- new file project_notes.md - (492373d) - containerscrew
+#### Miscellaneous Chores
+- **(deps)** bump tracing-subscriber from 0.3.19 to 0.3.20 - (2b2d169) - dependabot[bot]
+- **(deps)** bump clap from 4.5.45 to 4.5.46 - (cb1c92e) - dependabot[bot]
+- **(deps)** bump dns-lookup from 2.1.0 to 3.0.0 - (3f02fc6) - dependabot[bot]
+- **(deps)** bump network-types from 0.0.8 to 0.1.0 - (8b982e4) - dependabot[bot]
+- **(deps)** bump async-trait from 0.1.88 to 0.1.89 - (6da2fc8) - dependabot[bot]
+- **(deps)** bump anyhow from 1.0.98 to 1.0.99 - (19e1f37) - dependabot[bot]
+- **(deps)** bump clap from 4.5.44 to 4.5.45 - (6a72393) - dependabot[bot]
+- **(deps)** bump clap from 4.5.43 to 4.5.44 - (4db9bc7) - dependabot[bot]
+- **(deps)** bump slab from 0.4.10 to 0.4.11 - (bab9148) - dependabot[bot]
+- **(deps)** bump libc from 0.2.174 to 0.2.175 - (8daf01c) - dependabot[bot]
+- **(deps)** bump sysinfo from 0.36.1 to 0.37.0 - (2496221) - dependabot[bot]
+- **(deps)** bump clap from 4.5.42 to 4.5.43 - (5292e25) - dependabot[bot]
+- **(deps)** bump dns-lookup from 2.0.4 to 2.1.0 - (8c37173) - dependabot[bot]
+- **(deps)** bump tokio from 1.47.0 to 1.47.1 - (caad0ae) - dependabot[bot]
+- **(deps)** bump clap from 4.5.41 to 4.5.42 - (a66736b) - dependabot[bot]
+- **(deps)** bump tokio from 1.46.1 to 1.47.0 - (eb02d6c) - dependabot[bot]
+- **(deps)** bump sysinfo from 0.36.0 to 0.36.1 - (31b6909) - dependabot[bot]
+- **(version)** 0.12.5 - (c2b0ff3) - containerscrew
+- **(version)** 0.12.5 - (3c1e5fe) - containerscrew
+- remove cgroups feature - (58d6358) - containerscrew
+- remove cgroups feature - (8ba19ff) - containerscrew
+- remove cgroups feature - (1bcc017) - containerscrew
+- remove cgroups feature - (15df10a) - containerscrew
+- updating containerd implementation - (c682824) - containerscrew
+- update cog.toml - (c1c78dd) - containerscrew
+- Bump sysinfo from 0.35.2 to 0.36.0 - (d2cfc24) - dependabot[bot]
+- Bump clap from 4.5.40 to 4.5.41 - (cb1124e) - dependabot[bot]
+- update readme - (73ded38) - containerscrew
+- rollback convert_protocol helper - (73fda8d) - containerscrew
+- adding more information for unknown protocol - (755ea7e) - containerscrew
+- update README - (173dc3a) - containerscrew
+- update Makefile - (1c9a47c) - containerscrew
+- update changelog for v0.12.4 - (d4711c2) - containerscrew
+- new v0.12.4 - (5a12b48) - containerscrew
+- update Makefile - (9016408) - containerscrew
+- Generate CHANGELOG.md - (3fc1757) - containerscrew
+- update README.md - (8954978) - containerscrew
+- update README.md - (19de1d8) - containerscrew
+- update README.md - (d6dbf1b) - containerscrew
+- update README.md - (aabf577) - containerscrew
+- add cargo deb revision - (036636d) - containerscrew
+- release(v0.12.3): fix stack size allocation - (5177bfc) - containerscrew
+- remove comments and unnecessary dependencies - (07f85df) - containerscrew
+- ebpf: refactor to eliminate TcEvent stack allocation, reducing verifier stack usage - (6141ff6) - containerscrew
+- ebpf: refactor to eliminate tc_config stack allocation, reducing verifier stack usage - (2d550c3) - containerscrew
+- remove comments and unnecessary dependencies - (8566732) - containerscrew
+- ebpf: refactor to eliminate TcEvent stack allocation, reducing verifier stack usage - (2dc353a) - containerscrew
+- remove unnecessary dependencies - (8b9db19) - containerscrew
+- rollback: full tcpflags - (ecd4a68) - containerscrew
+- update changelog for v0.12.2 - (44fd049) - containerscrew
+- Add changelog - (901ff4c) - containerscrew
+- update changelog for v0.12.2 - (7523fe8) - containerscrew
+- Create changelog - (9a7cd51) - containerscrew
+- update changelog for v0.12.2 - (d1b51f1) - containerscrew
+- Fix Makefile - (ac3bdb4) - containerscrew
+- update changelog for v0.12.2 - (bbe9946) - containerscrew
+- Update Makefile - (a021d35) - containerscrew
+- Comment mtoc hook - (73b9ae4) - containerscrew
+- Temporary comment some Tcp flags to avoid stack limit size - (0d14c97) - containerscrew
+- Fix package deb metadata - (f0068ba) - containerscrew
+- Update Makefile - (4e1951e) - containerscrew
+- Change licensing - (2936678) - containerscrew
+- Add cargo deb in release pipeline - (e070351) - containerscrew
+- Update handle TcpFlags - (d5e99cc) - containerscrew
+- New version v0.12.1 including .deb package - (01e4b24) - containerscrew
+- Update cargo deb metadata - (aeb2a38) - containerscrew
+- Update build.yml pipeline - (29595e1) - containerscrew
+- Update CHANGELOG.md - (99fe705) - containerscrew
+- Update CHANGELOG.md - (27bf222) - containerscrew
+- Update CHANGELOG.md for release v0.12.0 - (8d5d910) - containerscrew
+- Update CHANGELOG.md for release v0.12.0 - (3249824) - containerscrew
+- Update CHANGELOG.md - (f27a5dc) - containerscrew
+- Update CHANGELOG.md - (1914c7a) - containerscrew
+- Update release pipeline - (378cf27) - containerscrew
+- Update CHANGELOG.md - (7c29e8f) - containerscrew
+- Update CHANGELOG.md - (35ba9a6) - containerscrew
+- Update CHANGELOG.md - (2511daf) - containerscrew
+- Update pre-push git hook - (58ec46e) - containerscrew
+- Update CHANGELOG.md - (970ab8f) - containerscrew
+- Update CHANGELOG.md - (932cbfc) - containerscrew
+- Update CHANGELOG.md - (202ec14) - containerscrew
+- Update git hook pre-push - (21d0634) - containerscrew
+- Update CHANGELOG.md - (f8ff4bd) - containerscrew
+- Update CHANGELOG.md - (3594142) - containerscrew
+- Update git hooks - (9d38f8a) - containerscrew
+- Update release pipeline - (0ace250) - containerscrew
+- Update CHANGELOG.md for release v0.11.0 - (a57f50a) - containerscrew
+- new nflux version v0.11.0 - (7783fd0) - containerscrew
+- Update CHANGELOG.md for release v0.11.0 - (9fdebc2) - containerscrew
+- Update README.md - (a87817d) - containerscrew
+- Update pre-commit - (1e67076) - containerscrew
+- Rename example2 - (d369ee9) - containerscrew
+- Update examples - (f9d3189) - containerscrew
+- add more tcp flags & IpFamily impl - (f99fa2e) - containerscrew
+- Update dependency - (0b7ff46) - containerscrew
+- Remove tokio thread in function process_tc_events - (72536af) - containerscrew
+- Change subcommands - (b445dc7) - containerscrew
+- Bump tokio from 1.46.0 to 1.46.1 - (3362230) - dependabot[bot]
+- Bump tokio from 1.45.1 to 1.46.0 - (bee2048) - dependabot[bot]
+- Update CHANGELOG.md for release v0.10.0 - (8847396) - containerscrew
+- New release v0.10.0 - (42b8d51) - containerscrew
+- Update CHANGELOG.md for release v0.10.0 - (a4aff8e) - containerscrew
+- Add vmlinux.rs & remove unused imports - (ff9a831) - containerscrew
+- Fix SkFamily data in dropped-pkt - (66ece20) - containerscrew
+- Update Makefile - (2ce8511) - containerscrew
+- Adding more socket information in dropped-pkt - (1daf8f0) - containerscrew
+- Update README.md - (455028f) - containerscrew
+- Update README.md - (d098791) - containerscrew
+- Setup monitoring stack - (9a2401c) - containerscrew
+- Fix loki config - (8f9a5e1) - containerscrew
+- Update CHANGELOG.md for release v0.9.0 - (9b28dec) - containerscrew
+- New infra/ folder to store compose and docker files - (6c84f93) - containerscrew
+- Revert "Add full example" - (d60f4d4) - containerscrew
+- Add full example - (c45d254) - containerscrew
+- update examples - (7484d36) - containerscrew
+- json logging for dropped-pkt & skip unknown reasons - (c7adbc1) - containerscrew
+- Refactor: cli subcommands & file structure - (142a82d) - containerscrew
+- Fix event struct in nflux-ebpf - (4c3cdd9) - containerscrew
+- Wip: dropped packets feature - (7833d21) - containerscrew
+- Add new example - (0c58ddf) - containerscrew
+- Update README.md - (7f561da) - containerscrew
+- update doc and examples - (ddaffa3) - containerscrew
+- Change imports rustfmt - (2833df2) - containerscrew
+- Remove docs/ folder in favour of Github Wiki - (bc144a2) - containerscrew
+- update code comments in nflux-ebpf - (09c6eda) - containerscrew
+- Update CHANGELOG.md for release v0.8.0 - (51d9f90) - containerscrew
+- Update Cargo.toml version - (0b1b09c) - containerscrew
+- Update usage.md - (6cc997c) - containerscrew
+- Update usage.md - (302a800) - containerscrew
+- Update rustfmt.toml - (6277128) - containerscrew
+- Change fn_params_layout carfo fmt to Vertical - (141f0b5) - containerscrew
+- Update example images - (d66108a) - containerscrew
+- Update CHANGELOG.md for release v0.7.0 - (f99414f) - containerscrew
+- Update Cargo.toml version - (91fc222) - containerscrew
+- Update Cargo.toml version - (eaaf362) - containerscrew
+- fmt code - (88f27d8) - containerscrew
+- Update CHANGELOG.md for release v0.6.1 - (c3711c2) - containerscrew
+- Fix pid and process field in json log - (98115f0) - containerscrew
+- Update CHANGELOG.md for release v0.6.0 - (88bc055) - containerscrew
+- Update Cargo.lock version - (04e6360) - containerscrew
+- Update Cargo.toml version - (ee22787) - containerscrew
+- Improve ActiveConnectiont tracker & cli help message - (c113926) - containerscrew
+- Update README - (c36a274) - containerscrew
+- Add new example - (20e36b6) - containerscrew
+- Refactor: folder structure - (7f9909f) - containerscrew
+- Update CHANGELOG.md for release v0.5.0 - (1d3440e) - containerscrew
+- Fix release pipeline - (96881bf) - containerscrew
+- Improve gracefull shutdown & update log egress event - (94b0a4b) - containerscrew
+- Bump libc from 0.2.173 to 0.2.174 - (8d62c8c) - dependabot[bot]
+- Improve gracefull shutdown & update log egress event - (660cbfb) - containerscrew
+- fix build pipeline - (cae75b4) - containerscrew
+- fix build pipeline - (93d6473) - containerscrew
+- Update CHANGELOG.md for release v0.4.0 - (1d44c84) - containerscrew
+- cargo fmt - (12a4fbe) - containerscrew
+- New v0.4.0 & fix unused imports - (5c361ea) - containerscrew
+- Implement pid and process name for egress traffic - (170606d) - containerscrew
+- Bump libc from 0.2.172 to 0.2.173 - (464a527) - dependabot[bot]
+- change after help message - (91d045e) - containerscrew
+- Fix pipeline zip package - (4621574) - containerscrew
+- update todo.md - (b2f9842) - containerscrew
+- Handle TCP state flags - (0e41af2) - containerscrew
+- Add TCP state examples - (8a4a879) - containerscrew
+- update doco.md - (3cc2d93) - containerscrew
+- Bump clap from 4.5.39 to 4.5.40 - (17f96e8) - dependabot[bot]
+- Update CHANGELOG.md for release v0.3.0-beta.5 - (f49a00e) - containerscrew
+- Update mtoc in CHANGELOG.md - (eb8b173) - containerscrew
+- Update docs/todo.md - (b54be09) - containerscrew
+- Add mtoc in changelog release pipeline - (37554ce) - containerscrew
+- Update CHANGELOG.md for release v0.3.0-beta.4 - (b8666ad) - containerscrew
+- Change welcome messager install.sh - (f76efd0) - containerscrew
+- Add cargo fmt in pre-commit config - (fceaebb) - containerscrew
+- Fix: rustfmt - (c585c11) - containerscrew
+- Fix: reimplement --disable-tcp|udp|icmp flag - (ad0bff1) - containerscrew
+- mtoc in Changelog.md - (30b5a9b) - containerscrew
+- fix(install.sh) - (d5b8f83) - containerscrew
+- Update CHANGELOG.md for release v0.3.0-beta.3 - (3496385) - containerscrew
+- mtoc - (f4bee0b) - containerscrew
+- Update CHANGELOG.md for release v0.3.0-beta.2 - (b340a5a) - containerscrew
+- doc(todo): add new todo - (fd146dd) - containerscrew
+- Bump sysinfo from 0.35.1 to 0.35.2 - (8b55b9b) - dependabot[bot]
+- cargo fmt - (8c4544c) - containerscrew
+- doc(readme): update README - (8e4ce2d) - containerscrew
+- doc(todo): add new todo - (9aa46a4) - containerscrew
+- Bump sysinfo from 0.35.1 to 0.35.2 - (bca29cf) - dependabot[bot]
+- cargo fmt - (9c0dba6) - containerscrew
+- doc(readme): update README - (1fa2302) - containerscrew
+- Change cli after_help message - (fa920e9) - containerscrew
+- Update doc - (f8d918b) - containerscrew
+- Add cache build pipeline - (3bf88fc) - containerscrew
+- Change cache in pipeline test - (a8d993c) - containerscrew
+- Rust fmt - (8fa4221) - containerscrew
+- Change nflux project description - (be50c6f) - containerscrew
+- Fix test format_mac - (b4ca183) - containerscrew
+- Update usage.md - (c195dd9) - containerscrew
+- Allow user to disable timestamp and other logger improvements - (5b8183d) - containerscrew
+- pre-commit - (a36efb5) - containerscrew
+- Change logger - (981ee87) - containerscrew
+- Add todo.md doc - (afd7e5d) - containerscrew
+- Change nflux logger - (a3cc306) - containerscrew
+- Bump clap from 4.5.38 to 4.5.39 - (e5a58b9) - dependabot[bot]
+- Fix: error message when programs runs without sudo - (d3590f2) - containerscrew
+- Improving logging - (8988908) - containerscrew
+- Remove prometheus metrics - (dd4578b) - containerscrew
+- Reimplement disable_full_log - (47a1457) - containerscrew
+- Implementing prometheus metrics - (7d4b155) - containerscrew
+- Refactor handle_packet - (57c6017) - containerscrew
+- Update README - (c87c58b) - containerscrew
+- Comment lint pipeline - (f177b8f) - containerscrew
+- Wip: lint pipeline - (ebd1985) - containerscrew
+- Update lint.yml pipeline - (7b6f7ba) - containerscrew
+- Update lint.yml pipeline - (0b42dc2) - containerscrew
+- Update test pipeline - (421f8cf) - containerscrew
+- Update test pipeline - (700ffe7) - containerscrew
+- Update test pipeline - (0cea3a6) - containerscrew
+- Update test pipeline - (2ef6724) - containerscrew
+- Update test pipeline - (a5c7dbc) - containerscrew
+- Split pipelines & organize lima files - (510d4ff) - containerscrew
+- Update installation.md - (6e6d7fc) - containerscrew
+- Add debian lima machine - (48d467b) - containerscrew
+- Update README.md - (aee0281) - containerscrew
+- Update README.md - (6d5c7a2) - containerscrew
+- Update CHANGELOG.md for release v0.3.0-beta.1 - (dd52a1b) - containerscrew
+- Update install script - (8fd2d5e) - containerscrew
+- Update install script - (0ef2c31) - containerscrew
+- Update doc - (c129b9f) - containerscrew
+- Update doc - (aef9416) - containerscrew
+- Update doc - (c42868a) - containerscrew
+- Fix proto & update doc - (89554a3) - containerscrew
+- Change license to GPL3 - (21f8fa8) - containerscrew
+- Update Cargo.toml version - (6529581) - containerscrew
+- cargo fmt & update doc - (a43b0d5) - containerscrew
+- Add format_mac unit test - (a7a64bd) - containerscrew
+- Refactor: handle_packet function - (2c87424) - containerscrew
+- Rollback cargo nextest - (cbd2c80) - containerscrew
+- Add cargo nextest - (6c1d0b6) - containerscrew
+- wip - (b3c3373) - containerscrew
+- Refactor nflux/ package - (857bc1d) - containerscrew
+- Add src and dest mac - (d82de62) - containerscrew
+- Add some useful comments - (2ef728b) - containerscrew
+- Bump clap from 4.5.37 to 4.5.38 - (0278644) - dependabot[bot]
+- Wip - (acdf15d) - containerscrew
+- Wip - (3e4a77c) - containerscrew
+- Removing tlstrace - (1c4a3e6) - containerscrew
+- Wip - (d405352) - containerscrew
+- Bump tokio from 1.44.2 to 1.45.0 - (bad3f95) - dependabot[bot]
+- Removing tlstrace code - (5015583) - containerscrew
+- Bump sysinfo from 0.34.2 to 0.35.0 - (2181518) - dependabot[bot]
+- Bump chrono from 0.4.40 to 0.4.41 - (39ade10) - dependabot[bot]
+- Update doc and Cargo.toml version - (c84bec5) - containerscrew
+- Bump clap from 4.5.36 to 4.5.37 - (b9bb634) - dependabot[bot]
+- Bump network-types from 0.0.7 to 0.0.8 - (eb43f44) - dependabot[bot]
+- Bump libc from 0.2.171 to 0.2.172 - (ba84427) - dependabot[bot]
+- Bump anyhow from 1.0.97 to 1.0.98 - (0043375) - dependabot[bot]
+- Bump clap from 4.5.35 to 4.5.36 - (b061d4d) - dependabot[bot]
+- Bump tokio from 1.44.1 to 1.44.2 - (bd8c96b) - dependabot[bot]
+- Bump sysinfo from 0.34.1 to 0.34.2 - (fa3e62d) - dependabot[bot]
+- Fix build_deb.sh - (9540ae3) - containerscrew
+- Bump clap from 4.5.34 to 4.5.35 - (0af7de5) - dependabot[bot]
+- Update readme - (8b86387) - containerscrew
+- Wip: rpm package - (c832973) - containerscrew
+- Change package description and delete package.metadata.deb - (e949593) - containerscrew
+- Modify fedora.yml lima vm - (3362038) - containerscrew
+- Wip: dpkg package - (7c5983c) - containerscrew
+- Setup debian dpkg package & refactor doc - (cfb1c25) - containerscrew
+- Setup ubuntu machine using lima - (c8a3d0f) - containerscrew
+- Setting up cargo deb - (48378f2) - containerscrew
+- Bump sysinfo from 0.33.1 to 0.34.1 - (46b9305) - dependabot[bot]
+- Bump clap from 4.5.33 to 4.5.34 - (2e22dfd) - dependabot[bot]
+- Pre-commit & CHANGELOG.md - (b0221c3) - containerscrew
+- Update CHANGELOG.md for release v0.2.1 - (2c4663c) - containerscrew
+- Fix: error when no default iface (no connectivity) - (85d1a75) - containerscrew
+- Bump clap from 4.5.32 to 4.5.33 - (a4f64ad) - dependabot[bot]
+- Update CHANGELOG.md for release v0.2.0 - (9f2eb32) - containerscrew
+- Change cargo version - (1f8a066) - containerscrew
+- Delete changelog - (2c38501) - containerscrew
+- cargo fmt - (d4b1d05) - containerscrew
+- Update installation.md - (fe3bde4) - containerscrew
+- Update CHANGELOG.md for release v0.2.0 - (c4b243c) - containerscrew
+- Update installation.md - (8d4f034) - containerscrew
+- Delete crates.io references - (655b680) - containerscrew
+- Delete workspace dependency for nflux-common - (182c1fc) - containerscrew
+- Strip nflux release - (64d8f24) - containerscrew
+- Update Cargo.toml - (80e75fd) - containerscrew
+- Update Cargo.toml - (eb48cd4) - containerscrew
+- Update Cargo.toml - (d2b9a3a) - containerscrew
+- Update Cargo.toml - (cfeb3c5) - containerscrew
+- Update Cargo.toml - (e890cb5) - containerscrew
+- Update Cargo.toml - (21da05d) - containerscrew
+- Update nflux/Cargo.toml - (2d532b2) - containerscrew
+- Update nflux/Cargo.toml - (9c266c8) - containerscrew
+- Comment cargo publish in release.yml pipeline - (8c6682e) - containerscrew
+- Add comm in netrace logger - (b269d35) - containerscrew
+- Update doc - (0a96f61) - containerscrew
+- Update doc - (80823e1) - containerscrew
+- Change test pipeline - (275e70d) - containerscrew
+- Update rustfmt - (a618a0f) - containerscrew
+- Update badges - (033a818) - containerscrew
+- Update doc - (8b9bf95) - containerscrew
+- Update doc - (189f095) - containerscrew
+- Update doc - (97c206c) - containerscrew
+- Update doc - (77d7d44) - containerscrew
+- Update doc - (48b13ba) - containerscrew
+- Update doc - (c90fa0d) - containerscrew
+- Update doc - (736453b) - containerscrew
+- Update doc - (3fa25d0) - containerscrew
+- Updating doc structure - (3f7b148) - containerscrew
+- Bump log from 0.4.26 to 0.4.27 - (4709d41) - dependabot[bot]
+- Update doc - (d1796a7) - containerscrew
+- Add lib.rs in netrace-ebpf - (bb90826) - containerscrew
+- Fix LICENSE file - (3d1bfa2) - containerscrew
+- Add versioning to Cargo.toml - (d22ccea) - containerscrew
+- Add cargo.toml metadata - (f1dbb9e) - containerscrew
+- Update CHANGELOG.md for release v0.1.0 - (942d9c9) - containerscrew
+- Strip binary - (4a2318f) - containerscrew
+- Fix zip packagein Makefile - (947b496) - containerscrew
+- Release pipeline - (36411f0) - containerscrew
+- Wip: release and build pipeline - (5da7135) - containerscrew
+- Update badges - (77053a5) - containerscrew
+- Wip: build pipelines - (69ffb03) - containerscrew
+- Wip: build pipeline - (f79bc00) - containerscrew
+- Wip: build pipeline - (9256b81) - containerscrew
+- Wip: build pipeline - (f7c6c19) - containerscrew
+- Wip: build pipelines - (e685968) - containerscrew
+- Pipeline updates - (eb22f39) - containerscrew
+- Update doc - (d4893c8) - containerscrew
+- Providing installation methods - (6e7ed43) - containerscrew
+- Update doc - (672f15f) - containerscrew
+- Update doc - (69cd975) - containerscrew
+- Update doc - (ebd38ac) - containerscrew
+- Update doc - (a407c79) - containerscrew
+- Update netrace logger - (9aa655f) - containerscrew
+- Add git changelog - (f39802b) - containerscrew
+- Improve TC log event - (c64f5e1) - containerscrew
+- Updating doc - (fcb9051) - containerscrew
+- Updating doc - (5386b71) - containerscrew
+- Updating doc - (76f67ff) - containerscrew
+- Update README.md and cli.rs - (3fa9ff7) - containerscrew
+- Update README.md and cli.rs - (9a5ef59) - containerscrew
+- Update README.md and cli.rs - (4863704) - containerscrew
+- Update README.md - (9a5d126) - containerscrew
+- Update README.md - (b333d8b) - containerscrew
+- Update README.md - (41fe5e3) - containerscrew
+- Update README.md - (bb9b45c) - containerscrew
+- fmt - (0f3db70) - containerscrew
+- Implement tlstrace - (bc3628e) - containerscrew
+- fmt - (abd0268) - containerscrew
+- Wip: tlstrace command - (2c654c1) - containerscrew
+- Update build.yml pipeline - (0186334) - containerscrew
+- Adding ebpf code for tlstrace - (44180c4) - containerscrew
+- Wip: build pipeline - (0c63621) - containerscrew
+- Wip: build pipeline - (df7fa2f) - containerscrew
+- Add build pipeline - (4012b92) - containerscrew
+- Update doc - (acbbb21) - containerscrew
+- Update doc - (8543bc1) - containerscrew
+- Rename ebpf code to netrace-ebpf - (1e65679) - containerscrew
+- Cargo fmt - (88fba06) - containerscrew
+- Massive refactor - (7d78ce1) - containerscrew
+- wip - (5a00d62) - containerscrew
+- wip - (ce9c495) - containerscrew
+- wip - (8461151) - containerscrew
+- pre-commit - (73e7c3b) - containerscrew
+- Implementing netrace subcommand - (b147aee) - containerscrew
+- Implementing netrace subcommand - (66d0695) - containerscrew
+- Implementing netrace subcommand - (97c65d0) - containerscrew
+- Restructure cli code - (0b37ae4) - containerscrew
+- Delete compose.yml - (3230963) - containerscrew
+- Update doc - (0048be3) - containerscrew
+- Modify Dockerfile - (486180e) - containerscrew
+- Updates - (90eca09) - containerscrew
+- Wip - (5142e58) - containerscrew
+- fmt and clippy - (04a3b0e) - containerscrew
+- Massive update - (3413959) - containerscrew
+- Update README.md - (72d3176) - containerscrew
+- Update doc and build pipeline - (824e07b) - containerscrew
+- Edit user space logger - (bd2ae3d) - containerscrew
+- Add old doc - (4d77d5f) - containerscrew
+- Delete old pacman PKGDBUILD - (deda44e) - containerscrew
+- Wip - (4bdafc5) - containerscrew
+- Remove prometheus dependencies - (d7f8bf9) - containerscrew
+- cargo update - (d670d17) - containerscrew
+- Fix cargo clippy - (b19b327) - containerscrew
+- Fix tests - (61522c7) - containerscrew
+- Cargo fmt - (c457645) - containerscrew
+- Change test pipeline - (ab538d5) - containerscrew
+- Change test pipeline - (7fbf266) - containerscrew
+- Update README.md - (59288f8) - containerscrew
+- Bump tempfile from 3.19.0 to 3.19.1 - (b06603d) - dependabot[bot]
+- Update README.md - (df9578f) - containerscrew
+- Update README.md - (455d6ed) - containerscrew
+- Remove multiple interface program attachment - (c7b3517) - containerscrew
+- Update README.md - (7bf381a) - containerscrew
+- Updatge todo_and_features.md - (fff895d) - containerscrew
+- Doc & move func to utils.rs - (431a6ee) - containerscrew
+- Adding more log fields - (8be2a20) - containerscrew
+- Add fedora.yml for mac osx lima - (a8b2657) - containerscrew
+- Fix cli: help usage - (50463a7) - containerscrew
+- Bump reqwest from 0.12.14 to 0.12.15 - (be754e3) - dependabot[bot]
+- Bump tempfile from 3.18.0 to 3.19.0 - (93f9aad) - dependabot[bot]
+- Bump tokio from 1.44.0 to 1.44.1 - (f71be69) - dependabot[bot]
+- Bump reqwest from 0.12.13 to 0.12.14 - (5528672) - dependabot[bot]
+- Bump libc from 0.2.170 to 0.2.171 - (9f2ce5a) - dependabot[bot]
+- Bump reqwest from 0.12.12 to 0.12.13 - (e7ed6e4) - dependabot[bot]
+- Bump clap from 4.5.31 to 4.5.32 - (aad07bf) - dependabot[bot]
+- Bump tokio from 1.43.0 to 1.44.0 - (2aa71a4) - dependabot[bot]
+- Bump ring from 0.17.8 to 0.17.13 - (b583fee) - dependabot[bot]
+- Bump tempfile from 3.17.1 to 3.18.0 - (cb18a77) - dependabot[bot]
+- Bump bytes from 1.10.0 to 1.10.1 - (e3accf6) - dependabot[bot]
+- Bump cargo_metadata from 0.19.1 to 0.19.2 - (7b2b5f9) - dependabot[bot]
+- Bump anyhow from 1.0.96 to 1.0.97 - (8bc84c6) - dependabot[bot]
+- Wip: modify log - (78e5aca) - containerscrew
+- Setting default iface if not set - (40f0bf6) - containerscrew
+- Wip: refactoring handlers - (d7b7f6f) - containerscrew
+- Wip: README and & cargo fmt - (f18bcc3) - containerscrew
+- Wip: cli - (cad0345) - containerscrew
+- Comment some functions - (519ce86) - containerscrew
+- Adding ttl, total_len only for tcp packets - (ec164c9) - containerscrew
+- Bump chrono from 0.4.39 to 0.4.40 - (39ab8a8) - dependabot[bot]
+- Bump libc from 0.2.169 to 0.2.170 - (c76e36c) - dependabot[bot]
+- Bump clap from 4.5.30 to 4.5.31 - (13028c5) - dependabot[bot]
+- Bump log from 0.4.25 to 0.4.26 - (d2bd27d) - dependabot[bot]
+- Bump anyhow from 1.0.95 to 1.0.96 - (3a616d8) - dependabot[bot]
+- Bump tempfile from 3.16.0 to 3.17.1 - (33c02c3) - dependabot[bot]
+- Bump clap from 4.5.29 to 4.5.30 - (e0fdba9) - dependabot[bot]
+- Cargo clippy - (e590a48) - containerscrew
+- Cargo clippy - (0580e9b) - containerscrew
+- Cargo fmt - (aa3f27f) - containerscrew
+- Remove pid and command from tc - (161326b) - containerscrew
+- fmt - (343eecc) - containerscrew
+- Improve logger: track active connections storing pid:dest_ip - (6c20ffe) - containerscrew
+- Bump clap from 4.5.28 to 4.5.29 - (031682b) - dependabot[bot]
+- Comment/delete unused code/files - (752a6e3) - containerscrew
+- Update todo.md - (7168943) - containerscrew
+- Delete unused Makefile targets - (6462c67) - containerscrew
+- Delete unused files/folder - (1e680bc) - containerscrew
+- Update deps - (25a4b68) - containerscrew
+- Add ipgeoinfo - (7f54e84) - containerscrew
+- Change todo - (2726d97) - containerscrew
+- Add .vscode folder - (98aeb36) - containerscrew
+- Fmt - (4b2bd91) - containerscrew
+- Cargo fmt - (b43930f) - containerscrew
+- Log every N seconds & change perfeventarray and implement ringbuffer - (d2e4682) - containerscrew
+- Update README.md - (a3f58b0) - containerscrew
+- Implement wireguard iface tunnel monitoring - (3984235) - containerscrew
+- Wip: implement non ethernet packets - (064b4a9) - containerscrew
+- Wip - (9dd9d74) - containerscrew
+- Disable udp logging by default - (6fdbe88) - containerscrew
+- Add pid and command track to the log - (8742b85) - containerscrew
+- Creating new config bpf_map for tc - (986a91e) - containerscrew
+- Pipeline docker build: only when tags - (45c71a2) - containerscrew
+- Change logger timestamp - (075ee6f) - containerscrew
+- Update README.md - (59557f8) - containerscrew
+- Update README.md - (b644245) - containerscrew
+- Update README.md - (3ecab7e) - containerscrew
+- Update README.md - (69e11d9) - containerscrew
+- Update README.md - (80031d8) - containerscrew
+- Refactoring ingress/egress with TC - (9a835b1) - containerscrew
+- Creating the cli with clap - (0271164) - containerscrew
+- Comment test pipeline - (d8c14f0) - containerscrew
+- Update README.md - (8dd5ade) - containerscrew
+- Update README.md - (9061fa2) - containerscrew
+- Update nflux.toml - (92b2d7a) - containerscrew
+- Bump toml from 0.8.19 to 0.8.20 - (993dbd6) - dependabot[bot]
+- Bump bytes from 1.9.0 to 1.10.0 - (a759fd6) - dependabot[bot]
+- Reorganize code - (ba9e5ba) - containerscrew
+- Update README.md - (a844ed4) - daniels
+- Update README - (bde8814) - containerscrew
+- Bump tempfile from 3.15.0 to 3.16.0 - (3959a23) - dependabot[bot]
+- Wip: prometheus metrics - (b057a3b) - containerscrew
+- Wip: modify prometheus metrics counters - (21cc9df) - containerscrew
+- Wip: implement prometheus metrics - (5e3de94) - containerscrew
+- Fix logger for src and dest ip - (d71a546) - containerscrew
+- Improve debian package - (8b80fc3) - containerscrew
+- Fix nflux/src/egress.rs - (ac229bf) - containerscrew
+- Improve egress/ingress traffic control - (5c0180c) - containerscrew
+- cargo fmt - (689af81) - containerscrew
+- Remove pid tracking for traffic control connections & organize code - (5e7c97e) - containerscrew
+- Bump cargo_metadata from 0.18.1 to 0.19.1 - (a328c2c) - dependabot[bot]
+- Wip: docker builds - (ac87c00) - containerscrew
+- Wip: egress connection - (c317385) - containerscrew
+- Modify bpf_get_current_pid func - (47b3c65) - containerscrew
+- Remove .cargo/ root folder - (9294f1c) - containerscrew
+- Remove xtask folder - (955c04d) - containerscrew
+- Remove xtask for binary compilation - (869872c) - containerscrew
+- Update README.md - (8c1f318) - containerscrew
+- Wip: egress connection - (99e6ed3) - containerscrew
+- Wip: egress connection - (9a4716f) - containerscrew
+- Delete unused files, log when ipv6 packets in egress filter - (78d1562) - containerscrew
+- Stable: egress sniff for physical and virtual interfaces - (15e8559) - containerscrew
+- Bump log from 0.4.22 to 0.4.25 - (d8f6f10) - dependabot[bot]
+- Fix get_process_name func - (61d36bf) - containerscrew
+- Wip: egress connections - (e8bfc91) - containerscrew
+- Wip: egress connections - (4d9bfbd) - containerscrew
+- Wip - (e1addd8) - containerscrew
+- Working with egress connections - (619e22a) - containerscrew
+- Wip - (9cbc0a9) - containerscrew
+- Logging pid for every egress packet - (8fe27cc) - containerscrew
+- Bump clap from 4.5.24 to 4.5.26 - (df83e29) - dependabot[bot]
+- Working with egress log - (0b47848) - containerscrew
+- Bump tokio from 1.42.0 to 1.43.0 - (7a451fc) - dependabot[bot]
+- Bump clap from 4.5.23 to 4.5.24 - (885979c) - dependabot[bot]
+- Bump tempfile from 3.14.0 to 3.15.0 - (7b97892) - dependabot[bot]
+- Make podman compatible - (21b276a) - containerscrew
+- Update order for TCP IpProto in firewall ebpf code - (d0cdf75) - containerscrew
+- Edit log in xdp_firewall events - (a2547c2) - containerscrew
+- First initial working version - (336a4a7) - containerscrew
+- Bump serde from 1.0.216 to 1.0.217 - (d358c9c) - dependabot[bot]
+- Organice code - (620d591) - containerscrew
+- Support multiple interfaces - (d87b0da) - containerscrew
+- fmt - (4ca6061) - containerscrew
+- Refactor nflux.toml & implement egress monitoring for vpn virtual interfaces - (500a9f9) - containerscrew
+- Bump anyhow from 1.0.94 to 1.0.95 - (edbec9b) - dependabot[bot]
+- Bump env_logger from 0.11.5 to 0.11.6 - (4ccd2dd) - dependabot[bot]
+- Bump libc from 0.2.168 to 0.2.169 - (8422fbe) - dependabot[bot]
+- Some performance in nflux running inside a container - (65bb98b) - containerscrew
+- Fix config tests - (82bcbc2) - containerscrew
+- Working with TCP state flags - (e7dcf51) - containerscrew
+- Refactoring ipv4 tcp ingress proto - (4fbe7f4) - containerscrew
+- Wip - (dcef278) - containerscrew
+- Wip - (ba48b23) - containerscrew
+- Working with ingress traffic - (d22722b) - containerscrew
+- Improve tcp states - (60674d9) - containerscrew
+- Refactor ipv4 traffic - (cd1e162) - containerscrew
+- fmt - (f92b9d6) - containerscrew
+- Fix version of github action - (cac9518) - containerscrew
+- Bump serde from 1.0.215 to 1.0.216 - (916367b) - dependabot[bot]
+- Bump libc from 0.2.167 to 0.2.168 - (3d982c8) - dependabot[bot]
+- Update doc - (7a1e90f) - containerscrew
+- Update doc - (55e0838) - containerscrew
+- Update doc - (6a3aa97) - containerscrew
+- Update doc - (c07ae41) - containerscrew
+- Update doc - (632ac8f) - containerscrew
+- Working with TC egress implementation - (45e3379) - containerscrew
+- Implement egress traffic monitoring - (dea52db) - containerscrew
+- Adding TC egress control - (38edd4f) - containerscrew
+- Change docker-compose file - (18a7aec) - containerscrew
+- Change nflux.toml config - (37eea19) - containerscrew
+- Refactor ebpf code & logging - (891ded2) - containerscrew
+- Change auto-merge pipeline - (4ef1f75) - containerscrew
+- Bump clap from 4.5.22 to 4.5.23 - (b926b57) - dependabot[bot]
+- Implementing ipv6 - (21a9cc3) - containerscrew
+- Nflux running in containers - (fb977e5) - containerscrew
+- Implement icmp enable/disable - (4c94647) - containerscrew
+- Permit tcp syn-ack packets & config testing - (1c063ab) - containerscrew
+- Update nflux.toml - (8e55f79) - containerscrew
+- Fix prefix_len dynamically - (e1c5d80) - containerscrew
+- Change nflux.toml - (abc9981) - containerscrew
+- Change pre-commit - (e70cbb6) - containerscrew
+- fmt - (66803e5) - containerscrew
+- Refactor tests - (23b3465) - containerscrew
+- Change config format & some tests - (e6eb610) - containerscrew
+- Bump clap from 4.5.21 to 4.5.22 - (26d1eb3) - dependabot[bot]
+- wip - (6b8d3a8) - containerscrew
+- Bump anyhow from 1.0.93 to 1.0.94 - (10e46cc) - dependabot[bot]
+- Working with rule implementation - (f29651f) - containerscrew
+- Populating ipv4 rules - (83f856b) - containerscrew
+- Working with firewall.rules config structure - (706e4eb) - containerscrew
+- Modify pipeline tests.yml - (1e57abd) - containerscrew
+- Add new pipelines & some basic tests - (2bc88cf) - containerscrew
+- Feat: some print messagess - (7f92d24) - containerscrew
+- Fix denied syn packets - (fc12598) - containerscrew
+- Update README.md - (f832eea) - containerscrew
+- Update README.md - (28c4c93) - containerscrew
+- Update README.md - (49f009f) - containerscrew
+- Wip - (04c8aa0) - containerscrew
+- Rollback nflux.conf to nflux.toml file - (7539347) - containerscrew
+- Implement new BPF_MAP_ARRAY for global app config & fix dpkg installation - (bbff986) - containerscrew
+- Wip - (5a5d58a) - containerscrew
+- Implementing AsyncPerfEventArrayBuffer - (6bed3fa) - containerscrew
+- Refactor logging - (8b23a8f) - containerscrew
+- Update README - (0cd0b09) - containerscrew
+- First stable version - (8b12d06) - containerscrew
+- Add logging type (text,json) - (2bcf77d) - containerscrew
+- Update README & wip ebpf program - (47a5abe) - containerscrew
+- Create new testing tcp/udp services with compose - (4727105) - containerscrew
+- Using perfbuff - (9df9366) - containerscrew
+- pre-commit - (d4e8be1) - containerscrew
+- Add image examples - (bc0e242) - containerscrew
+- Fix incoming connection - (1f7c63b) - containerscrew
+- Change cli description - (75ab4dd) - containerscrew
+- Rename the project to nflux - (0a1821c) - containerscrew
+- Implement ipv4 access - (1d9c526) - containerscrew
+- Reduce logging info for same ip - (b4c8bdf) - containerscrew
+- Update doc - (9eafbe0) - containerscrew
+- Implement config.toml and add new doc - (8ed77b2) - containerscrew
+- First approach: deny all incoming traffic and allow syn-ack - (227b74f) - containerscrew
+- Initial commit - (3aa007f) - containerscrew
+#### Refactoring
+- **(TcEvent)** allow Ipv4 and Ipv6 in TcEvent struct & refactor handle_packet code) - (f6f9265) - containerscrew
+- **(cli)** about message - (06a189e) - containerscrew
+- **(cli)** help message & cargo fmt - (4b406a8) - containerscrew
+- **(cli)** help message & cargo fmt - (bd08627) - containerscrew
+- **(cli)** help message & cargo fmt - (e4bbe06) - containerscrew
+- **(ebpf-logger)** comment ebpf-logger - (9d21a32) - containerscrew
+- update edition in Cargo.toml - (8e20269) - containerscrew
+- delete changelog.md - (0ab73f5) - containerscrew
+- new nflux version with ebpf code refactor - (141fd84) - containerscrew
+- cog and pre-commit script - (6ba22e9) - containerscrew
+- cog and pre-commit script - (e2df73f) - containerscrew
+- cog and pre-commit script - (1d17843) - containerscrew
+- cog and pre-commit script - (0085d86) - containerscrew
+- edit cog.toml - (2d56e88) - containerscrew
+- refactoring - (08ad32c) - containerscrew
+- refactoring tc ebpf code & implement ARP packet sniffing - (fdf5336) - containerscrew
+- refactoring ebpf dpkt code - (ccd2d95) - containerscrew
+- refactoring - (b79c0cb) - containerscrew
+- refactoring tc ebpf code & implement ARP packet sniffing - (46ca26a) - containerscrew
+- refactoring ebpf code folder structure - (400de5d) - containerscrew
+- unused imports and utils::is_ipv4_private_address - (1e521fa) - containerscrew
+- cgroup skb attach type - (47ae600) - containerscrew
+- generic process_ring_buffer function - (a4407df) - containerscrew
+- renaming folder structure - (b2229d5) - containerscrew
+- pre-commit and cargo package release metadata - (e1ad0b8) - containerscrew
+- rename some functions & delete comments in nflux/src/main.rs - (d8954f7) - containerscrew
+#### ➕ Additional features
+- **(doc)** add new examples section - (8e29e1f) - containerscrew
+- **(exclude-ports)** new feature flag --exlude-ports from the logger) - (312fd4e) - containerscrew
+- **(filter-ports)** implement cli flag --filter-ports - (b83c9f0) - containerscrew
+- **(listen-port)** implement flag --listen-port - (2cf8244) - containerscrew
+- **(listen-ports)** filtering listen-ports in ebpf code - (afc035e) - containerscrew
+- **(logger)** change logger pkt_len field - (0e851dc) - containerscrew
+- **(logger)** change logger pkt_len field - (4588d7c) - containerscrew
+- **(tcp_flags)** implement tcp flags & remove pid and command track for egress connections - (5b7b58e) - containerscrew
+- implementing containerd cgroup support - (0907457) - containerscrew
+- implementing containerd cgroup support - (783f014) - containerscrew
+- implementing containerd cgroup support - (e4262e0) - containerscrew
+- adding ebpf-cgroups for container networking - (02ba70d) - containerscrew
+- wip: adding support for cgroup sniffing - (51c76a7) - containerscrew
+- new version v0.12.4 - (f323aac) - containerscrew
+- add verbosity for unknown procotols - (a862b03) - containerscrew
+- refactor to eliminate high stack allocation, reducing verifier stack usage - (846b6fe) - containerscrew
+- nflux subcommands & file and code refactor - (c5740cd) - containerscrew
+- implement new feature to detect dropped packets - (a51e955) - containerscrew
+#### 🪲 Releases
+- **(cli)** help message in --log-inverval flag - (3d2379d) - containerscrew
+- **(cli)** merge conflix cli.rs - (bd254f7) - containerscrew
+- **(doc)** typo in usage.md - (c2397da) - containerscrew
+- **(install.sh)** relocate install.sh and fix script - (0de4bf2) - containerscrew
+- **(install.sh)** shebang and welcome message - (9630f67) - containerscrew
+- **(test)** is_root_user - (d854cbf) - containerscrew
+- sudo permissions in test pipeline - (05064fc) - containerscrew
+- protobuf-compiler dependency in test.yml github workflow - (5cd12b4) - containerscrew
+- protobuf-compiler dependency in github ci - (bd36404) - containerscrew
+- protobuf-compiler dependency in github ci - (923371d) - containerscrew
+- convert_protocol helper function - (222bd95) - containerscrew
+- cargo deb metadata - (9277e39) - containerscrew
+- process_tc_events json logger - (1814523) - containerscrew
+- test cli::test::test_print_help_message - (a86f1d9) - containerscrew
+- test & update README.md - (178d71a) - containerscrew
+- cargo deb metadata - (a23fc82) - containerscrew
+- release pipeline - (3513398) - containerscrew
+- release pipeline - (d25fa04) - containerscrew
+- test to_ip_addr - (4f0f923) - containerscrew
+- split ebpf code to avoid errors in stack size - (fe15606) - containerscrew
+- nostd alloc for impl Display in TcpFlags struct - (6c6a000) - containerscrew
+
+
