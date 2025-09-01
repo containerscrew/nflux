@@ -1,7 +1,7 @@
 use std::fmt::{self, Display};
 
 use aya::maps::{MapData, RingBuf};
-use nflux_common::NetworkEvent;
+use nflux_common::dto::NetworkEvent;
 use tracing::{info, warn};
 
 use crate::utils::{convert_direction, convert_protocol, to_ipaddr};

@@ -84,7 +84,6 @@ fn try_traffic_control(
         attach_tc_program(ebpf, "tc_ingress", interface, TcAttachType::Ingress)?;
     }
 
-    // Populate config
     populate_configmap(ebpf, configmap)?;
 
     Ok(())

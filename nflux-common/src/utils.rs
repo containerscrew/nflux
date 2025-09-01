@@ -1,5 +1,7 @@
 use core::net::Ipv4Addr;
 
+use crate::dto::IpFamily;
+
 // Checks if a given IPv4 address in u32 format is private.
 // Returns `true` if the IP is private, otherwise `false`.
 pub fn is_ipv4_private_address(ip: Ipv4Addr) -> bool {
@@ -12,6 +14,30 @@ pub fn is_ipv4_private_address(ip: Ipv4Addr) -> bool {
         [127, ..] => true,          // 127.0.0.0/8
         [169, 254, ..] => true,     // 169.254.0.0/16
         _ => false,
+    }
+}
+
+impl IpFamily {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            IpFamily::Ipv4 => "IPv4",
+            IpFamily::Ipv6 => "IPv6",
+        }
+    }
+
+    pub fn to_owned(&self) -> u8 {
+        match self {
+            IpFamily::Ipv4 => 2,  // AF_INET
+            IpFamily::Ipv6 => 10, // AF_INET6
+        }
+    }
+
+    pub fn from_u8(family: u8) -> Result<Self, u8> {
+        match family {
+            2 => Ok(IpFamily::Ipv4),  // AF_INET
+            10 => Ok(IpFamily::Ipv6), // AF_INET6
+            _ => Err(family),
+        }
     }
 }
 
