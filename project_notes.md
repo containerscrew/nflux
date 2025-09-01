@@ -4,8 +4,6 @@ Everything I’ve learned about eBPF, aya-rs, and Rust, shared in my own tool fo
 
 * Linux dropped packets monitoring using the kernel tracepoint → tracepoint/skb/kfree_skb
 
-* Cgroups network monitoring using cgroups skb, for example to monitor containers. Supports container autodiscovery for containerd and Podman.
-
 * JSON log mode to capture data and build dashboards (Grafana with Promtail, Fluent Bit, etc.)
 
 * In progress: capturing TCP states, RTT, and other improvements as they come to mind.
