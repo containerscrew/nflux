@@ -1,4 +1,4 @@
-use aya::{maps::RingBuf, programs::TracePoint, Ebpf};
+use aya::{Ebpf, maps::RingBuf, programs::TracePoint};
 use tracing::{error, warn};
 
 use super::events::process_dp_events;

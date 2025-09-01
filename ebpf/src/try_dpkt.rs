@@ -1,7 +1,7 @@
 use core::{ffi::c_void, mem::offset_of};
 
 use aya_ebpf::{
-    helpers::gen::{bpf_get_current_pid_tgid, bpf_probe_read_kernel},
+    helpers::r#gen::{bpf_get_current_pid_tgid, bpf_probe_read_kernel},
     programs::TracePointContext,
 };
 use nflux_common::{

@@ -1,8 +1,8 @@
 use anyhow::Context;
 use aya::{
-    maps::{Array, RingBuf},
-    programs::{tc, SchedClassifier, TcAttachType},
     Ebpf,
+    maps::{Array, RingBuf},
+    programs::{SchedClassifier, TcAttachType, tc},
 };
 use nflux_common::dto::Configmap;
 use tracing::{debug, error, warn};

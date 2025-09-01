@@ -1,4 +1,4 @@
-use clap::{value_parser, Parser, Subcommand};
+use clap::{Parser, Subcommand, value_parser};
 use colored::Colorize;
 
 use crate::utils::set_default_iface;
@@ -49,7 +49,9 @@ fn print_about() -> String {
 }
 
 fn print_after_help_message() -> String {
-    format!("Author: containerscrew \nWebsite: github.com/containerscrew/nflux\nLicense: MIT or GPL3\nIssues: github.com/containerscrew/nflux/issues")
+    format!(
+        "Author: containerscrew \nWebsite: github.com/containerscrew/nflux\nLicense: MIT or GPL3\nIssues: github.com/containerscrew/nflux/issues"
+    )
 }
 
 #[derive(Debug, Subcommand)]
@@ -165,6 +167,9 @@ mod test {
 
     #[test]
     fn test_print_help_message() {
-        assert_eq!(print_after_help_message(), "Author: containerscrew \nWebsite: github.com/containerscrew/nflux\nLicense: MIT or GPL3\nIssues: github.com/containerscrew/nflux/issues")
+        assert_eq!(
+            print_after_help_message(),
+            "Author: containerscrew \nWebsite: github.com/containerscrew/nflux\nLicense: MIT or GPL3\nIssues: github.com/containerscrew/nflux/issues"
+        )
     }
 }

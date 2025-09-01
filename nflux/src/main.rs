@@ -1,6 +1,6 @@
 use std::process::{self, exit};
 
-use aya::{include_bytes_aligned, Ebpf};
+use aya::{Ebpf, include_bytes_aligned};
 use clap::Parser;
 use libc::getuid;
 use logger::LoggerConfig;
