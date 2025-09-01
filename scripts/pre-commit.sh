@@ -1,11 +1,15 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Run pre-commit hooks
-pre-commit run -a
+separator() {
+    echo -e "\n--- $1 ---\n"
+}
 
-# Cargo
-cargo fmt --all --
+separator "Running pre-commit hooks"
+pre-commit run -a --show-diff-on-failure
+
+separator "Formatting Rust code"
+cargo fmt --all > /dev/null
+
+separator "Running tests with nextest"
 cargo nextest run
-
-# Changelog
-#git cliff --output CHANGELOG.md
