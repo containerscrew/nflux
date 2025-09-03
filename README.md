@@ -45,18 +45,6 @@ tracepoint
 _Quick installation:_
 
 ```shell
-curl -L https://github.com/containerscrew/nflux/releases/download/v0.12.4/nflux_0.12.4-1_amd64.deb -o nflux.deb && sudo apt install ./nflux.deb
-```
-
-> [!NOTE]
-> RPM package will come soon.
-> Change also the [release version](https://github.com/containerscrew/nflux/releases) you need in the URL above.
-
----
-
-_Use the generic binary instead:_
-
-```shell
 curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/nflux/main/scripts/install.sh | sh
 ```
 
