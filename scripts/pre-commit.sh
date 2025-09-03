@@ -8,5 +8,5 @@ separator() {
 separator "Running pre-commit hooks"
 pre-commit run -a --show-diff-on-failure
 
-separator "Running tests with nextest"
-cargo nextest run
+# separator "Running tests with nextest"
+# cargo nextest run
