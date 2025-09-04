@@ -59,6 +59,7 @@ download_release() {
 
   printf "\033[0;32m[info] - Downloading version: ${VERSION}/$BINARY_NAME-${OS}-${cli_arch}-${VERSION}.zip \033[0m\n"
   curl -L --fail --remote-name-all https://github.com/containerscrew/$BINARY_NAME/releases/download/"${VERSION}"/$BINARY_NAME-${OS}-${cli_arch}-${VERSION}.zip -o /tmp/$BINARY_NAME.zip
+  rm -rf /tmp/$BINARY_NAME
   unzip -o /tmp/$BINARY_NAME.zip -d /tmp/
 }
 
