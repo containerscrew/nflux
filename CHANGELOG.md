@@ -1,5 +1,8 @@
-## 0.12.6 - 2025-09-04
+## Unreleased (0b29829..22e5197)
 #### Bug Fixes
+- pre-commit scripts - (22e5197) - containerscrew
+- pre-commit scripts - (3754962) - containerscrew
+- missing code - (110a5b3) - containerscrew
 - ethernet network types in try_tc.rs - (283b4fa) - containerscrew
 - ethernet network types in try_tc.rs - (30a7c7d) - containerscrew
 #### Documentation
@@ -12,6 +15,7 @@
 - update CHANGELOG.md - (45ade49) - containerscrew
 - update CHANGELOG.md - (0b29829) - containerscrew
 #### Refactoring
+- update changelog - (de66767) - containerscrew
 - delete changelog.md - (7994cdb) - containerscrew
 - pre-commit config - (8637c57) - containerscrew
 - pre-commit config - (0f6498e) - containerscrew
