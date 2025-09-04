@@ -13,25 +13,11 @@ repos:
     rev: v8.18.0
     hooks:
       - id: gitleaks
-  # - repo: https://github.com/containerscrew/mtoc
-  #   rev: v0.5.0
-  #   hooks:
-  #     - id: mtoc
-  #       args: ["-e", ".target/", "-e", "./README.md"]
   - repo: https://github.com/doublify/pre-commit-rust
     rev: v1.0
     hooks:
       - id: fmt
         args: ["--all", "--"]
-      # - id: cargo-check
+      - id: cargo-check
       # - id: clippy
       #   args: ["--", "-D", "warnings", "-D", "unused-imports"]
-
-  # - repo: local
-  #   hooks:
-  #     - id: cargo-fix-unused-imports
-  #       name: "cargo fix unused imports"
-  #       entry: cargo fix --allow-dirty --allow-staged --quiet
-  #       language: system
-  #       pass_filenames: false
-  #       stages: [pre-commit]
