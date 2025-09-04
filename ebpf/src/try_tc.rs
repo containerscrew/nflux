@@ -18,8 +18,8 @@ pub fn try_tc(
         // let src_mac = ethhdr.src_addr;
         // let dst_mac = ethhdr.dst_addr;
 
-        match ethhdr.ether_type {
-            EtherType::Ipv4 => {
+        match ethhdr.ether_type() {
+            Ok(EtherType::Ipv4) => {
                 // Parse IPv4 header, which starts right after Ethernet (offset 14)
                 let ipv4hdr: Ipv4Hdr = ctx.load(EthHdr::LEN).map_err(|_| ())?;
 
@@ -28,7 +28,7 @@ pub fn try_tc(
                 return Ok(TC_ACT_PIPE);
             }
 
-            EtherType::Ipv6 => {
+            Ok(EtherType::Ipv6) => {
                 // Parse IPv6 header (starts at same place: offset 14)
                 let ipv6hdr: Ipv6Hdr = ctx.load(EthHdr::LEN).map_err(|_| ())?;
 
@@ -37,11 +37,11 @@ pub fn try_tc(
                 return Ok(TC_ACT_PIPE);
             }
 
-            EtherType::Arp => {
+            Ok(EtherType::Arp) => {
                 let arp_hdr: ArpHdr = ctx.load(EthHdr::LEN).map_err(|_| ())?;
-                let op_code = u16::from_be(arp_hdr.oper);
+                let op_code = u16::from_be_bytes(arp_hdr.oper);
 
-                let ip_family = match u16::from_be(arp_hdr.ptype) {
+                let ip_family = match u16::from_be_bytes(arp_hdr.ptype) {
                     0x0800 => IpFamily::Ipv4, // AF_INET
                     0x86DD => IpFamily::Ipv6, // AF_INET6
                     _ => IpFamily::Unknown,
