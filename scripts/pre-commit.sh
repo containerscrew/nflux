@@ -11,5 +11,6 @@ pre-commit run -a --show-diff-on-failure
 # separator "Running tests with nextest"
 # cargo nextest run
 
+separator "Running cargo fmt and cargo check"
 cargo fmt --all --
 cargo check -q
