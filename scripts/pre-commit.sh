@@ -10,3 +10,6 @@ pre-commit run -a --show-diff-on-failure
 
 # separator "Running tests with nextest"
 # cargo nextest run
+
+cargo fmt --all --
+cargo check -q

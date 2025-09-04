@@ -13,11 +13,3 @@ repos:
     rev: v8.18.0
     hooks:
       - id: gitleaks
-  - repo: https://github.com/doublify/pre-commit-rust
-    rev: v1.0
-    hooks:
-      - id: fmt
-        args: ["--all", "--"]
-      - id: cargo-check
-      # - id: clippy
-      #   args: ["--", "-D", "warnings", "-D", "unused-imports"]
