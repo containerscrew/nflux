@@ -31,8 +31,8 @@ fn handle_ports(
         IpProto::Tcp => {
             let tcp_hdr: *const TcpHdr = tc_ptr_at(ctx, offset)?;
             unsafe {
-                let src_port = u16::from_be((*tcp_hdr).source);
-                let dst_port = u16::from_be((*tcp_hdr).dest);
+                let src_port = u16::from_be_bytes((*tcp_hdr).source);
+                let dst_port = u16::from_be_bytes((*tcp_hdr).dest);
 
                 let tcp_flags = TcpFlags {
                     syn: ((*tcp_hdr).syn() != 0) as u8,
@@ -51,8 +51,8 @@ fn handle_ports(
         IpProto::Udp => {
             let udp_hdr: *const UdpHdr = tc_ptr_at(ctx, offset)?;
             unsafe {
-                let src_port = u16::from_be_bytes((*udp_hdr).source);
-                let dst_port = u16::from_be_bytes((*udp_hdr).dest);
+                let src_port = u16::from_be_bytes((*udp_hdr).src);
+                let dst_port = u16::from_be_bytes((*udp_hdr).dst);
                 Ok((src_port, dst_port, None))
             }
         }
