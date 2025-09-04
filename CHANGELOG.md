@@ -22,6 +22,32 @@
 - update pre-commit script - (028137f) - containerscrew
 
 - - -
+## 0.12.6 - 2025-09-04
+#### Bug Fixes
+- pre-commit scripts - (22e5197) - containerscrew
+- pre-commit scripts - (3754962) - containerscrew
+- missing code - (110a5b3) - containerscrew
+- ethernet network types in try_tc.rs - (283b4fa) - containerscrew
+- ethernet network types in try_tc.rs - (30a7c7d) - containerscrew
+#### Documentation
+- update README - (fef2053) - containerscrew
+#### Miscellaneous Chores
+- **(deps)** bump log from 0.4.27 to 0.4.28 - (3d75206) - dependabot[bot]
+- **(deps)** bump clap from 4.5.46 to 4.5.47 - (10d904a) - dependabot[bot]
+- **(deps)** bump network-types from 0.0.8 to 0.1.0 - (3cf32ce) - dependabot[bot]
+- **(version)** 0.12.6 - (95a6b0f) - containerscrew
+- update CHANGELOG.md - (bef89ab) - containerscrew
+- update CHANGELOG.md - (45ade49) - containerscrew
+- update CHANGELOG.md - (0b29829) - containerscrew
+#### Refactoring
+- update changelog - (de66767) - containerscrew
+- delete changelog.md - (7994cdb) - containerscrew
+- pre-commit config - (8637c57) - containerscrew
+- pre-commit config - (0f6498e) - containerscrew
+- update pre-commit script - (028137f) - containerscrew
+
+- - -
+
 
 ## 0.12.5 - 2025-09-04
 #### Bug Fixes
