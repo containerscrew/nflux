@@ -20,7 +20,7 @@ aya-log = "0.2.1"
 dns-lookup = "3.0.0"
 sysinfo = "0.37.0"
 clap = { version = "4.5.47", features = ["derive"] }
-chrono = "0.4.41"
+chrono = "0.4.42"
 default-net = "0.22.0"
 colored = "3.0.0"
 containerd-client = "0.8.0"
