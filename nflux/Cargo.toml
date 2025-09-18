@@ -1,6 +1,6 @@
 [package]
 name = "nflux"
-version = "0.12.6"
+version = "0.12.7"
 edition = "2024"
 authors = ["containerscrew info@containerscrew.com"]
 description = "Network monitoring tool & TLS/SSL sniffer using eBPF 🐝"
@@ -23,9 +23,9 @@ clap = { version = "4.5.47", features = ["derive"] }
 chrono = "0.4.42"
 default-net = "0.22.0"
 colored = "3.0.0"
-containerd-client = "0.8.0"
-podman-api = "0.10.0"
-async-trait = "0.1.89"
+# containerd-client = "0.8.0"
+# podman-api = "0.10.0"
+# async-trait = "0.1.89"
 
 [build-dependencies]
 anyhow = { workspace = true }
