@@ -45,7 +45,10 @@ pub struct NfluxCliArgs {
 }
 
 fn print_about() -> String {
-    "eBPF network monitoring tool 🐝".red().italic().to_string()
+    "\neBPF network monitoring tool 🐝"
+        .red()
+        .italic()
+        .to_string()
 }
 
 fn print_after_help_message() -> String {
