@@ -24,6 +24,25 @@
 - update pre-commit script - (028137f) - containerscrew
 
 - - -
+## 0.12.7 - 2025-09-18
+#### Bug Fixes
+- test cli set_about - (4be914a) - containerscrew
+- install.sh script - (2a04aaf) - containerscrew
+#### Features
+- new tag 0.12.7 - (95ce189) - containerscrew
+#### Miscellaneous Chores
+- **(deps)** bump chrono from 0.4.41 to 0.4.42 - (9ff430b) - dependabot[bot]
+- pre-commit - (d7bd460) - containerscrew
+- update LICENSE-MIT - (5ea5c7e) - containerscrew
+- update CHANGELOG.md - (644cc2e) - containerscrew
+#### Refactoring
+- DisplayFmt for NetworkEvent - (bb5b398) - containerscrew
+- check_is_root func - (80c86e4) - containerscrew
+- print_about() message - (29ce09a) - containerscrew
+- pre-commit - (2f06ea5) - containerscrew
+
+- - -
+
 
 ## 0.12.5 - 2025-09-04
 #### Bug Fixes
