@@ -8,6 +8,9 @@ separator() {
 separator "Running pre-commit hooks"
 pre-commit run -a --show-diff-on-failure
 
+separator "Scanning for secrets"
+gitleaks dir -v
+
 # separator "Running tests with nextest"
 # cargo nextest run
 
