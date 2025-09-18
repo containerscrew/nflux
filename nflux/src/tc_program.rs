@@ -19,7 +19,7 @@ pub async fn start_traffic_control(
     log_format: String,
     exclude_ports: Option<Vec<u16>>,
 ) -> anyhow::Result<()> {
-    // Attach TC programs
+    // Attach TC programs and populate configmap
     try_traffic_control(ebpf, interface, disable_ingress, disable_egress, configmap)?;
 
     let tc_event_ring_map = ebpf
@@ -140,7 +140,7 @@ fn attach_tc_program(
 fn populate_configmap(
     bpf: &mut Ebpf,
     config: Configmap,
-) -> anyhow::Result<()> {
+) -> anyhow::Result<(), anyhow::Error> {
     let mut tc_config = Array::<_, Configmap>::try_from(
         bpf.map_mut("TC_CONFIG")
             .context("Failed to find TC_CONFIG map")?,
