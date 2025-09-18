@@ -4,7 +4,10 @@ use aya::maps::{MapData, RingBuf};
 use nflux_common::dto::{ArpEvent, DroppedPacketEvent, IpFamily, NetworkEvent};
 use tracing::{info, warn};
 
-use crate::utils::{convert_direction, convert_protocol, format_tcp_flags};
+use crate::{
+    network_event::DisplayNetworkEvent,
+    utils::{convert_direction, convert_protocol, format_tcp_flags},
+};
 
 fn format_mac(mac: &[u8; 6]) -> String {
     mac.iter()
@@ -27,7 +30,7 @@ fn to_ipaddr(
     }
 }
 
-fn ip_familiy_as_str(ip_family: u8) -> &'static str {
+fn _ip_familiy_as_str(ip_family: u8) -> &'static str {
     match ip_family {
         2 => "IPv4",
         10 => "IPv6",
@@ -97,30 +100,6 @@ pub async fn process_tc_events(
                         continue;
                     }
                 }
-
-                let src_ip = to_ipaddr(event.src_ip, event.ip_family.to_owned());
-                let dst_ip = to_ipaddr(event.dst_ip, event.ip_family.to_owned());
-
-                let mut msg = format!(
-                    "[{}][{}][{}] {}:{} -> {}:{} pkt_len={} ttl={}",
-                    convert_direction(event.direction),
-                    convert_protocol(event.protocol),
-                    event.ip_family.as_str(),
-                    src_ip,
-                    event.src_port,
-                    dst_ip,
-                    event.dst_port,
-                    event.total_len,
-                    event.ttl,
-                );
-
-                if convert_protocol(event.protocol) == "tcp" {
-                    msg.push_str(&format!(
-                        " tcp_flags={}",
-                        format_tcp_flags(event.tcp_flags.unwrap())
-                    ));
-                }
-
                 match log_format.as_str() {
                     "json" => {
                         let tcp_flags_str = format_tcp_flags(event.tcp_flags.unwrap());
@@ -142,7 +121,7 @@ pub async fn process_tc_events(
                         );
                     }
                     _ => {
-                        info!("{}", msg);
+                        info!("{}", DisplayNetworkEvent(*event));
                     }
                 }
             }

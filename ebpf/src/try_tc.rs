@@ -84,6 +84,7 @@ pub fn try_tc(
                     return Ok(TC_ACT_PIPE);
                 }
 
+                // If neither Ethernet nor IP headers could be parsed, just pass the packet along
                 return Ok(TC_ACT_PIPE);
             }
         }

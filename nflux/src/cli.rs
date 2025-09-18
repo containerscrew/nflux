@@ -74,7 +74,8 @@ pub enum Commands {
             long = "disable-egress",
             help = "Disable egress traffic monitoring. [default: false]",
             default_value_t = false,
-            required = false
+            required = false,
+            conflicts_with = "disable_ingress"
         )]
         disable_egress: bool,
 
@@ -82,7 +83,8 @@ pub enum Commands {
             long = "disable-ingress",
             help = "Disable ingress traffic monitoring. [default: false]",
             default_value_t = false,
-            required = false
+            required = false,
+            conflicts_with = "disable_egress"
         )]
         disable_ingress: bool,
 

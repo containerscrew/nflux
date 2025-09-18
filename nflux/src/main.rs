@@ -2,7 +2,6 @@ use std::process::{self, exit};
 
 use aya::{Ebpf, include_bytes_aligned};
 use clap::Parser;
-use libc::getuid;
 use logger::LoggerConfig;
 use nflux_common::dto::Configmap;
 use tracing::{error, info};
@@ -10,7 +9,7 @@ use utils::{is_true, set_mem_limit};
 
 use crate::{
     cli::NfluxCliArgs, dpkt_program::start_dropped_packets, logger::init_logger,
-    tc_program::start_traffic_control, utils::is_root_user,
+    tc_program::start_traffic_control, utils::check_is_root,
 };
 
 mod cli;
@@ -31,9 +30,8 @@ async fn main() -> anyhow::Result<()> {
         with_timer: cli.with_timer,
     });
 
-    let uid = unsafe { getuid() };
-    if let Err(e) = is_root_user(uid) {
-        error!("{}", e);
+    if let Err(e) = check_is_root() {
+        error!("{e}");
         exit(1);
     }
 
@@ -65,6 +63,8 @@ async fn main() -> anyhow::Result<()> {
         }) => {
             // User data shared from the user space to the eBPF program
             info!("Sniffing traffic on interface: {}", interface);
+
+            // Create the configmap for data shared between user space and kernel space
             let configmap = Configmap {
                 disable_udp: is_true(disable_udp), // 0 = no, 1 = yes
                 disable_icmp: is_true(disable_icmp),
@@ -75,13 +75,7 @@ async fn main() -> anyhow::Result<()> {
                 listen_port: listen_port.unwrap_or(0), // Default to 0 if not provided
             };
 
-            // If enable_egress and enable_ingress are both false, the app is doing nothing, exit
-            if disable_egress && disable_ingress {
-                error!("Can't disable both egress and ingress traffic, nothing to display.");
-                exit(1)
-            }
-
-            // Also, if all protocols are disabled, exit
+            // If all protocols are disabled, noting to do here
             if disable_icmp && disable_tcp && disable_udp && disable_arp {
                 error!("You disabled all the protocols (tcp/udp/icmp/arp), nothing to display.");
                 exit(1)
