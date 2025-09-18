@@ -166,7 +166,10 @@ mod test {
     fn test_set_about() {
         assert_eq!(
             print_about(),
-            "eBPF network monitoring tool 🐝".red().italic().to_string()
+            "\neBPF network monitoring tool 🐝"
+                .red()
+                .italic()
+                .to_string()
         );
     }
 
