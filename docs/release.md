@@ -1,6 +1,6 @@
 # Publish a new release
 
-Edit the version number in `nflux/Cargo.toml`:  
+Edit the version number in `nflux/Cargo.toml`:
 > Make sure to follow [Semantic Versioning](https://semver.org/).
 
 ```shell
