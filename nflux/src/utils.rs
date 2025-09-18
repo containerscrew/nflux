@@ -5,11 +5,22 @@ use std::{
 
 use default_net::interface::get_default_interface_name;
 use dns_lookup::lookup_addr;
-use libc::{c_char, c_int, getservbyport, ntohs, servent, setrlimit};
+use libc::{c_char, c_int, getservbyport, getuid, ntohs, servent, setrlimit};
 use nflux_common::{dto::TcpFlags, utils::is_ipv4_private_address};
 use sysinfo::{Pid, System};
 use tokio::signal;
 use tracing::{debug, warn};
+
+/// check_is_root checks if the current user who runs the program is root
+pub fn check_is_root() -> Result<(), anyhow::Error> {
+    let uid = unsafe { getuid() };
+    if uid != 0 {
+        return Err(anyhow::anyhow!(
+            "This program must be run as root. Try: $ sudo nflux subcommands [flags]".to_string()
+        ));
+    }
+    Ok(())
+}
 
 pub fn convert_direction(direction: u8) -> &'static str {
     match direction {
@@ -44,17 +55,6 @@ pub fn to_ipaddr(
             IpAddr::V4(Ipv4Addr::UNSPECIFIED)
         }
     }
-}
-
-/// is_root_user checks if the current user who runs the program is root.
-/// Avoid running nflux as uid != 0 (root). eBPF requires privileges
-pub fn is_root_user(uid: u32) -> Result<(), String> {
-    if uid != 0 {
-        return Err(
-            "This program must be run as root. Try: $ sudo nflux subcommands [flags]".to_string(),
-        );
-    }
-    Ok(())
 }
 
 /// set_default_iface returns the default interface name.
@@ -202,22 +202,6 @@ pub fn _get_process_name(pid: u64) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_check_is_root_user_with_root_uid() {
-        let result = is_root_user(0);
-        assert!(result.is_ok());
-    }
-
-    #[test]
-    fn test_check_is_root_user_with_non_root_uid() {
-        let result = is_root_user(1000);
-        assert!(result.is_err());
-        assert_eq!(
-            result.unwrap_err(),
-            "This program must be run as root. Try: $ sudo nflux subcommands [flags]"
-        );
-    }
 
     #[test]
     fn test_is_true() {
