@@ -59,6 +59,8 @@ fn print_after_help_message() -> String {
 
 #[derive(Debug, Subcommand)]
 pub enum Commands {
+    /// Sniff ingress packets in L2/3 using XDP. Near to the NIC driver
+    Xdp {},
     /// Sniff packets in L2/3 using traffic control (TC)
     Tc {
         #[arg(

@@ -473,6 +473,42 @@ dependencies = [
 ]
 
 [[package]]
+name = "ebpf-dpkt"
+version = "0.1.0"
+dependencies = [
+ "aya-ebpf",
+ "aya-log-ebpf",
+ "log",
+ "network-types",
+ "nflux-common",
+ "which",
+]
+
+[[package]]
+name = "ebpf-tc"
+version = "0.1.0"
+dependencies = [
+ "aya-ebpf",
+ "aya-log-ebpf",
+ "log",
+ "network-types",
+ "nflux-common",
+ "which",
+]
+
+[[package]]
+name = "ebpf-xdp"
+version = "0.1.0"
+dependencies = [
+ "aya-ebpf",
+ "aya-log-ebpf",
+ "log",
+ "network-types",
+ "nflux-common",
+ "which",
+]
+
+[[package]]
 name = "either"
 version = "1.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -764,18 +800,6 @@ name = "nflux-common"
 version = "0.1.0"
 dependencies = [
  "aya",
-]
-
-[[package]]
-name = "nflux-ebpf"
-version = "0.1.0"
-dependencies = [
- "aya-ebpf",
- "aya-log-ebpf",
- "log",
- "network-types",
- "nflux-common",
- "which",
 ]
 
 [[package]]

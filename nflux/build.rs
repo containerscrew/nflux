@@ -7,12 +7,17 @@ fn main() -> anyhow::Result<()> {
         .exec()
         .context("MetadataCommand::exec")?;
 
-    let nflux_ebpf = packages
-        .iter()
-        .find(|pkg| pkg.name == "nflux-ebpf")
-        .ok_or_else(|| anyhow!("nflux-ebpf package not found"))?
-        .clone();
+    let ebpf_packages: Vec<_> = packages
+        .into_iter()
+        .filter(|pkg| pkg.name.starts_with("ebpf-"))
+        .collect();
 
-    aya_build::build_ebpf([nflux_ebpf])?;
+    if ebpf_packages.is_empty() {
+        return Err(anyhow!(
+            "No eBPF packages found (expected names starting with nflux-ebpf-)"
+        ));
+    }
+
+    aya_build::build_ebpf(ebpf_packages)?;
     Ok(())
 }
