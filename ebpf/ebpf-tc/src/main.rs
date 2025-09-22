@@ -6,19 +6,11 @@ mod dto;
 mod handle_packet;
 mod logger;
 mod maps;
-mod try_dpkt;
 mod try_tc;
 mod utils;
-mod vmlinux;
 
-use aya_ebpf::{
-    bindings::TC_ACT_SHOT,
-    macros::{classifier, tracepoint},
-    programs::{TcContext, TracePointContext},
-};
+use aya_ebpf::{bindings::TC_ACT_SHOT, macros::classifier, programs::TcContext};
 use try_tc::try_tc;
-
-use crate::try_dpkt::try_dropped_packets;
 
 #[classifier]
 pub fn tc_egress(ctx: TcContext) -> i32 {
@@ -32,15 +24,6 @@ pub fn tc_ingress(ctx: TcContext) -> i32 {
     // Pass the ctx and 0 which is the direction of the traffic (1: egress, 0: ingress)
     // This is used to determine the direction of the traffic
     try_tc(ctx, 0).unwrap_or_else(|_| TC_ACT_SHOT)
-}
-
-#[tracepoint]
-pub fn dropped_packets(ctx: TracePointContext) -> u32 {
-    // This function is called when a packet is dropped
-    match try_dropped_packets(ctx) {
-        Ok(ret) => ret,
-        Err(ret) => ret,
-    }
 }
 
 #[cfg(not(test))]

@@ -39,8 +39,6 @@ provision:
       set -eux -o pipefail
       apt update -y
       apt install -y vim gcc make clang bpftool bpftrace linux-headers-$(uname -r) protobuf-compiler
-      systemctl start containerd
-      nerdctl run -d --name test docker.io/alpine:latest sh -c 'while true; do sleep 100; done'
 
   - mode: user
     script: |

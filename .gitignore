@@ -12,13 +12,13 @@ target/
 # IDE
 .idea/
 .vscode/
-
+.zed/
 
 # Debian builds
 deb-build/
 *.deb
 
-# Lima VM machines
+# Lima VM machines
 lima.REJECTED.yaml
 
 # Zip packages

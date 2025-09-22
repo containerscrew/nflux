@@ -1,10 +1,8 @@
 images:
-  - location: "https://cloud-images.ubuntu.com/releases/oracular/release-20250305/ubuntu-24.10-server-cloudimg-amd64.img"
+  - location: "https://cloud-images.ubuntu.com/releases/plucky/release/ubuntu-25.04-server-cloudimg-amd64.img"
     arch: "x86_64"
-    digest: "sha256:c2c3ed89097c5f5c90ebbe45216d1569e3ea2d3c8d0993eeae74f859f6467cdb"
-  - location: "https://cloud-images.ubuntu.com/releases/oracular/release-20250305/ubuntu-24.10-server-cloudimg-arm64.img"
+  - location: "https://cloud-images.ubuntu.com/releases/plucky/release/ubuntu-25.04-server-cloudimg-arm64.img"
     arch: "aarch64"
-    digest: "sha256:9d8e0c98858d53866117d5c701a554a9d2434bedffec1c0ab7253691bfd2c70e"
 
 vmType: "vz"
 
@@ -22,16 +20,9 @@ mounts:
   - location: "~/Documents/Code/Personal/nflux"
     writable: true
 
-  - location: "~/.ssh/lima"
-    mountPoint: "/tmp/lima"
-    writable: false
-
-memory: "5GiB"
+memory: "2GiB"
 cpus: 4
 disk: "25GiB"
-ssh:
-  localPort: 2222
-  loadDotSSHPubKeys: true
 
 provision:
   - mode: system
@@ -39,10 +30,7 @@ provision:
       #!/bin/bash
       set -eux -o pipefail
       apt update -y
-      apt install -y vim gcc make clang bpftool bpftrace linux-headers-$(uname -r) containerd protobuf-compiler
-      # This is used by nflux to filter traffic of containers using cgroup skb
-      systemctl start containerd
-      nerdctl run -d --name test docker.io/alpine:latest sh -c 'while true; do sleep 100; done'
+      apt install -y vim gcc make clang bpftool bpftrace linux-headers-$(uname -r) protobuf-compiler
 
   - mode: user
     script: |
@@ -51,9 +39,6 @@ provision:
       curl https://sh.rustup.rs -sSf | sh -s -- -y
       source $HOME/.cargo/env
       rustup install stable && rustup toolchain install nightly --component rust-src
-      rustup component add rust-src --toolchain nightly-aarch64-unknown-linux-gnu
       rustup component add rust-analyzer
       rustup default nightly
       cargo install bpf-linker
-      sudo cat /tmp/lima/lima.pub >> $HOME/.ssh/authorized_keys
-      sudo chmod 0644 $HOME/.ssh/authorized_keys

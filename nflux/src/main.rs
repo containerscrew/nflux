@@ -4,7 +4,7 @@ use aya::{Ebpf, include_bytes_aligned};
 use clap::Parser;
 use logger::LoggerConfig;
 use nflux_common::dto::Configmap;
-use tracing::{error, info};
+use tracing::{error, info, warn};
 use utils::{is_true, set_mem_limit};
 
 use crate::{
@@ -37,17 +37,19 @@ async fn main() -> anyhow::Result<()> {
 
     set_mem_limit();
 
-    let mut ebpf = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/ebpf")))?;
-
     info!("Starting nflux with pid {}", process::id());
-
-    // Uncomment the following line to enable eBPF logging
-    // if let Err(e) = aya_log::EbpfLogger::init(&mut ebpf) {
-    //     warn!("failed to initialize eBPF logger: {e}");
-    // }
 
     // Match possible subcommands
     match cli.command {
+        Some(cli::Commands::Xdp {}) => {
+            let mut ebpf_xdp =
+                Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/xdp")))?;
+            info!("Sniffing xdp packets :)");
+            // Uncomment the following line to enable eBPF logging
+            if let Err(e) = aya_log::EbpfLogger::init(&mut ebpf_xdp) {
+                warn!("failed to initialize eBPF logger: {e}");
+            }
+        }
         Some(cli::Commands::Tc {
             interface,
             disable_egress,
@@ -61,6 +63,7 @@ async fn main() -> anyhow::Result<()> {
             log_interval,
             disable_full_log,
         }) => {
+            let mut ebpf_tc = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/tc")))?;
             // User data shared from the user space to the eBPF program
             info!("Sniffing traffic on interface: {}", interface);
 
@@ -75,7 +78,7 @@ async fn main() -> anyhow::Result<()> {
                 listen_port: listen_port.unwrap_or(0), // Default to 0 if not provided
             };
 
-            // If all protocols are disabled, noting to do here
+            // If all protocols are disabled, nothing to do here
             if disable_icmp && disable_tcp && disable_udp && disable_arp {
                 error!("You disabled all the protocols (tcp/udp/icmp/arp), nothing to display.");
                 exit(1)
@@ -83,7 +86,7 @@ async fn main() -> anyhow::Result<()> {
 
             // Start nflux tc
             start_traffic_control(
-                &mut ebpf,
+                &mut ebpf_tc,
                 &interface,
                 disable_egress,
                 disable_ingress,
@@ -94,8 +97,10 @@ async fn main() -> anyhow::Result<()> {
             .await?;
         }
         Some(cli::Commands::Dpkt {}) => {
+            // let mut ebpf_dpkt = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"),
+            // "/dpkt")))?;
             info!("Sniffing dropped packets");
-            start_dropped_packets(&mut ebpf, cli.log_format).await?;
+            // start_dropped_packets(&mut ebpf_dpkt, cli.log_format).await?;
         }
         None => {
             // Unreachable: CLI shows help if no args are provided.
