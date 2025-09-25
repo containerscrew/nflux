@@ -8,12 +8,11 @@ use tracing::{error, info, warn};
 use utils::{is_true, set_mem_limit};
 
 use crate::{
-    cli::NfluxCliArgs, dpkt_program::start_dropped_packets, logger::init_logger,
+    cli::NfluxCliArgs, logger::init_logger,
     tc_program::start_traffic_control, utils::check_is_root,
 };
 
 mod cli;
-mod dpkt_program;
 mod events;
 mod logger;
 mod network_event;
@@ -95,12 +94,6 @@ async fn main() -> anyhow::Result<()> {
                 exclude_port,
             )
             .await?;
-        }
-        Some(cli::Commands::Dpkt {}) => {
-            // let mut ebpf_dpkt = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"),
-            // "/dpkt")))?;
-            info!("Sniffing dropped packets");
-            // start_dropped_packets(&mut ebpf_dpkt, cli.log_format).await?;
         }
         None => {
             // Unreachable: CLI shows help if no args are provided.

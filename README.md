@@ -55,7 +55,6 @@ Read the [installation](https://github.com/containerscrew/nflux/wiki/Installatio
 ```shell
 sudo nflux --help
 sudo nflux tc # L2/L3 monitoring
-sudo nflux dpkt
 ```
 
 Read the [usage](https://github.com/containerscrew/nflux/wiki/Usage) doc for more options.

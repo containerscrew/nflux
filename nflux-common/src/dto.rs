@@ -47,17 +47,6 @@ pub struct NetworkEvent {
 }
 
 #[repr(C)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct DroppedPacketEvent {
-    pub protocol: u16,
-    pub pid: u32,
-    pub reason_code: u32,
-    pub reason: [u8; 64],              // Human-readable reason
-    pub reason_description: [u8; 128], // Detailed description of the reason
-    pub family: u16,                   // Address family (AF_INET, AF_INET6, etc.)
-}
-
-#[repr(C)]
 #[derive(Clone, Copy)]
 pub struct ArpEvent {
     pub op_code: u16,

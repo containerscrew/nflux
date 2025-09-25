@@ -1,4 +1,4 @@
-use clap::{Parser, Subcommand, value_parser};
+use clap::{value_parser, Parser, Subcommand};
 use colored::Colorize;
 
 use crate::utils::set_default_iface;
@@ -52,14 +52,14 @@ fn print_about() -> String {
 }
 
 fn print_after_help_message() -> String {
-    format!(
+    String::from(
         "Author: containerscrew \nWebsite: github.com/containerscrew/nflux\nLicense: MIT or GPL3\nIssues: github.com/containerscrew/nflux/issues"
     )
 }
 
 #[derive(Debug, Subcommand)]
 pub enum Commands {
-    /// Sniff ingress packets in L2/3 using XDP. Near to the NIC driver
+    /// Sniff ingress packets in L2/3 using XDP. Near to the NIC driver less overhead.
     Xdp {},
     /// Sniff packets in L2/3 using traffic control (TC)
     Tc {
@@ -156,8 +156,6 @@ pub enum Commands {
         )]
         disable_full_log: bool,
     },
-    /// Sniff dropped packets using tracepoint/skb/kfree_skb
-    Dpkt {},
 }
 
 #[cfg(test)]
