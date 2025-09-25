@@ -8,7 +8,11 @@ use tracing::{error, info, warn};
 use utils::{is_true, set_mem_limit};
 
 use crate::{
-    cli::NfluxCliArgs, logger::init_logger, tc_program::start_traffic_control, utils::check_is_root,
+    cli::NfluxCliArgs,
+    logger::init_logger,
+    tc_program::start_traffic_control,
+    utils::check_is_root,
+    xdp_program::{attach_xdp_program, start_xdp_program},
 };
 
 mod cli;
@@ -17,6 +21,7 @@ mod logger;
 mod network_event;
 mod tc_program;
 mod utils;
+mod xdp_program;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -39,14 +44,16 @@ async fn main() -> anyhow::Result<()> {
 
     // Match possible subcommands
     match cli.command {
-        Some(cli::Commands::Xdp {}) => {
+        Some(cli::Commands::Xdp { interface }) => {
             let mut ebpf_xdp =
                 Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/xdp")))?;
+            attach_xdp_program(&mut ebpf_xdp, &interface)?;
             info!("Sniffing xdp packets :)");
             // Uncomment the following line to enable eBPF logging
             if let Err(e) = aya_log::EbpfLogger::init(&mut ebpf_xdp) {
                 warn!("failed to initialize eBPF logger: {e}");
             }
+            start_xdp_program(&mut ebpf_xdp).await?;
         }
         Some(cli::Commands::Tc {
             interface,

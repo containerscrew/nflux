@@ -9,11 +9,19 @@ use aya_ebpf::{
     programs::XdpContext,
 };
 use aya_log_ebpf::info;
-use network_types::eth::{EthHdr, EtherType};
+use network_types::{
+    eth::{EthHdr, EtherType},
+    ip::Ipv4Hdr,
+};
+use nflux_common::dto::NetworkEvent;
+
+use crate::maps::XDP_EVENT;
+
+mod maps;
 
 #[xdp]
-pub fn xdp_hello(ctx: XdpContext) -> u32 {
-    match unsafe { try_xdp_hello(ctx) } {
+pub fn xdp_program(ctx: XdpContext) -> u32 {
+    match unsafe { try_xdp_program(ctx) } {
         Ok(ret) => ret,
         Err(_) => xdp_action::XDP_ABORTED,
     }
@@ -35,11 +43,45 @@ unsafe fn ptr_at<T>(
     Ok((start + offset) as *const T)
 }
 
-unsafe fn try_xdp_hello(ctx: XdpContext) -> Result<u32, ()> {
+unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
     let ethhdr: *const EthHdr = unsafe { ptr_at(&ctx, 0)? };
 
     match (*ethhdr).ether_type() {
-        Ok(EtherType::Ipv4) => info!(&ctx, "IPv4 packet"),
+        Ok(EtherType::Ipv4) => {
+            let ipv4hdr: *const Ipv4Hdr = unsafe { ptr_at(&ctx, EthHdr::LEN)? };
+            let mut src_ip = [0u8; 16];
+            let mut dst_ip = [0u8; 16];
+
+            let r_src_ip = unsafe { (*ipv4hdr).src_addr };
+            let r_dst_ip = unsafe { (*ipv4hdr).dst_addr };
+
+            src_ip[12..].copy_from_slice(&r_src_ip);
+            dst_ip[12..].copy_from_slice(&r_dst_ip);
+
+            let total_len = u16::from_be_bytes(unsafe { (*ipv4hdr).tot_len });
+            let protocol = unsafe { (*ipv4hdr).proto };
+            let ttl = unsafe { (*ipv4hdr).ttl };
+
+            if let Some(mut data) = XDP_EVENT.reserve::<NetworkEvent>(0) {
+                let ptr = data.as_mut_ptr();
+                core::ptr::write(
+                    ptr,
+                    NetworkEvent {
+                        src_ip,
+                        dst_ip,
+                        total_len,
+                        ttl,
+                        src_port: 0,
+                        dst_port: 0,
+                        protocol: protocol as u8,
+                        direction: 0,
+                        ip_family: nflux_common::dto::IpFamily::Ipv4,
+                        tcp_flags: None,
+                    },
+                );
+                data.submit(0);
+            }
+        }
         Ok(EtherType::Ipv6) => info!(&ctx, "IPv6 packet"),
         Ok(EtherType::Arp) => info!(&ctx, "ARP packet"),
         _ => {
