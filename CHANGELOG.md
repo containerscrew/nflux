@@ -1,4 +1,21 @@
-## 0.12.7 - 2025-09-18
+## 0.13.0 - 2025-09-25
+#### Documentation
+- add folder docs/ and release.md doc - (8fad09d) - containerscrew
+- add folder docs/ and release.md doc - (641d616) - containerscrew
+#### Miscellaneous Chores
+- **(deps)** bump libc from 0.2.175 to 0.2.176 - (1288566) - dependabot[bot]
+- **(deps)** bump clap from 4.5.47 to 4.5.48 - (b93d9f4) - dependabot[bot]
+- **(deps)** bump anyhow from 1.0.99 to 1.0.100 - (143ddca) - dependabot[bot]
+- **(version)** 0.13.0 - (dcae26a) - containerscrew
+- update CHANGELOG.md for version 0.12.7 - (9764bf4) - containerscrew
+#### Refactoring
+- remove dropped packets feature (dpkt) - (a578d57) - containerscrew
+- remove dropped packets feature (dpkt) - (1874202) - containerscrew
+- ebpf folder and package structure - (938ef16) - containerscrew
+
+- - -
+
+## 0.12.7 - 2025-09-25
 #### Bug Fixes
 - test cli set_about - (4be914a) - containerscrew
 - install.sh script - (2a04aaf) - containerscrew
@@ -17,24 +34,8 @@
 - pre-commit - (2f06ea5) - containerscrew
 
 - - -
-## 0.13.0 - 2025-09-25
-#### Documentation
-- add folder docs/ and release.md doc - (8fad09d) - containerscrew
-- add folder docs/ and release.md doc - (641d616) - containerscrew
-#### Miscellaneous Chores
-- **(deps)** bump libc from 0.2.175 to 0.2.176 - (1288566) - dependabot[bot]
-- **(deps)** bump clap from 4.5.47 to 4.5.48 - (b93d9f4) - dependabot[bot]
-- **(deps)** bump anyhow from 1.0.99 to 1.0.100 - (143ddca) - dependabot[bot]
-- update CHANGELOG.md for version 0.12.7 - (9764bf4) - containerscrew
-#### Refactoring
-- remove dropped packets feature (dpkt) - (a578d57) - containerscrew
-- remove dropped packets feature (dpkt) - (1874202) - containerscrew
-- ebpf folder and package structure - (938ef16) - containerscrew
 
-- - -
-
-
-## 0.12.6 - 2025-09-18
+## 0.12.6 - 2025-09-25
 #### Bug Fixes
 - pre-commit scripts - (22e5197) - containerscrew
 - pre-commit scripts - (3754962) - containerscrew
@@ -61,7 +62,7 @@
 
 - - -
 
-## 0.12.5 - 2025-09-18
+## 0.12.5 - 2025-09-25
 #### Bug Fixes
 - **(cli)** help message in --log-inverval flag - (e7fd101) - containerscrew
 - **(cli)** merge conflix cli.rs - (0ed5577) - containerscrew
