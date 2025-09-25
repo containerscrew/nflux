@@ -1,7 +1,7 @@
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
 use aya::maps::{MapData, RingBuf};
-use nflux_common::dto::{ArpEvent, DroppedPacketEvent, IpFamily, NetworkEvent};
+use nflux_common::dto::{ArpEvent, NetworkEvent};
 use tracing::{info, warn};
 
 use crate::{
@@ -35,51 +35,6 @@ fn _ip_familiy_as_str(ip_family: u8) -> &'static str {
         2 => "IPv4",
         10 => "IPv6",
         _ => "Unknown",
-    }
-}
-
-pub async fn process_dp_events(
-    mut ring_buf: RingBuf<MapData>,
-    log_format: String,
-) -> Result<(), anyhow::Error> {
-    loop {
-        while let Some(event) = ring_buf.next() {
-            let data = event.as_ref();
-
-            if data.len() == size_of::<DroppedPacketEvent>() {
-                let event: &DroppedPacketEvent =
-                    unsafe { &*(data.as_ptr() as *const DroppedPacketEvent) };
-
-                match log_format.as_str() {
-                    "json" => {
-                        info!(
-                            protocol = event.protocol,
-                            reason_code = event.reason_code,
-                            reason = String::from_utf8_lossy(&event.reason).trim_end_matches('\0'),
-                            pid = event.pid,
-                            reason_description = String::from_utf8_lossy(&event.reason_description)
-                                .trim_end_matches('\0'),
-                        );
-                    }
-                    _ => {
-                        info!(
-                            "Dropped packet! SkProto: {} SkFamily: {} Reason Code: {} Reason: {:?} PID: {} Human friendly: {:?}",
-                            convert_protocol(event.protocol as u8),
-                            IpFamily::from_u8(event.family as u8)
-                                .map(|fam| fam.as_str())
-                                .unwrap_or("unknown"),
-                            event.reason_code,
-                            String::from_utf8_lossy(&event.reason).trim_end_matches('\0'),
-                            event.pid,
-                            String::from_utf8_lossy(&event.reason_description)
-                                .trim_end_matches('\0'),
-                        );
-                    }
-                }
-            }
-        }
-        // Avoid busy-loop when no events are arriving
-        tokio::time::sleep(std::time::Duration::from_millis(100)).await;
     }
 }
 
