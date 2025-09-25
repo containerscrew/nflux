@@ -11,7 +11,8 @@ use aya_ebpf::{
 use aya_log_ebpf::info;
 use network_types::{
     eth::{EthHdr, EtherType},
-    ip::Ipv4Hdr,
+    ip::{IpProto, Ipv4Hdr},
+    tcp::TcpHdr,
 };
 use nflux_common::dto::NetworkEvent;
 
@@ -61,6 +62,22 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
             let total_len = u16::from_be_bytes(unsafe { (*ipv4hdr).tot_len });
             let protocol = unsafe { (*ipv4hdr).proto };
             let ttl = unsafe { (*ipv4hdr).ttl };
+            let mut src_port: u16 = 0;
+            let mut dst_port: u16 = 0;
+
+            match protocol {
+                IpProto::Tcp => {
+                    let tcphdr: *const TcpHdr =
+                        unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
+                    src_port = u16::from_be_bytes(unsafe { (*tcphdr).source });
+                    dst_port = u16::from_be_bytes(unsafe { (*tcphdr).dest });
+                }
+                IpProto::Udp => return Ok(XDP_PASS),
+                IpProto::Icmp => return Ok(XDP_PASS),
+                _ => return Ok(XDP_PASS),
+            }
+
+            // Check if the active connection is already tracked
 
             if let Some(mut data) = XDP_EVENT.reserve::<NetworkEvent>(0) {
                 let ptr = data.as_mut_ptr();
@@ -71,8 +88,8 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
                         dst_ip,
                         total_len,
                         ttl,
-                        src_port: 0,
-                        dst_port: 0,
+                        src_port,
+                        dst_port,
                         protocol: protocol as u8,
                         direction: 0,
                         ip_family: nflux_common::dto::IpFamily::Ipv4,
