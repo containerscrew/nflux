@@ -8,8 +8,7 @@ use tracing::{error, info, warn};
 use utils::{is_true, set_mem_limit};
 
 use crate::{
-    cli::NfluxCliArgs, logger::init_logger,
-    tc_program::start_traffic_control, utils::check_is_root,
+    cli::NfluxCliArgs, logger::init_logger, tc_program::start_traffic_control, utils::check_is_root,
 };
 
 mod cli;
