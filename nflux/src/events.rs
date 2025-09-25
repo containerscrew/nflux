@@ -108,6 +108,19 @@ pub async fn process_arp_events(mut ring_buf: RingBuf<MapData>) -> Result<(), an
     }
 }
 
+pub async fn process_xdp_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow::Error> {
+    loop {
+        while let Some(event) = ring_buf.next() {
+            let data = event.as_ref();
+            if data.len() == std::mem::size_of::<NetworkEvent>() {
+                let event: &NetworkEvent = unsafe { &*(data.as_ptr() as *const NetworkEvent) };
+                info!("{}", DisplayNetworkEvent(*event));
+            }
+        }
+        tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
