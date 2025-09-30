@@ -5,6 +5,7 @@ use core::mem;
 
 use aya_ebpf::{
     bindings::xdp_action::{self, XDP_PASS},
+    helpers::r#gen::bpf_ktime_get_ns,
     macros::xdp,
     programs::XdpContext,
 };
@@ -14,9 +15,9 @@ use network_types::{
     ip::{IpProto, Ipv4Hdr},
     tcp::TcpHdr,
 };
-use nflux_common::dto::NetworkEvent;
+use nflux_common::dto::{ActiveConnectionKey, NetworkEvent};
 
-use crate::maps::XDP_EVENT;
+use crate::maps::{ACTIVE_CONNECTIONS, XDP_EVENT};
 
 mod maps;
 
@@ -78,6 +79,24 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
             }
 
             // Check if the active connection is already tracked
+            let key = ActiveConnectionKey {
+                protocol: protocol as u8,
+                src_port,
+                dst_port,
+                src_ip,
+                dst_ip,
+            };
+
+            let current_time = bpf_ktime_get_ns();
+            let log_interval = 60_000_000_000; // 60 seconds in nanoseconds
+
+            if let Some(last_log_time) = ACTIVE_CONNECTIONS.get(&key) {
+                if current_time - *last_log_time < log_interval {
+                    return Ok(XDP_PASS);
+                }
+            }
+
+            ACTIVE_CONNECTIONS.insert(&key, &current_time, 0).ok();
 
             if let Some(mut data) = XDP_EVENT.reserve::<NetworkEvent>(0) {
                 let ptr = data.as_mut_ptr();
