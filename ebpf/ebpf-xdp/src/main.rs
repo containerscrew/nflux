@@ -118,8 +118,9 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
                 data.submit(0);
             }
         }
-        Ok(EtherType::Ipv6) => info!(&ctx, "IPv6 packet"),
-        Ok(EtherType::Arp) => info!(&ctx, "ARP packet"),
+        Ok(EtherType::Ipv6) => return Ok(XDP_PASS),
+        Ok(EtherType::Arp) => return Ok(XDP_PASS),
+        // Err(_) => return Ok(XDP_PASS),
         _ => {
             // Other packet
             return Ok(XDP_PASS);
