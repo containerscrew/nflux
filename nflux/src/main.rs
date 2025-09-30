@@ -48,11 +48,11 @@ async fn main() -> anyhow::Result<()> {
             let mut ebpf_xdp =
                 Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/xdp")))?;
             attach_xdp_program(&mut ebpf_xdp, &interface)?;
-            info!("Sniffing xdp packets :)");
+            info!("Sniffing ingress packets in the NIC");
             // Uncomment the following line to enable eBPF logging
-            if let Err(e) = aya_log::EbpfLogger::init(&mut ebpf_xdp) {
-                warn!("failed to initialize eBPF logger: {e}");
-            }
+            // if let Err(e) = aya_log::EbpfLogger::init(&mut ebpf_xdp) {
+            //     warn!("failed to initialize eBPF logger: {e}");
+            // }
             start_xdp_program(&mut ebpf_xdp).await?;
         }
         Some(cli::Commands::Tc {
