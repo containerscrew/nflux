@@ -47,6 +47,16 @@ pub struct NetworkEvent {
 }
 
 #[repr(C)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
+pub struct ActiveConnectionKey {
+    pub protocol: u8,
+    pub src_port: u16,
+    pub dst_port: u16,
+    pub src_ip: [u8; 16],
+    pub dst_ip: [u8; 16],
+}
+
+#[repr(C)]
 #[derive(Clone, Copy)]
 pub struct ArpEvent {
     pub op_code: u16,
