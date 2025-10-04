@@ -20,6 +20,7 @@ pub struct NfluxCliArgs {
         long = "log-level",
         global = true,
         help = "Log level for logging tracing. Possible values: info, warn, trace, debug, error.",
+        value_parser = ["info", "warn", "trace", "debug", "error"],
         default_value = "info",
         required = false
     )]
@@ -30,6 +31,7 @@ pub struct NfluxCliArgs {
         global = true,
         help = "Log format for logging tracing. Possible values: text, json.",
         default_value = "text",
+        value_parser = ["text", "json"],
         required = false
     )]
     pub log_format: String,
