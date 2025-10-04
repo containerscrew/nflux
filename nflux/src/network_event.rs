@@ -59,7 +59,7 @@ impl fmt::Display for DisplayNetworkEvent {
         let event = &self.0;
         write!(
             f,
-            "[{}][{}][{}] {}:{} -> {}:{} pkt_len={} ttl={}",
+            "[{}][{}][{}] {}:{} -> {}:{} -> data_len={} -> ttl={}",
             convert_direction(event.direction),
             convert_protocol(event.protocol),
             event.ip_family.as_str(),

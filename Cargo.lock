@@ -777,6 +777,7 @@ dependencies = [
  "dns-lookup",
  "libc",
  "nflux-common",
+ "serde_json",
  "sysinfo",
  "tokio",
  "tracing",
