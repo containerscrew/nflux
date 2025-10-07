@@ -71,7 +71,7 @@ pub enum Commands {
         )]
         interface: String,
     },
-    /// Sniff packets in L2/3 using traffic control (TC)
+    /// Sniff packets in L2/3 using traffic control (TC)    
     Tc {
         #[arg(
             short = 'i',

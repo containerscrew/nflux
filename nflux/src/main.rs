@@ -1,21 +1,20 @@
+mod cli;
+
 use std::process::{self, exit};
 
 use aya::{Ebpf, include_bytes_aligned};
 use clap::Parser;
 use logger::LoggerConfig;
-use nflux_common::dto::Configmap;
 use tracing::{error, info};
-use utils::{is_true, set_mem_limit};
+use utils::set_mem_limit;
 
 use crate::{
-    cli::NfluxCliArgs,
+    cli::{Commands, NfluxCliArgs},
     logger::init_logger,
-    tc_program::start_traffic_control,
     utils::check_is_root,
     xdp_program::{attach_xdp_program, start_xdp_program},
 };
 
-mod cli;
 mod events;
 mod logger;
 mod network_event;
@@ -44,66 +43,63 @@ async fn main() -> anyhow::Result<()> {
 
     // Match possible subcommands
     match cli.command {
-        Some(cli::Commands::Xdp { interface }) => {
+        Commands::Xdp(xdp_args) => {
             let mut ebpf_xdp =
                 Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/xdp")))?;
-            attach_xdp_program(&mut ebpf_xdp, &interface)?;
-            info!("Sniffing ingress packets in the NIC");
+            attach_xdp_program(&mut ebpf_xdp, &xdp_args.interface)?;
+            info!("Sniffing ingress packets in the NIC {}", xdp_args.interface);
             // Uncomment the following line to enable eBPF logging
             // if let Err(e) = aya_log::EbpfLogger::init(&mut ebpf_xdp) {
             //     warn!("failed to initialize eBPF logger: {e}");
             // }
             start_xdp_program(&mut ebpf_xdp).await?;
         }
-        Some(cli::Commands::Tc {
-            interface,
-            disable_egress,
-            disable_ingress,
-            listen_port,
-            exclude_port,
-            disable_udp,
-            disable_icmp,
-            disable_tcp,
-            disable_arp,
-            log_interval,
-            disable_full_log,
-        }) => {
-            let mut ebpf_tc = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/tc")))?;
-            // User data shared from the user space to the eBPF program
-            info!("Sniffing traffic on interface: {}", interface);
+        // Some(old_cli::Commands::Tc {
+        //     interface,
+        //     disable_egress,
+        //     disable_ingress,
+        //     listen_port,
+        //     exclude_port,
+        //     disable_udp,
+        //     disable_icmp,
+        //     disable_tcp,
+        //     disable_arp,
+        //     log_interval,
+        //     disable_full_log,
+        // }) => {
+        //     let mut ebpf_tc = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"),
+        // "/tc")))?;     // User data shared from the user space to the eBPF program
+        //     info!("Sniffing traffic on interface: {}", interface);
 
-            // Create the configmap for data shared between user space and kernel space
-            let configmap = Configmap {
-                disable_udp: is_true(disable_udp), // 0 = no, 1 = yes
-                disable_icmp: is_true(disable_icmp),
-                disable_tcp: is_true(disable_tcp),
-                disable_arp: is_true(disable_arp),
-                log_interval: log_interval as u64 * 1_000_000_000,
-                disable_full_log: is_true(disable_full_log),
-                listen_port: listen_port.unwrap_or(0), // Default to 0 if not provided
-            };
+        //     // Create the configmap for data shared between user space and kernel space
+        //     let configmap = Configmap {
+        //         disable_udp: is_true(disable_udp), // 0 = no, 1 = yes
+        //         disable_icmp: is_true(disable_icmp),
+        //         disable_tcp: is_true(disable_tcp),
+        //         disable_arp: is_true(disable_arp),
+        //         log_interval: log_interval as u64 * 1_000_000_000,
+        //         disable_full_log: is_true(disable_full_log),
+        //         listen_port: listen_port.unwrap_or(0), // Default to 0 if not provided
+        //     };
 
-            // If all protocols are disabled, nothing to do here
-            if disable_icmp && disable_tcp && disable_udp && disable_arp {
-                error!("You disabled all the protocols (tcp/udp/icmp/arp), nothing to display.");
-                exit(1)
-            }
+        //     // If all protocols are disabled, nothing to do here
+        //     if disable_icmp && disable_tcp && disable_udp && disable_arp {
+        //         error!("You disabled all the protocols (tcp/udp/icmp/arp), nothing to display.");
+        //         exit(1)
+        //     }
 
-            // Start nflux tc
-            start_traffic_control(
-                &mut ebpf_tc,
-                &interface,
-                disable_egress,
-                disable_ingress,
-                configmap,
-                cli.log_format,
-                exclude_port,
-            )
-            .await?;
-        }
-        None => {
-            // Unreachable: CLI shows help if no args are provided.
-        }
+        //     // Start nflux tc
+        //     start_traffic_control(
+        //         &mut ebpf_tc,
+        //         &interface,
+        //         disable_egress,
+        //         disable_ingress,
+        //         configmap,
+        //         cli.log_format,
+        //         exclude_port,
+        //     )
+        //     .await?;
+        // }
     }
 
     Ok(())
