@@ -35,10 +35,10 @@
 # What is nflux?
 
 Nflux is an [`eBPF`](./docs/what_is_ebpf.md)-based tool that monitors `incoming/outgoing` traffic on a Linux system by
-attaching a `TC (Traffic Control)` program using eBPF technology. It can be attached to both physical and virtual
-interfaces, allowing us to obtain networking data at a very low level. You can also monitor dropped packets using the
-tracepoint
-`tracepoint/skb/kfree_skb`.
+attaching a `TC (Traffic Control)` program and `XDP (Express Data Path)` program using eBPF technology. It can be attached to both physical and virtual
+interfaces, allowing us to obtain networking data at a very low level.
+
+> THe `main` branch is considered `unstable` and may contain `breaking changes`. Please use the latest `release` for a stable experience.
 
 # Installation
 
