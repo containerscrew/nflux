@@ -15,7 +15,6 @@ use crate::{
     xdp_program::{attach_xdp_program, start_xdp_program},
 };
 
-mod events;
 mod logger;
 mod network_event;
 mod tc_program;
@@ -52,7 +51,7 @@ async fn main() -> anyhow::Result<()> {
             // if let Err(e) = aya_log::EbpfLogger::init(&mut ebpf_xdp) {
             //     warn!("failed to initialize eBPF logger: {e}");
             // }
-            start_xdp_program(&mut ebpf_xdp).await?;
+            start_xdp_program(&mut ebpf_xdp, cli.log_format).await?;
         }
         // Some(old_cli::Commands::Tc {
         //     interface,

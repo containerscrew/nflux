@@ -5,7 +5,10 @@ use aya::{
 use nflux_common::dto::NetworkEvent;
 use tracing::{debug, error, info, warn};
 
-use crate::{network_event::DisplayNetworkEvent, utils::wait_for_shutdown};
+use crate::{
+    network_event::{DisplayNetworkEvent, process_networking_event},
+    utils::wait_for_shutdown,
+};
 
 pub fn attach_xdp_program(
     bpf: &mut Ebpf,
@@ -39,15 +42,18 @@ pub async fn process_xdp_event(mut ring_buf: RingBuf<MapData>) -> Result<(), any
     }
 }
 
-pub async fn start_xdp_program(ebpf: &mut Ebpf) -> anyhow::Result<()> {
+pub async fn start_xdp_program(
+    ebpf: &mut Ebpf,
+    log_format: String,
+) -> anyhow::Result<()> {
     let xdp_event_ring_map = ebpf
         .take_map("XDP_EVENT")
         .ok_or_else(|| anyhow::anyhow!("Failed to find ring buffer XDP_EVENT map"))?;
     let ring_buf_net = RingBuf::try_from(xdp_event_ring_map)?;
 
     let xdp_task = tokio::spawn(async move {
-        if let Err(e) = process_xdp_event(ring_buf_net).await {
-            error!("process_xdp_events failed: {:?}", e);
+        if let Err(e) = process_networking_event(ring_buf_net, log_format, None).await {
+            error!("process_networking_event failed: {:?}", e);
         }
     });
 
