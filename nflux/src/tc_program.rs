@@ -7,8 +7,10 @@ use aya::{
 use nflux_common::dto::Configmap;
 use tracing::{debug, error, warn};
 
-use super::events::process_tc_events;
-use crate::{events::process_arp_events, utils::wait_for_shutdown};
+use crate::{
+    network_event::{process_arp_events, process_networking_event},
+    utils::wait_for_shutdown,
+};
 
 pub async fn start_traffic_control(
     ebpf: &mut Ebpf,
@@ -33,7 +35,7 @@ pub async fn start_traffic_control(
     let ring_buf_arp = RingBuf::try_from(arp_event_ring_map)?;
 
     let net_task = tokio::spawn(async move {
-        if let Err(e) = process_tc_events(ring_buf_net, log_format, exclude_ports).await {
+        if let Err(e) = process_networking_event(ring_buf_net, log_format, exclude_ports).await {
             error!("process_tc_events failed: {:?}", e);
         }
     });
