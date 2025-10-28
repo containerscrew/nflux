@@ -57,7 +57,6 @@ pub async fn process_networking_event(
                 }
                 match log_format.as_str() {
                     "json" => {
-                        let tcp_flags_str = format_tcp_flags(event.tcp_flags.unwrap());
                         info!(
                             dir = %convert_direction(event.direction),
                             ip_family = %event.ip_family.as_str(),
@@ -68,11 +67,7 @@ pub async fn process_networking_event(
                             dst_ip = %to_ipaddr(event.dst_ip, event.ip_family.to_owned()),
                             src_port = event.src_port,
                             dst_port = event.dst_port,
-                            tcp_flags = if !tcp_flags_str.is_empty() {
-                                Some(tcp_flags_str)
-                            } else {
-                                None
-                            },
+                            tcp_flags = event.tcp_flags.map(|flags| format_tcp_flags(flags)),
                         );
                     }
                     _ => {
