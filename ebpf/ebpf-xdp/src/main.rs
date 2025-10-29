@@ -15,7 +15,7 @@ use network_types::{
     ip::{IpProto, Ipv4Hdr},
     tcp::TcpHdr,
 };
-use nflux_common::dto::{ActiveConnectionKey, NetworkEvent};
+use nflux_common::dto::{ActiveConnectionKey, NetworkEvent, TcpFlags};
 
 use crate::maps::{ACTIVE_CONNECTIONS, XDP_EVENT};
 
@@ -65,6 +65,7 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
             let ttl = unsafe { (*ipv4hdr).ttl };
             let mut src_port: u16 = 0;
             let mut dst_port: u16 = 0;
+            let mut tcp_flags: Option<TcpFlags> = None;
 
             match protocol {
                 IpProto::Tcp => {
@@ -72,6 +73,16 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
                         unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
                     src_port = u16::from_be_bytes(unsafe { (*tcphdr).source });
                     dst_port = u16::from_be_bytes(unsafe { (*tcphdr).dest });
+                    tcp_flags = TcpFlags {
+                        syn: ((*tcphdr).syn() != 0) as u8,
+                        ack: ((*tcphdr).ack() != 0) as u8,
+                        fin: ((*tcphdr).fin() != 0) as u8,
+                        rst: ((*tcphdr).rst() != 0) as u8,
+                        psh: ((*tcphdr).psh() != 0) as u8,
+                        urg: ((*tcphdr).urg() != 0) as u8,
+                        ece: ((*tcphdr).ece() != 0) as u8,
+                        cwr: ((*tcphdr).cwr() != 0) as u8,
+                    };
                 }
                 IpProto::Udp => return Ok(XDP_PASS),
                 IpProto::Icmp => return Ok(XDP_PASS),
@@ -112,7 +123,7 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
                         protocol: protocol as u8,
                         direction: 0,
                         ip_family: nflux_common::dto::IpFamily::Ipv4,
-                        tcp_flags: None,
+                        tcp_flags: tcp_flags,
                     },
                 );
                 data.submit(0);

@@ -20,9 +20,13 @@ mod network_event;
 mod tc_program;
 mod utils;
 mod xdp_program;
+mod config;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+
+    let config = NfluxConfig::load("config.toml")?;
+
     let cli = NfluxCliArgs::parse();
 
     init_logger(LoggerConfig {
