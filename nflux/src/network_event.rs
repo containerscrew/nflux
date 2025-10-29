@@ -5,6 +5,7 @@ use std::{
 
 use aya::maps::{MapData, RingBuf};
 use nflux_common::dto::{ArpEvent, NetworkEvent, TcpFlags};
+use serde::ser::{Serialize, SerializeStruct, Serializer};
 use tracing::{info, warn};
 
 use crate::utils::{convert_direction, convert_protocol, format_tcp_flags};
@@ -47,7 +48,7 @@ pub async fn process_networking_event(
         while let Some(event) = ring_buf.next() {
             let data = event.as_ref();
 
-            if data.len() == std::mem::size_of::<NetworkEvent>() {
+            if data.len() == size_of::<NetworkEvent>() {
                 let event: &NetworkEvent = unsafe { &*(data.as_ptr() as *const NetworkEvent) };
 
                 if let Some(ref ports) = exclude_ports {
@@ -57,17 +58,22 @@ pub async fn process_networking_event(
                 }
                 match log_format.as_str() {
                     "json" => {
+                        let e = event;
                         info!(
-                            dir = %convert_direction(event.direction),
-                            ip_family = %event.ip_family.as_str(),
-                            protocol = %convert_protocol(event.protocol),
-                            pkt_len = event.total_len,
-                            ttl = event.ttl,
-                            src_ip = %to_ipaddr(event.src_ip, event.ip_family.to_owned()),
-                            dst_ip = %to_ipaddr(event.dst_ip, event.ip_family.to_owned()),
-                            src_port = event.src_port,
-                            dst_port = event.dst_port,
-                            tcp_flags = event.tcp_flags.map(|flags| format_tcp_flags(flags)),
+                            direction = %convert_direction(e.direction),
+                            protocol = %convert_protocol(e.protocol),
+                            ip_family = %e.ip_family.as_str(),
+                            src_ip = %to_ipaddr(e.src_ip, e.ip_family.to_owned()),
+                            src_port = e.src_port,
+                            dst_ip = %to_ipaddr(e.dst_ip, e.ip_family.to_owned()),
+                            dst_port = e.dst_port,
+                            total_len = e.total_len,
+                            ttl = e.ttl,
+                            tcp_flags = if let Some(flags) = e.tcp_flags {
+                                format_tcp_flags(flags)
+                            } else {
+                                "".to_string()
+                            },
                         );
                     }
                     _ => {
@@ -221,3 +227,4 @@ impl fmt::Display for DisplayNetworkEvent {
         write!(f, "")
     }
 }
+
