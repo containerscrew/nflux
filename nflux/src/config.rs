@@ -1,3 +1,6 @@
+use std::fs;
+
+use anyhow::{Context, Result};
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
@@ -12,19 +15,18 @@ pub struct AgentConfig {
 }
 
 #[derive(Debug, Deserialize)]
-#[allow(dead_code)]
 pub struct NfluxConfig {
     pub logging: LoggingConfig,
     pub agent: AgentConfig,
 }
 
 impl NfluxConfig {
-    pub fn load(path: &str) -> Result<Self, Box<dyn Error>> {
+    pub fn load(path: &str) -> Result<Self> {
         let contents = fs::read_to_string(path)
-            .map_err(|e| format!("Error reading the config file in '{}': {}", path, e))?;
+            .with_context(|| format!("Error reading the config file in '{}'", path))?;
 
         let config: NfluxConfig =
-            toml::from_str(&contents).map_err(|e| format!("Error parsing TOML content: {}", e))?;
+            toml::from_str(&contents).context("Error parsing TOML content")?;
 
         Ok(config)
     }

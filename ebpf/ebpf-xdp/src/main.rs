@@ -9,7 +9,6 @@ use aya_ebpf::{
     macros::xdp,
     programs::XdpContext,
 };
-use aya_log_ebpf::info;
 use network_types::{
     eth::{EthHdr, EtherType},
     ip::{IpProto, Ipv4Hdr},
@@ -73,7 +72,7 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
                         unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
                     src_port = u16::from_be_bytes(unsafe { (*tcphdr).source });
                     dst_port = u16::from_be_bytes(unsafe { (*tcphdr).dest });
-                    tcp_flags = TcpFlags {
+                    tcp_flags = Some(TcpFlags {
                         syn: ((*tcphdr).syn() != 0) as u8,
                         ack: ((*tcphdr).ack() != 0) as u8,
                         fin: ((*tcphdr).fin() != 0) as u8,
@@ -82,7 +81,7 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
                         urg: ((*tcphdr).urg() != 0) as u8,
                         ece: ((*tcphdr).ece() != 0) as u8,
                         cwr: ((*tcphdr).cwr() != 0) as u8,
-                    };
+                    });
                 }
                 IpProto::Udp => return Ok(XDP_PASS),
                 IpProto::Icmp => return Ok(XDP_PASS),
