@@ -46,7 +46,7 @@ pub async fn process_networking_event(
 ) -> Result<(), anyhow::Error> {
     loop {
         while let Some(event) = ring_buf.next() {
-            let data = event.as_ref();
+            let data: &[u8] = event.as_ref();
 
             if data.len() == size_of::<NetworkEvent>() {
                 let event: &NetworkEvent = unsafe { &*(data.as_ptr() as *const NetworkEvent) };
@@ -91,7 +91,7 @@ pub async fn process_networking_event(
 pub async fn process_arp_events(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow::Error> {
     loop {
         while let Some(event) = ring_buf.next() {
-            let data = event.as_ref();
+            let data: &[u8] = event.as_ref();
             if data.len() == std::mem::size_of::<ArpEvent>() {
                 let event: &ArpEvent = unsafe { &*(data.as_ptr() as *const ArpEvent) };
                 info!(
@@ -227,4 +227,3 @@ impl fmt::Display for DisplayNetworkEvent {
         write!(f, "")
     }
 }
-

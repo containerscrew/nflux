@@ -1,14 +1,7 @@
-use aya::{
-    Ebpf,
-    maps::{MapData, RingBuf},
-};
-use nflux_common::dto::NetworkEvent;
-use tracing::{debug, error, info, warn};
+use aya::{Ebpf, maps::RingBuf};
+use tracing::{debug, error, warn};
 
-use crate::{
-    network_event::{DisplayNetworkEvent, process_networking_event},
-    utils::wait_for_shutdown,
-};
+use crate::{network_event::process_networking_event, utils::wait_for_shutdown};
 
 pub fn attach_xdp_program(
     bpf: &mut Ebpf,
@@ -18,28 +11,12 @@ pub fn attach_xdp_program(
     program.load()?;
 
     if let Err(e) = program.attach(interface, aya::programs::XdpFlags::default()) {
-        error!(
-            "Failed to attach XDP program to interface {}: {}. Ensure it is a physical interface.",
-            interface, e
-        );
+        return Err(anyhow::anyhow!(e));
     }
 
     debug!("XDP program attached to interface {}", interface);
 
     Ok(())
-}
-
-pub async fn process_xdp_event(mut ring_buf: RingBuf<MapData>) -> Result<(), anyhow::Error> {
-    loop {
-        while let Some(event) = ring_buf.next() {
-            let data = event.as_ref();
-            if data.len() == std::mem::size_of::<NetworkEvent>() {
-                let event: &NetworkEvent = unsafe { &*(data.as_ptr() as *const NetworkEvent) };
-                info!("{}", DisplayNetworkEvent(*event));
-            }
-        }
-        tokio::time::sleep(std::time::Duration::from_millis(50)).await;
-    }
 }
 
 pub async fn start_xdp_program(

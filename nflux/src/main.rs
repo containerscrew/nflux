@@ -10,22 +10,24 @@ use utils::set_mem_limit;
 
 use crate::{
     cli::{Commands, NfluxCliArgs},
+    config::NfluxConfig,
     logger::init_logger,
     utils::check_is_root,
     xdp_program::{attach_xdp_program, start_xdp_program},
 };
 
+mod config;
 mod logger;
 mod network_event;
 mod tc_program;
 mod utils;
 mod xdp_program;
-mod config;
 
 #[tokio::main]
-async fn main() -> anyhow::Result<()> {
+async fn main() -> anyhow::Result<(), anyhow::Error> {
+    // let config = NfluxConfig::load("config.toml")?;
 
-    let config = NfluxConfig::load("config.toml")?;
+    // println!("Loaded configuration: {:?}", config);
 
     let cli = NfluxCliArgs::parse();
 
