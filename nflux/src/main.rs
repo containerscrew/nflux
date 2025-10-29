@@ -10,7 +10,6 @@ use utils::set_mem_limit;
 
 use crate::{
     cli::{Commands, NfluxCliArgs},
-    config::NfluxConfig,
     logger::init_logger,
     utils::check_is_root,
     xdp_program::{attach_xdp_program, start_xdp_program},
