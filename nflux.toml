@@ -1,6 +1,8 @@
 [logging]
 log_level = "info" # trace, debug, info, warn, or error (default: info)
 log_type = "text"  # text or json (default: text)
+with_timer = false  # include timestamps in logs (default: false)
 
 [agent]
-interface = "eth0"
+interface = "wlp2s0"
+mode = "xdp"       # xdp or tc (default: xdp) (xdp only sniff ingress traffic using a physical interface)

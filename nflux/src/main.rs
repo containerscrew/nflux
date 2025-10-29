@@ -1,15 +1,12 @@
-mod cli;
-
 use std::process::{self, exit};
 
 use aya::{Ebpf, include_bytes_aligned};
-use clap::Parser;
 use logger::LoggerConfig;
 use tracing::{error, info};
 use utils::set_mem_limit;
 
 use crate::{
-    cli::{Commands, NfluxCliArgs},
+    config::NfluxConfig,
     logger::init_logger,
     utils::check_is_root,
     xdp_program::{attach_xdp_program, start_xdp_program},
@@ -24,16 +21,12 @@ mod xdp_program;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<(), anyhow::Error> {
-    // let config = NfluxConfig::load("config.toml")?;
-
-    // println!("Loaded configuration: {:?}", config);
-
-    let cli = NfluxCliArgs::parse();
+    let config = NfluxConfig::load("nflux.toml")?;
 
     init_logger(LoggerConfig {
-        level: cli.log_level,
-        format: cli.log_format.clone(),
-        with_timer: cli.with_timer,
+        level: config.logging.log_level,
+        format: config.logging.log_type.clone(),
+        with_timer: config.logging.with_timer,
     });
 
     if let Err(e) = check_is_root() {
@@ -45,65 +38,29 @@ async fn main() -> anyhow::Result<(), anyhow::Error> {
 
     info!("Starting nflux with pid {}", process::id());
 
-    // Match possible subcommands
-    match cli.command {
-        Commands::Xdp(xdp_args) => {
+    match config.agent.mode.as_str() {
+        "xdp" => {
             let mut ebpf_xdp =
                 Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/xdp")))?;
-            attach_xdp_program(&mut ebpf_xdp, &xdp_args.interface)?;
-            info!("Sniffing ingress packets in the NIC {}", xdp_args.interface);
+            attach_xdp_program(&mut ebpf_xdp, &config.agent.interface)?;
+            info!(
+                "Sniffing ingress packets in the NIC {}",
+                config.agent.interface
+            );
             // Uncomment the following line to enable eBPF logging
             // if let Err(e) = aya_log::EbpfLogger::init(&mut ebpf_xdp) {
             //     warn!("failed to initialize eBPF logger: {e}");
             // }
-            start_xdp_program(&mut ebpf_xdp, cli.log_format).await?;
+            start_xdp_program(&mut ebpf_xdp, config.logging.log_type).await?;
         }
-        // Some(old_cli::Commands::Tc {
-        //     interface,
-        //     disable_egress,
-        //     disable_ingress,
-        //     listen_port,
-        //     exclude_port,
-        //     disable_udp,
-        //     disable_icmp,
-        //     disable_tcp,
-        //     disable_arp,
-        //     log_interval,
-        //     disable_full_log,
-        // }) => {
-        //     let mut ebpf_tc = Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"),
-        // "/tc")))?;     // User data shared from the user space to the eBPF program
-        //     info!("Sniffing traffic on interface: {}", interface);
-
-        //     // Create the configmap for data shared between user space and kernel space
-        //     let configmap = Configmap {
-        //         disable_udp: is_true(disable_udp), // 0 = no, 1 = yes
-        //         disable_icmp: is_true(disable_icmp),
-        //         disable_tcp: is_true(disable_tcp),
-        //         disable_arp: is_true(disable_arp),
-        //         log_interval: log_interval as u64 * 1_000_000_000,
-        //         disable_full_log: is_true(disable_full_log),
-        //         listen_port: listen_port.unwrap_or(0), // Default to 0 if not provided
-        //     };
-
-        //     // If all protocols are disabled, nothing to do here
-        //     if disable_icmp && disable_tcp && disable_udp && disable_arp {
-        //         error!("You disabled all the protocols (tcp/udp/icmp/arp), nothing to display.");
-        //         exit(1)
-        //     }
-
-        //     // Start nflux tc
-        //     start_traffic_control(
-        //         &mut ebpf_tc,
-        //         &interface,
-        //         disable_egress,
-        //         disable_ingress,
-        //         configmap,
-        //         cli.log_format,
-        //         exclude_port,
-        //     )
-        //     .await?;
-        // }
+        "tc" => info!("Operating in TC mode"),
+        other => {
+            error!(
+                "Invalid mode '{}' in configuration. Use 'xdp' or 'tc'.",
+                other
+            );
+            exit(1);
+        }
     }
 
     Ok(())
