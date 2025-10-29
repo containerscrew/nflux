@@ -19,7 +19,7 @@ tracing = "0.1.40"
 aya-log = "0.2.1"
 dns-lookup = "3.0.1"
 sysinfo = "0.37.2"
-clap = { version = "4.5.50", features = ["derive"] }
+clap = { version = "4.5.51", features = ["derive"] }
 chrono = "0.4.42"
 default-net = "0.22.0"
 colored = "3.0.0"
