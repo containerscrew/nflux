@@ -29,3 +29,6 @@ nflux.toml
 
 # vmlinux.rs
 #vmlinux.rs
+
+# MaxMind DB files
+*.mmdb
