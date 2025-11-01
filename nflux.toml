@@ -1,6 +1,6 @@
 [logging]
 log_level = "info" # trace, debug, info, warn, or error (default: info)
-log_type = "text"  # text or json (default: text)
+log_type = "json"  # text or json (default: text)
 with_timer = false  # include timestamps in logs (default: false)
 
 [agent]

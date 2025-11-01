@@ -32,6 +32,12 @@
 
 ---
 
+<p align="center">
+    <img src="./examples/grafana-map.png" alt="example3"/>
+</p>
+
+---
+
 # What is nflux?
 
 Nflux is an [`eBPF`](./docs/what_is_ebpf.md)-based tool that monitors `incoming/outgoing` traffic on a Linux system by

@@ -98,7 +98,7 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
             };
 
             let current_time = bpf_ktime_get_ns();
-            let log_interval = 120_000_000_000; // 120 seconds in nanoseconds (too much by the moment)
+            let log_interval = 5_000_000_000; // 5 seconds in nanoseconds (too much by the moment)
 
             if let Some(last_log_time) = ACTIVE_CONNECTIONS.get(&key) {
                 if current_time - *last_log_time < log_interval {

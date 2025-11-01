@@ -1,6 +1,6 @@
 services:
   promtail:
-    image: grafana/promtail:latest
+    image: docker.io/grafana/promtail:latest
     restart: unless-stopped
     security_opt:
       - seccomp=unconfined
@@ -8,5 +8,6 @@ services:
     volumes:
       - ${PWD}/promtail/config.yml:/etc/promtail/config.yml:z
       - /tmp/nflux.log:/tmp/nflux.log:z
+      - ${PWD}/promtail/geoip/GeoLite2-City.mmdb:/usr/share/GeoIP/GeoLite2-City.mmdb:z
     container_name: promtail
     command: -config.file=/etc/promtail/config.yml

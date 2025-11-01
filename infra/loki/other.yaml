@@ -1,0 +1,50 @@
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+  log_level: info
+
+distributor:
+  ring:
+    kvstore:
+      store: inmemory
+    replication_factor: 1
+
+ingester:
+  chunk_idle_period: 5m
+  chunk_target_size: 1048576
+  max_chunk_age: 1h
+  lifecycler:
+    ring:
+      kvstore:
+        store: inmemory
+      replication_factor: 1
+    heartbeat_period: 1m
+  wal:
+    enabled: true
+    dir: /loki/wal
+
+storage_config:
+  boltdb_shipper:
+    active_index_directory: /loki/index
+    cache_location: /loki/cache
+    shared_store: s3
+  s3:
+    bucketnames: <your-bucket-name>
+    endpoint: <your-s3-endpoint> # Use `s3.amazonaws.com` for AWS S3
+    access_key_id: <your-access-key-id>
+    secret_access_key: <your-secret-access-key>
+    insecure: false # Set to true if not using SSL
+
+compactor:
+  working_directory: /loki/compactor
+  shared_store: s3
+
+query_range:
+  split_queries_by_interval: 15m
+  max_retries: 5
+  parallelism: 32
+
+frontend:
+  max_outstanding_per_tenant: 1000
+  max_outstanding_per_request: 500

@@ -31,6 +31,7 @@ limits_config:
   ingestion_rate_mb: 50000
   ingestion_burst_size_mb: 50000
   volume_enabled: true
+  max_label_names_per_series: 25
 
 query_range:
   results_cache:
@@ -43,21 +44,29 @@ schema_config:
   configs:
     - from: 2020-10-24
       store: tsdb
-      # object_store: filesystem
-      object_store: s3
+      object_store: filesystem
+      # object_store: s3
       schema: v13
       index:
         prefix: index_
         period: 24h
 
 storage_config:
-  aws:
-    s3: http://admin:minioadmin@minio:9000/loki
-    s3forcepathstyle: true
   tsdb_shipper:
-    active_index_directory: /home/loki/tsdb-index
-    cache_location: /home/loki/tsdb-cache
-    resync_interval: 5s
+    active_index_directory: /loki/index
+    cache_location: /loki/index_cache
+    cache_ttl: 24h
+  filesystem:
+    directory: /loki/chunks
+
+# storage_config:
+#   aws:
+#     s3: http://admin:minioadmin@minio:9000/loki
+#     s3forcepathstyle: true
+#   tsdb_shipper:
+#     active_index_directory: /home/loki/tsdb-index
+#     cache_location: /home/loki/tsdb-cache
+#     resync_interval: 5s
 
 ruler:
   alertmanager_url: http://localhost:9093
