@@ -1,4 +1,7 @@
-use std::process::{self, exit};
+use std::{
+    env,
+    process::{self, exit},
+};
 
 use anyhow::Context;
 use aya::{Ebpf, include_bytes_aligned, maps::Array};
@@ -23,7 +26,8 @@ mod xdp_program;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<(), anyhow::Error> {
-    let config = NfluxConfig::load("nflux.toml")?;
+    let config_file = env::var("NFUX_CONFIG_FILE").unwrap_or_else(|_| "nflux.toml".into());
+    let config = NfluxConfig::load(&config_file)?;
 
     init_logger(LoggerConfig {
         level: config.logging.log_level,

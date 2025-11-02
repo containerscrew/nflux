@@ -9,6 +9,7 @@ Type=simple
 ExecStart=/usr/bin/nflux
 Restart=on-failure
 PIDFile=/run/nflux.pid
+Environment="NFLUX_CONFIG_FILE=/etc/nflux/nflux.toml"
 # StandardOutput=append:/var/log/nflux/lastlog
 # StandardError=append:/var/log/nflux/lastlog
 StandardOutput=file:/var/log/nflux/lastlog
