@@ -15,9 +15,7 @@ use tracing::{debug, warn};
 pub fn check_is_root() -> Result<(), anyhow::Error> {
     let uid = unsafe { getuid() };
     if uid != 0 {
-        return Err(anyhow::anyhow!(
-            "This program must be run as root. Try: $ sudo nflux subcommands [flags]".to_string()
-        ));
+        return Err(anyhow::anyhow!("nflux must be run as root".to_string()));
     }
     Ok(())
 }
