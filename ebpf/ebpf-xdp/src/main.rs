@@ -88,9 +88,9 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
                         cwr: ((*tcphdr).cwr() != 0) as u8,
                     });
 
-                    // if config.enable_tcp == 0 {
-                    //     return Ok(XDP_PASS);
-                    // }
+                    if config.enable_tcp == 0 {
+                        return Ok(XDP_PASS);
+                    }
                 }
                 IpProto::Udp => {
                     let udphdr: *const UdpHdr =
@@ -98,9 +98,9 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
                     src_port = u16::from_be_bytes(unsafe { (*udphdr).src });
                     dst_port = u16::from_be_bytes(unsafe { (*udphdr).dst });
 
-                    // if config.enable_udp == 0 {
-                    //     return Ok(XDP_PASS);
-                    // }
+                    if config.enable_udp == 0 {
+                        return Ok(XDP_PASS);
+                    }
                 }
                 IpProto::Icmp => {}
                 _ => return Ok(XDP_PASS),
@@ -127,22 +127,19 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
             ACTIVE_CONNECTIONS.insert(&key, &current_time, 0).ok();
 
             if let Some(mut data) = NETWORK_EVENT.reserve::<NetworkEvent>(0) {
-                let ptr = data.as_mut_ptr();
-                core::ptr::write(
-                    ptr,
-                    NetworkEvent {
-                        src_ip,
-                        dst_ip,
-                        total_len,
-                        ttl,
-                        src_port,
-                        dst_port,
-                        protocol: protocol as u8,
-                        direction: 0,
-                        ip_family: nflux_common::dto::IpFamily::Ipv4,
-                        tcp_flags: tcp_flags,
-                    },
-                );
+                let event = NetworkEvent {
+                    src_ip,
+                    dst_ip,
+                    total_len,
+                    ttl,
+                    src_port,
+                    dst_port,
+                    protocol: protocol as u8,
+                    direction: 0,
+                    ip_family: nflux_common::dto::IpFamily::Ipv4,
+                    tcp_flags,
+                };
+                data.write(event);
                 data.submit(0);
             }
         }
