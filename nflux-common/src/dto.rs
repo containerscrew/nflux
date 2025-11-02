@@ -62,10 +62,6 @@ pub struct ActiveConnectionKey {
 pub struct ArpEvent {
     pub op_code: u16,
     pub ip_family: IpFamily,
-    pub sha: [u8; 6],
-    pub spa: [u8; 16],
-    pub tha: [u8; 6],
-    pub tpa: [u8; 16],
 }
 
 impl ArpEvent {

@@ -54,7 +54,6 @@ services:
       - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml
     command: -config.file=/etc/loki/loki-config.yaml
 
-
 volumes:
   # minio-data:
   grafana-storage:

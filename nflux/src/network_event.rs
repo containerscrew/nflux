@@ -94,13 +94,9 @@ pub async fn process_arp_events(mut ring_buf: RingBuf<MapData>) -> Result<(), an
             if data.len() == std::mem::size_of::<ArpEvent>() {
                 let event: &ArpEvent = unsafe { &*(data.as_ptr() as *const ArpEvent) };
                 info!(
-                    "[arp][{}][{}] {} ({}) -> {} ({})",
-                    event.arp_op_to_str(),
-                    event.ip_family.as_str(),
-                    format_mac(&event.sha),
-                    to_ipaddr(event.spa, event.ip_family.to_owned()),
-                    format_mac(&event.tha),
-                    to_ipaddr(event.tpa, event.ip_family.to_owned())
+                    message = "arp event",
+                    op_code = event.arp_op_to_str(),
+                    ip_family = event.ip_family.as_str(),
                 );
             }
         }

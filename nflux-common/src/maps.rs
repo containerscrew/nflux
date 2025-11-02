@@ -1,9 +1,9 @@
 use aya_ebpf::{
     macros::map,
-    maps::{Array, RingBuf},
+    maps::{Array, LruHashMap, RingBuf},
 };
 
-use crate::dto::Configmap;
+use crate::dto::{ActiveConnectionKey, Configmap};
 
 // Maps
 #[map]
@@ -11,3 +11,10 @@ pub static NETWORK_EVENT: RingBuf = RingBuf::with_byte_size(4096, 0);
 
 #[map]
 pub static CONFIGMAP: Array<Configmap> = Array::with_max_entries(1, 0);
+
+#[map]
+pub static ARP_EVENTS: RingBuf = RingBuf::with_byte_size(1024, 0);
+
+#[map]
+pub static ACTIVE_CONNECTIONS: LruHashMap<ActiveConnectionKey, u64> =
+    LruHashMap::with_max_entries(4096, 0);

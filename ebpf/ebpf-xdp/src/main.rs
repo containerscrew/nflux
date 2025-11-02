@@ -10,19 +10,16 @@ use aya_ebpf::{
     programs::XdpContext,
 };
 use network_types::{
+    arp::ArpHdr,
     eth::{EthHdr, EtherType},
     ip::{IpProto, Ipv4Hdr},
     tcp::TcpHdr,
     udp::UdpHdr,
 };
 use nflux_common::{
-    dto::{ActiveConnectionKey, NetworkEvent, TcpFlags},
-    maps::{CONFIGMAP, NETWORK_EVENT},
+    dto::{ActiveConnectionKey, ArpEvent, IpFamily, NetworkEvent, TcpFlags},
+    maps::{ACTIVE_CONNECTIONS, ARP_EVENTS, CONFIGMAP, NETWORK_EVENT},
 };
-
-use crate::maps::ACTIVE_CONNECTIONS;
-
-mod maps;
 
 #[xdp]
 pub fn xdp_program(ctx: XdpContext) -> u32 {
@@ -108,6 +105,12 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
                 _ => return Ok(XDP_PASS),
             }
 
+            if config.listen_port != 0
+                && (src_port != config.listen_port && dst_port != config.listen_port)
+            {
+                return Ok(XDP_PASS);
+            }
+
             // Check if the active connection is already tracked
             let key = ActiveConnectionKey {
                 protocol: protocol as u8,
@@ -146,7 +149,25 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
             }
         }
         Ok(EtherType::Ipv6) => return Ok(XDP_PASS),
-        Ok(EtherType::Arp) => return Ok(XDP_PASS),
+        Ok(EtherType::Arp) => {
+            let arphdr: *const ArpHdr = unsafe { ptr_at(&ctx, EthHdr::LEN)? };
+            let op_code = u16::from_be_bytes(unsafe { (*arphdr).oper });
+
+            let ip_family = match u16::from_be_bytes(unsafe { (*arphdr).ptype }) {
+                0x0800 => IpFamily::Ipv4, // AF_INET
+                0x86DD => IpFamily::Ipv6, // AF_INET6
+                _ => IpFamily::Unknown,
+            };
+
+            if config.enable_arp == 0 {
+                return Ok(XDP_PASS);
+            }
+
+            if let Some(mut slot) = ARP_EVENTS.reserve(0) {
+                slot.write(ArpEvent { op_code, ip_family });
+                slot.submit(0);
+            }
+        }
         // Err(_) => return Ok(XDP_PASS),
         _ => {
             // Other packet

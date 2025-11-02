@@ -1,7 +1,10 @@
 use aya::{Ebpf, maps::RingBuf};
 use tracing::{debug, error, warn};
 
-use crate::{network_event::process_networking_event, utils::wait_for_shutdown};
+use crate::{
+    network_event::{process_arp_events, process_networking_event},
+    utils::wait_for_shutdown,
+};
 
 pub fn attach_xdp_program(
     bpf: &mut Ebpf,
@@ -34,12 +37,26 @@ pub async fn start_xdp_program(
         }
     });
 
+    let arp_event_ring_map = ebpf
+        .take_map("ARP_EVENTS")
+        .ok_or_else(|| anyhow::anyhow!("Failed to find ring buffer ARP_EVENTS map"))?;
+    let ring_buf_arp = RingBuf::try_from(arp_event_ring_map)?;
+
+    let arp_task = tokio::spawn(async move {
+        if let Err(e) = process_arp_events(ring_buf_arp).await {
+            error!("process_arp_events failed: {:?}", e);
+        }
+    });
+
     tokio::select! {
         _ = wait_for_shutdown() => {
             warn!("You pressed Ctrl-C, shutting down nflux...");
         }
         _ = xdp_task => {
             warn!("XDP task ended");
+        }
+        _ = arp_task => {
+            warn!("ARP_EVENTS task ended");
         }
     }
 
