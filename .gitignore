@@ -26,7 +26,6 @@ lima.REJECTED.yaml
 # Nflux config file
 nflux.toml
 
-
 # vmlinux.rs
 #vmlinux.rs
 

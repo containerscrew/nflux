@@ -14,9 +14,12 @@ use network_types::{
     ip::{IpProto, Ipv4Hdr},
     tcp::TcpHdr,
 };
-use nflux_common::dto::{ActiveConnectionKey, NetworkEvent, TcpFlags};
+use nflux_common::{
+    dto::{ActiveConnectionKey, NetworkEvent, TcpFlags},
+    maps::NETWORK_EVENT,
+};
 
-use crate::maps::{ACTIVE_CONNECTIONS, XDP_EVENT};
+use crate::maps::ACTIVE_CONNECTIONS;
 
 mod maps;
 
@@ -108,7 +111,7 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
 
             ACTIVE_CONNECTIONS.insert(&key, &current_time, 0).ok();
 
-            if let Some(mut data) = XDP_EVENT.reserve::<NetworkEvent>(0) {
+            if let Some(mut data) = NETWORK_EVENT.reserve::<NetworkEvent>(0) {
                 let ptr = data.as_mut_ptr();
                 core::ptr::write(
                     ptr,

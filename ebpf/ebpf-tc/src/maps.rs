@@ -10,9 +10,6 @@ use crate::dto::ActiveConnectionKey;
 pub static TC_CONFIG: Array<Configmap> = Array::with_max_entries(1, 0);
 
 #[map]
-pub static NETWORK_EVENT: RingBuf = RingBuf::with_byte_size(4096, 0);
-
-#[map]
 pub static ARP_EVENTS: RingBuf = RingBuf::with_byte_size(1024, 0);
 
 #[map]

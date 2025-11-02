@@ -24,8 +24,8 @@ pub async fn start_xdp_program(
     log_format: String,
 ) -> anyhow::Result<()> {
     let xdp_event_ring_map = ebpf
-        .take_map("XDP_EVENT")
-        .ok_or_else(|| anyhow::anyhow!("Failed to find ring buffer XDP_EVENT map"))?;
+        .take_map("NETWORK_EVENT")
+        .ok_or_else(|| anyhow::anyhow!("Failed to find ring buffer NETWORK_EVENT map"))?;
     let ring_buf_net = RingBuf::try_from(xdp_event_ring_map)?;
 
     let xdp_task = tokio::spawn(async move {
