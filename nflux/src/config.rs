@@ -42,6 +42,13 @@ impl LoggingConfig {
 pub struct AgentConfig {
     pub interface: String,
     pub mode: String,
+    pub listen_port: Option<u16>,
+    // pub exclude_ports: Option<Vec<u16>>,
+    pub enable_udp: bool,
+    pub enable_icmp: bool,
+    pub enable_tcp: bool,
+    pub enable_arp: bool,
+    pub log_interval: u64,
 }
 
 #[derive(Debug, Deserialize)]

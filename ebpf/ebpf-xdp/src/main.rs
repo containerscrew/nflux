@@ -13,10 +13,11 @@ use network_types::{
     eth::{EthHdr, EtherType},
     ip::{IpProto, Ipv4Hdr},
     tcp::TcpHdr,
+    udp::UdpHdr,
 };
 use nflux_common::{
     dto::{ActiveConnectionKey, NetworkEvent, TcpFlags},
-    maps::NETWORK_EVENT,
+    maps::{CONFIGMAP, NETWORK_EVENT},
 };
 
 use crate::maps::ACTIVE_CONNECTIONS;
@@ -49,6 +50,7 @@ unsafe fn ptr_at<T>(
 
 unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
     let ethhdr: *const EthHdr = unsafe { ptr_at(&ctx, 0)? };
+    let config = CONFIGMAP.get(0).ok_or(())?;
 
     match (*ethhdr).ether_type() {
         Ok(EtherType::Ipv4) => {
@@ -85,9 +87,22 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
                         ece: ((*tcphdr).ece() != 0) as u8,
                         cwr: ((*tcphdr).cwr() != 0) as u8,
                     });
+
+                    if config.enable_tcp == 0 {
+                        return Ok(XDP_PASS);
+                    }
                 }
-                IpProto::Udp => return Ok(XDP_PASS),
-                IpProto::Icmp => return Ok(XDP_PASS),
+                IpProto::Udp => {
+                    let udphdr: *const UdpHdr =
+                        unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
+                    src_port = u16::from_be_bytes(unsafe { (*udphdr).src });
+                    dst_port = u16::from_be_bytes(unsafe { (*udphdr).dst });
+
+                    if config.enable_udp == 0 {
+                        return Ok(XDP_PASS);
+                    }
+                }
+                IpProto::Icmp => {}
                 _ => return Ok(XDP_PASS),
             }
 
@@ -101,7 +116,7 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
             };
 
             let current_time = bpf_ktime_get_ns();
-            let log_interval = 5_000_000_000; // 5 seconds in nanoseconds (too much by the moment)
+            let log_interval = config.log_interval;
 
             if let Some(last_log_time) = ACTIVE_CONNECTIONS.get(&key) {
                 if current_time - *last_log_time < log_interval {

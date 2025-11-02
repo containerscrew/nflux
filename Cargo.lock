@@ -370,18 +370,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ebpf-tc"
-version = "0.1.0"
-dependencies = [
- "aya-ebpf",
- "aya-log-ebpf",
- "log",
- "network-types",
- "nflux-common",
- "which",
-]
-
-[[package]]
 name = "ebpf-xdp"
 version = "0.1.0"
 dependencies = [
