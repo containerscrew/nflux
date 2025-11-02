@@ -88,9 +88,9 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
                         cwr: ((*tcphdr).cwr() != 0) as u8,
                     });
 
-                    if config.enable_tcp == 0 {
-                        return Ok(XDP_PASS);
-                    }
+                    // if config.enable_tcp == 0 {
+                    //     return Ok(XDP_PASS);
+                    // }
                 }
                 IpProto::Udp => {
                     let udphdr: *const UdpHdr =
@@ -98,9 +98,9 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
                     src_port = u16::from_be_bytes(unsafe { (*udphdr).src });
                     dst_port = u16::from_be_bytes(unsafe { (*udphdr).dst });
 
-                    if config.enable_udp == 0 {
-                        return Ok(XDP_PASS);
-                    }
+                    // if config.enable_udp == 0 {
+                    //     return Ok(XDP_PASS);
+                    // }
                 }
                 IpProto::Icmp => {}
                 _ => return Ok(XDP_PASS),
