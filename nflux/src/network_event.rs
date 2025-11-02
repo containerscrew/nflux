@@ -5,7 +5,6 @@ use std::{
 
 use aya::maps::{MapData, RingBuf};
 use nflux_common::dto::{ArpEvent, NetworkEvent, TcpFlags};
-use serde::ser::{Serialize, SerializeStruct, Serializer};
 use tracing::{info, warn};
 
 use crate::utils::{convert_direction, convert_protocol, format_tcp_flags};

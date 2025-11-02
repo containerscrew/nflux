@@ -97,6 +97,7 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
                         unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
                     src_port = u16::from_be_bytes(unsafe { (*udphdr).src });
                     dst_port = u16::from_be_bytes(unsafe { (*udphdr).dst });
+                    tcp_flags = None;
 
                     if config.enable_udp == 0 {
                         return Ok(XDP_PASS);
