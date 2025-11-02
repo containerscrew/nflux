@@ -72,7 +72,16 @@ install_binary(){
       sudo chmod +x $INSTALLATION_PATH/$BINARY_NAME
   fi
   rm -rf /tmp/$BINARY_NAME*
-  happyexit
+}
+
+install_systemd_service(){
+  wget -O /etc/systemd/system/nflux.service https://raw.githubusercontent.com/containerscrew/nflux/refs/heads/main/systemd/nflux.service
+}
+
+install_nflux_config(){
+  if [ ! -f /etc/nflux/nflux.toml ]; then
+    wget -O /etc/nflux/nflux.toml https://raw.githubusercontent.com/containerscrew/nflux/refs/heads/main/nflux.toml.example
+  fi
 }
 
 # Function to display help text
@@ -90,6 +99,9 @@ while getopts "v:h" option; do
             version=${OPTARG}
             download_release "$version"
             install_binary
+            install_systemd_service
+            install_nflux_config
+            happyexit
             ;;
         h)  # Help option
             usage
@@ -107,4 +119,7 @@ done
 if [ $# -eq 0 ]; then
     download_release
     install_binary
+    install_systemd_service
+    install_nflux_config
+    happyexit
 fi

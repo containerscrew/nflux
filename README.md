@@ -56,14 +56,9 @@ curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containe
 
 Read the [installation](https://github.com/containerscrew/nflux/wiki/Installation) doc.
 
-# Usage
+> [!WARNING]
+> Starting from version `0.13.X`, `nflux` will be an agent (systemd service or containerized application) not a cli.
 
-```shell
-sudo nflux --help
-sudo nflux tc # L2/L3 monitoring
-```
-
-Read the [usage](https://github.com/containerscrew/nflux/wiki/Usage) doc for more options.
 
 # Wiki
 

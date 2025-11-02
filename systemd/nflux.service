@@ -1,0 +1,21 @@
+[Unit]
+Description=Nflux eBPF Privilege Escalation Detector
+After=network-online.target nss-lookup.target
+Wants=network-online.target nss-lookup.target
+ConditionPathExists=/etc/nflux/nflux.toml
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/nflux
+Restart=on-failure
+PIDFile=/run/nflux.pid
+# StandardOutput=append:/var/log/nflux/lastlog
+# StandardError=append:/var/log/nflux/lastlog
+StandardOutput=file:/var/log/nflux/lastlog
+StandardError=file:/var/log/nflux/lastlog
+RestartSec=5s
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

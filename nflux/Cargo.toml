@@ -1,6 +1,6 @@
 [package]
 name = "nflux"
-version = "0.12.7"
+version = "0.13.0"
 edition = "2024"
 authors = ["containerscrew info@containerscrew.com"]
 description = "Network monitoring tool & TLS/SSL sniffer using eBPF 🐝"
@@ -47,24 +47,3 @@ cargo_metadata = { workspace = true }
 [[bin]]
 name = "nflux"
 path = "src/main.rs"
-
-[package.metadata.deb]
-maintainer = "Daniels <info@containerscrew.com>"
-copyright = "2025, Daniels <info@containerscrew.com>"
-license-file = ["../LICENSE-GPL3"]
-revision = "1"
-extended-description = """
-Simple network monitoring tool. Powered by eBPF 🐝
-"""
-section = "utils"
-priority = "optional"
-assets = [
-    ["target/release/nflux", "/usr/local/bin/", "755"],
-    ["../LICENSE-GPL3", "/usr/share/doc/nflux/", "644"],
-    ["../LICENSE-MIT", "/usr/share/doc/nflux/", "644"],
-    # [
-    #     "docs/usage.md",
-    #     "/usr/share/doc/nflux/",
-    #     "644",
-    # ],
-]

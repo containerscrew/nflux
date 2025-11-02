@@ -1,7 +1,0 @@
-Package: nflux
-Version: 0.12.0
-Section: utils
-Priority: optional
-Architecture: arm64
-Maintainer: Daniels <info@containerscrew.com>
-Description: Simple network monitoring tool. Powered by eBPF 🐝
