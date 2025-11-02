@@ -26,7 +26,7 @@ mod xdp_program;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<(), anyhow::Error> {
-    let config_file = env::var("NFUX_CONFIG_FILE").unwrap_or_else(|_| "nflux.toml".into());
+    let config_file = env::var("NFLUX_CONFIG_FILE").unwrap_or_else(|_| "nflux.toml".into());
     let config = NfluxConfig::load(&config_file)?;
 
     init_logger(LoggerConfig {
