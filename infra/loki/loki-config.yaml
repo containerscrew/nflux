@@ -7,14 +7,14 @@ server:
 common:
   instance_addr: 127.0.0.1
   path_prefix: loki
-  storage:
-    s3:
-      bucketnames: loki
-      region: eu-central-1
   # storage:
-  #   filesystem:
-  #     chunks_directory: /tmp/loki/chunks
-  #     rules_directory: /tmp/loki/rules
+  #   s3:
+  #     bucketnames: loki
+  #     region: eu-central-1
+  storage:
+    filesystem:
+      chunks_directory: /tmp/loki/chunks
+      rules_directory: /tmp/loki/rules
   replication_factor: 1
   ring:
     kvstore:

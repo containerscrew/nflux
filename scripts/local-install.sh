@@ -16,6 +16,7 @@ sudo install -m 0644 "$SERVICE_NAME" /etc/systemd/system/
 
 # Copy the config file
 sudo mkdir -p /etc/nflux
+sudo cp /etc/nflux/nflux.toml /etc/nflux/nflux.toml.bak 2>/dev/null || true
 sudo cp nflux.toml.example /etc/nflux/nflux.toml
 sudo chown -R root:root /etc/nflux
 sudo chmod 644 /etc/nflux/nflux.toml

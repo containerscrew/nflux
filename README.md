@@ -27,12 +27,6 @@
 ---
 
 <p align="center">
-    <img src="./examples/example2.png" alt="example2"/>
-</p>
-
----
-
-<p align="center">
     <img src="./examples/grafana-map.png" alt="example3"/>
 </p>
 
