@@ -48,6 +48,7 @@ unsafe fn ptr_at<T>(
     Ok((start + offset) as *const T)
 }
 
+#[inline(always)]
 unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
     let ethhdr: *const EthHdr = unsafe { ptr_at(&ctx, 0)? };
     let config = CONFIGMAP.get(0).ok_or(())?;
