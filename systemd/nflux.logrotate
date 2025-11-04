@@ -1,0 +1,13 @@
+/var/log/nflux/*.log {
+    daily
+    rotate 7
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 0640 root adm
+    sharedscripts
+    postrotate
+        systemctl reload nflux.service >/dev/null 2>&1 || true
+    endscript
+}

@@ -28,6 +28,9 @@ sudo touch /var/log/nflux/lastlog
 sudo chown root:root /var/log/nflux/lastlog
 sudo chmod 644 /var/log/nflux/lastlog
 
+# Logrotate configuration
+sudo cp systemd/nflux.logrotate /etc/logrotate.d/nflux
+
 # Reload systemd and enable service
 sudo systemctl daemon-reload
 sudo systemctl enable --now nflux.service
