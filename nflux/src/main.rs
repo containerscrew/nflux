@@ -57,7 +57,7 @@ async fn main() -> anyhow::Result<(), anyhow::Error> {
     match config.agent.mode.as_str() {
         "xdp" => {
             let mut ebpf_xdp =
-                Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/xdp")))?;
+                Ebpf::load(include_bytes_aligned!(concat!(env!("OUT_DIR"), "/nflux")))?;
             attach_xdp_program(&mut ebpf_xdp, &config.agent.interface)?;
             populate_configmap(&mut ebpf_xdp, configmap)?;
             info!(

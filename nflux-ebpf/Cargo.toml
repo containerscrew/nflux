@@ -1,10 +1,10 @@
 [package]
-name = "ebpf-xdp"
+name = "nflux-ebpf"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-nflux-common = { path = "../../nflux-common/", version = "0.1.0" }
+nflux-common = { path = "../nflux-common/", version = "0.1.0" }
 
 aya-ebpf = { workspace = true }
 aya-log-ebpf = { workspace = true }
@@ -15,5 +15,5 @@ log = "0.4.28"
 which = { workspace = true }
 
 [[bin]]
-name = "xdp"
+name = "nflux"
 path = "src/main.rs"

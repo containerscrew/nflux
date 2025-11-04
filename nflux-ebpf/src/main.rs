@@ -5,7 +5,7 @@ use core::mem;
 
 use aya_ebpf::{
     bindings::xdp_action::{self, XDP_PASS},
-    helpers::r#gen::bpf_ktime_get_ns,
+    helpers::generated::bpf_ktime_get_ns,
     macros::xdp,
     programs::XdpContext,
 };
