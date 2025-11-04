@@ -34,13 +34,12 @@
 
 # What is nflux?
 
-Nflux is an [`eBPF`](./docs/what_is_ebpf.md)-based tool that monitors `incoming/outgoing` traffic on a Linux system by
-attaching a `TC (Traffic Control)` program and `XDP (Express Data Path)` program using eBPF technology. It can be attached to both physical and virtual
-interfaces, allowing us to obtain networking data at a very low level.
-
-> THe `main` branch is considered `unstable` and may contain `breaking changes`. Please use the latest `release` for a stable experience.
+Nflux is an [`eBPF`](./docs/what_is_ebpf.md)-based agent tool that monitors `incoming/outgoing` traffic on a Linux system by
+attaching a `XDP (Express Data Path)` program using eBPF technology. (... More coming soon!)
 
 > [!WARNING]
+I am working on a new agent-mode implementation of `nflux` that can be deployed as a `systemd` service or a Docker container. The goal is to extract network statistics (using `eBPF` and `XDP`) from any Linux server and display them on a centralized `Grafana` dashboard. Version [`0.12.7`](https://github.com/containerscrew/nflux/tree/v0.12.4) is the latest released version that uses `nflux` as a `CLI` using `TC` (Traffic Control).
+
 
 # License
 
