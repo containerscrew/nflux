@@ -12,7 +12,7 @@ use aya_ebpf::{
 use network_types::{
     arp::ArpHdr,
     eth::{EthHdr, EtherType},
-    ip::{IpProto, Ipv4Hdr},
+    ip::{IpProto, Ipv4Hdr, Ipv6Hdr},
     tcp::TcpHdr,
     udp::UdpHdr,
 };
@@ -148,7 +148,97 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
                 data.submit(0);
             }
         }
-        Ok(EtherType::Ipv6) => return Ok(XDP_PASS),
+        Ok(EtherType::Ipv6) => {
+            let ipv6hdr: *const Ipv6Hdr = unsafe { ptr_at(&ctx, EthHdr::LEN)? };
+            let src_ip = unsafe { (*ipv6hdr).src_addr };
+            let dst_ip = unsafe { (*ipv6hdr).dst_addr };
+            let total_len = u16::from_be_bytes(unsafe { (*ipv6hdr).payload_len });
+            let protocol = unsafe { (*ipv6hdr).next_hdr };
+            let ttl = unsafe { (*ipv6hdr).hop_limit };
+            let mut src_port: u16 = 0;
+            let mut dst_port: u16 = 0;
+            let mut tcp_flags: Option<TcpFlags> = None;
+
+            match protocol {
+                IpProto::Tcp => {
+                    let tcphdr: *const TcpHdr =
+                        unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
+                    src_port = u16::from_be_bytes(unsafe { (*tcphdr).source });
+                    dst_port = u16::from_be_bytes(unsafe { (*tcphdr).dest });
+
+                    tcp_flags = Some(TcpFlags {
+                        syn: ((*tcphdr).syn() != 0) as u8,
+                        ack: ((*tcphdr).ack() != 0) as u8,
+                        fin: ((*tcphdr).fin() != 0) as u8,
+                        rst: ((*tcphdr).rst() != 0) as u8,
+                        psh: ((*tcphdr).psh() != 0) as u8,
+                        urg: ((*tcphdr).urg() != 0) as u8,
+                        ece: ((*tcphdr).ece() != 0) as u8,
+                        cwr: ((*tcphdr).cwr() != 0) as u8,
+                    });
+
+                    if config.enable_tcp == 0 {
+                        return Ok(XDP_PASS);
+                    }
+                }
+                IpProto::Udp => {
+                    let udphdr: *const UdpHdr =
+                        unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
+                    src_port = u16::from_be_bytes(unsafe { (*udphdr).src });
+                    dst_port = u16::from_be_bytes(unsafe { (*udphdr).dst });
+                    tcp_flags = None;
+
+                    if config.enable_udp == 0 {
+                        return Ok(XDP_PASS);
+                    }
+                }
+                IpProto::Icmp => {}
+                _ => return Ok(XDP_PASS),
+            }
+
+            if config.listen_port != 0
+                && (src_port != config.listen_port && dst_port != config.listen_port)
+            {
+                return Ok(XDP_PASS);
+            }
+
+            // Check if the active connection is already tracked
+            let key = ActiveConnectionKey {
+                protocol: protocol as u8,
+                src_port,
+                dst_port,
+                src_ip,
+                dst_ip,
+            };
+
+            let current_time = bpf_ktime_get_ns();
+            let log_interval = config.log_interval;
+
+            if let Some(last_log_time) = ACTIVE_CONNECTIONS.get(&key) {
+                if current_time - *last_log_time < log_interval {
+                    return Ok(XDP_PASS);
+                }
+            }
+
+            ACTIVE_CONNECTIONS.insert(&key, &current_time, 0).ok();
+
+            if let Some(mut data) = NETWORK_EVENT.reserve::<NetworkEvent>(0) {
+                let event = NetworkEvent {
+                    src_ip,
+                    dst_ip,
+                    total_len,
+                    ttl,
+                    src_port,
+                    dst_port,
+                    protocol: protocol as u8,
+                    direction: 0,
+                    ip_family: nflux_common::dto::IpFamily::Ipv4,
+                    tcp_flags,
+                };
+                data.write(event);
+                data.submit(0);
+            }
+        }
         Ok(EtherType::Arp) => {
             let arphdr: *const ArpHdr = unsafe { ptr_at(&ctx, EthHdr::LEN)? };
             let op_code = u16::from_be_bytes(unsafe { (*arphdr).oper });
@@ -174,6 +264,7 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
             return Ok(XDP_PASS);
         }
     }
+
     Ok(xdp_action::XDP_PASS)
 }
 

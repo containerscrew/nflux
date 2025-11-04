@@ -7,7 +7,7 @@ use anyhow::Context;
 use aya::{Ebpf, include_bytes_aligned, maps::Array};
 use logger::LoggerConfig;
 use nflux_common::dto::Configmap;
-use tracing::{debug, error, info};
+use tracing::{debug, error, info, warn};
 use utils::set_mem_limit;
 
 use crate::{
@@ -20,7 +20,6 @@ use crate::{
 mod config;
 mod logger;
 mod network_event;
-mod tc_program;
 mod utils;
 mod xdp_program;
 
@@ -71,7 +70,7 @@ async fn main() -> anyhow::Result<(), anyhow::Error> {
             // }
             start_xdp_program(&mut ebpf_xdp, config.logging.log_type).await?;
         }
-        "tc" => info!("Operating in TC mode"),
+        "tc" => warn!("Operating in TC mode. Not implemented yet to this new agent version."),
         other => {
             error!(
                 "Invalid mode '{}' in configuration. Use 'xdp' or 'tc'.",

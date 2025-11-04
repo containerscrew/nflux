@@ -41,7 +41,7 @@ pub fn convert_protocol(protocol: u8) -> &'static str {
     }
 }
 
-pub fn to_ipaddr(
+pub fn _to_ipaddr(
     ip: [u8; 16],
     ip_family: u8,
 ) -> IpAddr {
@@ -56,7 +56,7 @@ pub fn to_ipaddr(
 }
 
 /// set_default_iface returns the default interface name.
-pub fn set_default_iface() -> String {
+pub fn _set_default_iface() -> String {
     match get_default_interface_name() {
         Some(iface) => iface,
         None => "No default interface found. Are you connected?".to_string(),

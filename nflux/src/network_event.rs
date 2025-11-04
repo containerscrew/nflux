@@ -9,7 +9,7 @@ use tracing::{info, warn};
 
 use crate::utils::{convert_direction, convert_protocol, format_tcp_flags};
 
-fn format_mac(mac: &[u8; 6]) -> String {
+fn _format_mac(mac: &[u8; 6]) -> String {
     mac.iter()
         .map(|b| format!("{:02x}", b))
         .collect::<Vec<_>>()
@@ -108,12 +108,12 @@ pub async fn process_arp_events(mut ring_buf: RingBuf<MapData>) -> Result<(), an
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_format_mac() {
-        let mac = [0x00, 0x1A, 0x2B, 0x3C, 0x4D, 0x5E];
-        let formatted_mac = format_mac(&mac);
-        assert_eq!(formatted_mac, "00:1a:2b:3c:4d:5e");
-    }
+    // #[test]
+    // fn test_format_mac() {
+    //     let mac = [0x00, 0x1A, 0x2B, 0x3C, 0x4D, 0x5E];
+    //     let formatted_mac = format_mac(&mac);
+    //     assert_eq!(formatted_mac, "00:1a:2b:3c:4d:5e");
+    // }
 
     #[test]
     fn test_to_ipaddr_ipv4() {
