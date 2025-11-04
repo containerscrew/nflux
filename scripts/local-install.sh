@@ -26,7 +26,7 @@ sudo mkdir -p /var/log/nflux
 sudo rm -f /var/log/nflux/lastlog
 sudo touch /var/log/nflux/lastlog
 sudo chown root:root /var/log/nflux/lastlog
-sudo chmod 600 /var/log/nflux/lastlog
+sudo chmod 644 /var/log/nflux/lastlog
 
 # Reload systemd and enable service
 sudo systemctl daemon-reload

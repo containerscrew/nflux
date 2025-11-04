@@ -40,26 +40,7 @@ interfaces, allowing us to obtain networking data at a very low level.
 
 > THe `main` branch is considered `unstable` and may contain `breaking changes`. Please use the latest `release` for a stable experience.
 
-# Installation
-
-_Quick installation:_
-
-```shell
-curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/nflux/main/scripts/install.sh | sh
-```
-
-Read the [installation](https://github.com/containerscrew/nflux/wiki/Installation) doc.
-
 > [!WARNING]
-> Starting from version `0.13.X`, `nflux` will be an agent (systemd service or containerized application) not a cli.
-
-
-# Wiki
-
-> [!WARNING]
-> The wiki is still under construction, so some pages may not be complete or outdated.
-
-Read the [wiki](https://github.com/containerscrew/nflux/wiki) for more information about the project.
 
 # License
 

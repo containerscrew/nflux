@@ -37,9 +37,6 @@ scrape_configs:
           source: src_ip
           db_type: city
 
-      # - drop:
-      #     expression: ".geoip_location_latitude == null or .geoip_location_longitude == null"
-
       - labels:
           direction:
           protocol:
@@ -49,6 +46,7 @@ scrape_configs:
           geoip_country_name:
           geoip_location_latitude:
           geoip_location_longitude:
+          server_name: archlinux
 
       - metrics:
           traffic_bytes_total:

@@ -9,36 +9,20 @@ services:
       - monitoring
     environment:
       - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=grafana
+      - GF_SECURITY_ADMIN_PASSWORD=nfluxadmin
+      - GF_PATHS_DATA=/var/lib/grafana
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_USERS_DEFAULT_THEME=light
       - GF_AUTH_ANONYMOUS_ENABLED=false
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=containerscrew
       - GF_AUTH_DISABLE_LOGIN_FORM=false
       - GF_PANELS_ENABLE_ALPHA=true
       - GF_FEATURE_TOGGLES_ENABLE=accessControlOnCall lokiLogsDataplane
     volumes:
-      #      - grafana-datasources:/etc/grafana/provisioning/datasources
       - grafana-storage:/var/lib/grafana
       - ./grafana/data-sources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
-      # - ./grafana/plugins.yaml:/etc/grafana/provisioning/plugins/app.yaml
-      # - ./grafana/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml:ro
-  #      - ./dashboards:/var/lib/grafana/dashboards
-
-  # minio:
-  #   image: docker.io/bitnamilegacy/minio:latest
-  #   container_name: minio
-  #   restart: unless-stopped
-  #   networks:
-  #     - monitoring
-  #   ports:
-  #     - '9000:9000'
-  #     - '9001:9001'
-  #   volumes:
-  #     - 'minio-data:/data'
-  #   environment:
-  #     - MINIO_ROOT_USER=admin
-  #     - MINIO_ROOT_PASSWORD=minioadmin
-  #     - MINIO_DEFAULT_BUCKETS=loki
+      - ./grafana/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ./grafana/org.yml:/etc/grafana/provisioning/organizations/organization.yml
 
   loki:
     image: docker.io/grafana/loki:latest
@@ -46,16 +30,19 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
-    # depends_on:
-    #   - minio
     ports:
       - 3100:3100
     volumes:
       - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml
+      - loki-data-chunks:/loki/chunks
+      - loki-data-index:/loki/index
+      - loki-data-cache:/loki/index_cache
     command: -config.file=/etc/loki/loki-config.yaml
 
 volumes:
-  # minio-data:
+  loki-data-chunks:
+  loki-data-index:
+  loki-data-cache:
   grafana-storage:
 
 networks:

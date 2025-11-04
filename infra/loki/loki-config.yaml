@@ -7,10 +7,6 @@ server:
 common:
   instance_addr: 127.0.0.1
   path_prefix: loki
-  # storage:
-  #   s3:
-  #     bucketnames: loki
-  #     region: eu-central-1
   storage:
     filesystem:
       chunks_directory: /tmp/loki/chunks
@@ -22,9 +18,6 @@ common:
 
 frontend:
   max_outstanding_per_tenant: 2048
-
-# pattern_ingester:
-#   enabled: true
 
 limits_config:
   max_global_streams_per_user: 0
@@ -45,7 +38,6 @@ schema_config:
     - from: 2020-10-24
       store: tsdb
       object_store: filesystem
-      # object_store: s3
       schema: v13
       index:
         prefix: index_
@@ -58,18 +50,6 @@ storage_config:
     cache_ttl: 24h
   filesystem:
     directory: /loki/chunks
-
-# storage_config:
-#   aws:
-#     s3: http://admin:minioadmin@minio:9000/loki
-#     s3forcepathstyle: true
-#   tsdb_shipper:
-#     active_index_directory: /home/loki/tsdb-index
-#     cache_location: /home/loki/tsdb-cache
-#     resync_interval: 5s
-
-ruler:
-  alertmanager_url: http://localhost:9093
 
 analytics:
   reporting_enabled: false
