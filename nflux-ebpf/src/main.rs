@@ -162,7 +162,7 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
             match protocol {
                 IpProto::Tcp => {
                     let tcphdr: *const TcpHdr =
-                        unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
+                        unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv6Hdr::LEN)? };
                     src_port = u16::from_be_bytes(unsafe { (*tcphdr).source });
                     dst_port = u16::from_be_bytes(unsafe { (*tcphdr).dest });
 
@@ -232,7 +232,7 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
                     dst_port,
                     protocol: protocol as u8,
                     direction: 0,
-                    ip_family: nflux_common::dto::IpFamily::Ipv4,
+                    ip_family: nflux_common::dto::IpFamily::Ipv6,
                     tcp_flags,
                 };
                 data.write(event);
