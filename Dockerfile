@@ -1,17 +1,17 @@
-FROM docker.io/rust:1 as base
-
-RUN set -eux ;\
-    rustup install stable && rustup toolchain install nightly --component rust-src ;\
-    cargo install bpf-linker
-
-FROM base as build-env
-
-WORKDIR /app
-
-COPY . /app
-
-# cargo xtask build --release
-RUN cargo build --release
+# FROM docker.io/rust:1 as base
+#
+# RUN set -eux ;\
+#     rustup install stable && rustup toolchain install nightly --component rust-src ;\
+#     cargo install bpf-linker
+#
+# FROM base as build-env
+#
+# WORKDIR /app
+#
+# COPY . /app
+#
+# # cargo xtask build --release
+# RUN cargo build --release
 
 # Strip debugging symbols to reduce binary size
 # RUN strip target/release/nflux
@@ -23,6 +23,6 @@ RUN cargo build --release
 # CMD ["/app/nflux"]
 FROM docker.io/library/debian:bookworm-slim
 
-COPY --from=build-env /app/target/release/nflux /usr/local/bin/nflux
+COPY ./target/release/nflux /usr/local/bin/nflux
 
 CMD ["/usr/local/bin/nflux"]
