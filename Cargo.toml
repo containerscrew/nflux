@@ -29,9 +29,5 @@ which = { version = "8.0.0", features = ["real-sys"], default-features = false }
 debug = 2
 codegen-units = 1
 
-# [profile.release.package.nflux-ebpf]
-# debug = 2
-# codegen-units = 1
-
-# [profile.release.package.nflux]
-# strip = true
+[profile.release.package.nflux]
+strip = true

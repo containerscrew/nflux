@@ -31,3 +31,7 @@ nflux.toml
 
 # MaxMind DB files
 *.mmdb
+
+
+# Arch
+pkg/

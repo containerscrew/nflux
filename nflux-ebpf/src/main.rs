@@ -45,6 +45,51 @@ unsafe fn ptr_at<T>(
     Ok((start + offset) as *const T)
 }
 
+fn handle_ports(
+    ctx: &XdpContext,
+    protocol: IpProto,
+    ip_family: IpFamily,
+) -> Result<(u16, u16, Option<TcpFlags>), ()> {
+    // Calculate offset assuming Ethernet frame
+    let offset = match ip_family {
+        IpFamily::Ipv4 => EthHdr::LEN + Ipv4Hdr::LEN,
+        IpFamily::Ipv6 => EthHdr::LEN + Ipv6Hdr::LEN,
+        IpFamily::Unknown => 0,
+    };
+
+    match protocol {
+        IpProto::Tcp => {
+            let tcphdr: *const TcpHdr = unsafe { ptr_at(&ctx, offset)? };
+            unsafe {
+                let src_port = u16::from_be_bytes((*tcphdr).source);
+                let dst_port = u16::from_be_bytes((*tcphdr).dest);
+
+                let tcp_flags = TcpFlags {
+                    syn: ((*tcphdr).syn() != 0) as u8,
+                    ack: ((*tcphdr).ack() != 0) as u8,
+                    fin: ((*tcphdr).fin() != 0) as u8,
+                    rst: ((*tcphdr).rst() != 0) as u8,
+                    psh: ((*tcphdr).psh() != 0) as u8,
+                    urg: ((*tcphdr).urg() != 0) as u8,
+                    ece: ((*tcphdr).ece() != 0) as u8,
+                    cwr: ((*tcphdr).cwr() != 0) as u8,
+                };
+
+                Ok((src_port, dst_port, Some(tcp_flags)))
+            }
+        }
+        IpProto::Udp => {
+            let udphdr: *const UdpHdr = unsafe { ptr_at(&ctx, offset)? };
+            unsafe {
+                let src_port = u16::from_be_bytes((*udphdr).src);
+                let dst_port = u16::from_be_bytes((*udphdr).dst);
+                Ok((src_port, dst_port, None))
+            }
+        }
+        _ => Ok((0, 0, None)), // ICMP or other protocols
+    }
+}
+
 #[inline(always)]
 unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
     let ethhdr: *const EthHdr = unsafe { ptr_at(&ctx, 0)? };
@@ -65,45 +110,8 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
             let total_len = u16::from_be_bytes(unsafe { (*ipv4hdr).tot_len });
             let protocol = unsafe { (*ipv4hdr).proto };
             let ttl = unsafe { (*ipv4hdr).ttl };
-            let mut src_port: u16 = 0;
-            let mut dst_port: u16 = 0;
-            let mut tcp_flags: Option<TcpFlags> = None;
 
-            match protocol {
-                IpProto::Tcp => {
-                    let tcphdr: *const TcpHdr =
-                        unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
-                    src_port = u16::from_be_bytes(unsafe { (*tcphdr).source });
-                    dst_port = u16::from_be_bytes(unsafe { (*tcphdr).dest });
-                    tcp_flags = Some(TcpFlags {
-                        syn: ((*tcphdr).syn() != 0) as u8,
-                        ack: ((*tcphdr).ack() != 0) as u8,
-                        fin: ((*tcphdr).fin() != 0) as u8,
-                        rst: ((*tcphdr).rst() != 0) as u8,
-                        psh: ((*tcphdr).psh() != 0) as u8,
-                        urg: ((*tcphdr).urg() != 0) as u8,
-                        ece: ((*tcphdr).ece() != 0) as u8,
-                        cwr: ((*tcphdr).cwr() != 0) as u8,
-                    });
-
-                    if config.enable_tcp == 0 {
-                        return Ok(XDP_PASS);
-                    }
-                }
-                IpProto::Udp => {
-                    let udphdr: *const UdpHdr =
-                        unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
-                    src_port = u16::from_be_bytes(unsafe { (*udphdr).src });
-                    dst_port = u16::from_be_bytes(unsafe { (*udphdr).dst });
-                    tcp_flags = None;
-
-                    if config.enable_udp == 0 {
-                        return Ok(XDP_PASS);
-                    }
-                }
-                IpProto::Icmp => {}
-                _ => return Ok(XDP_PASS),
-            }
+            let (src_port, dst_port, tcp_flags) = handle_ports(&ctx, protocol, IpFamily::Ipv4)?;
 
             if config.listen_port != 0
                 && (src_port != config.listen_port && dst_port != config.listen_port)

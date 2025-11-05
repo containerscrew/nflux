@@ -40,6 +40,17 @@ attaching a `XDP (Express Data Path)` program using eBPF technology. (... More c
 > [!WARNING]
 I am working on a new agent-mode implementation of `nflux` that can be deployed as a `systemd` service or a Docker container. The goal is to extract network statistics (using `eBPF` and `XDP`) from any Linux server and display them on a centralized `Grafana` dashboard. Version [`0.12.7`](https://github.com/containerscrew/nflux/tree/v0.12.4) is the latest released version that uses `nflux` as a `CLI` using `TC` (Traffic Control).
 
+# Installation
+
+## Arch Linux
+
+```bash
+git clone https://github.com/containerscrew/nflux.git
+cd nflux
+makepkg -si # or makepkg -si --cleanbuild for a clean build
+# Clean
+rm -rf pkg src *.pkg.tar* && cargo clean
+```
 
 # License
 
