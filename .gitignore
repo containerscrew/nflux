@@ -35,3 +35,4 @@ nflux.toml
 
 # Arch
 pkg/
+*.pkg.tar.*

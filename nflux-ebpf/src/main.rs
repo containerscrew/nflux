@@ -111,6 +111,12 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
             let protocol = unsafe { (*ipv4hdr).proto };
             let ttl = unsafe { (*ipv4hdr).ttl };
 
+            if config.enable_tcp == 0 && protocol == IpProto::Tcp {
+                return Ok(XDP_PASS);
+            } else if config.enable_udp == 0 && protocol == IpProto::Udp {
+                return Ok(XDP_PASS);
+            };
+
             let (src_port, dst_port, tcp_flags) = handle_ports(&ctx, protocol, IpFamily::Ipv4)?;
 
             if config.listen_port != 0
@@ -163,46 +169,7 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
             let total_len = u16::from_be_bytes(unsafe { (*ipv6hdr).payload_len });
             let protocol = unsafe { (*ipv6hdr).next_hdr };
             let ttl = unsafe { (*ipv6hdr).hop_limit };
-            let mut src_port: u16 = 0;
-            let mut dst_port: u16 = 0;
-            let mut tcp_flags: Option<TcpFlags> = None;
-
-            match protocol {
-                IpProto::Tcp => {
-                    let tcphdr: *const TcpHdr =
-                        unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv6Hdr::LEN)? };
-                    src_port = u16::from_be_bytes(unsafe { (*tcphdr).source });
-                    dst_port = u16::from_be_bytes(unsafe { (*tcphdr).dest });
-
-                    tcp_flags = Some(TcpFlags {
-                        syn: ((*tcphdr).syn() != 0) as u8,
-                        ack: ((*tcphdr).ack() != 0) as u8,
-                        fin: ((*tcphdr).fin() != 0) as u8,
-                        rst: ((*tcphdr).rst() != 0) as u8,
-                        psh: ((*tcphdr).psh() != 0) as u8,
-                        urg: ((*tcphdr).urg() != 0) as u8,
-                        ece: ((*tcphdr).ece() != 0) as u8,
-                        cwr: ((*tcphdr).cwr() != 0) as u8,
-                    });
-
-                    if config.enable_tcp == 0 {
-                        return Ok(XDP_PASS);
-                    }
-                }
-                IpProto::Udp => {
-                    let udphdr: *const UdpHdr =
-                        unsafe { ptr_at(&ctx, EthHdr::LEN + Ipv4Hdr::LEN)? };
-                    src_port = u16::from_be_bytes(unsafe { (*udphdr).src });
-                    dst_port = u16::from_be_bytes(unsafe { (*udphdr).dst });
-                    tcp_flags = None;
-
-                    if config.enable_udp == 0 {
-                        return Ok(XDP_PASS);
-                    }
-                }
-                IpProto::Icmp => {}
-                _ => return Ok(XDP_PASS),
-            }
+            let (src_port, dst_port, tcp_flags) = handle_ports(&ctx, protocol, IpFamily::Ipv6)?;
 
             if config.listen_port != 0
                 && (src_port != config.listen_port && dst_port != config.listen_port)
@@ -266,7 +233,6 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
                 slot.submit(0);
             }
         }
-        // Err(_) => return Ok(XDP_PASS),
         _ => {
             // Other packet
             return Ok(XDP_PASS);
