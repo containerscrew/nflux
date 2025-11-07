@@ -2,11 +2,11 @@ name: Check Version Consistency
 
 on:
   push:
-    paths:
-      - "Cargo.toml"
-      - "PKGBUILD"
-      - "stable.txt"
-      - ".github/workflows/check-version.yml"
+    # paths:
+    #   - "Cargo.toml"
+    #   - "PKGBUILD"
+    #   - "stable.txt"
+    #   - ".github/workflows/check-version.yml"
   pull_request:
 
 jobs:
