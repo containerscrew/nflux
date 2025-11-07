@@ -1,0 +1,55 @@
+name: Build Arch Linux Package
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+    workflow_dispatch:
+
+jobs:
+    build-arch-package:
+        runs-on: ubuntu-latest
+        container:
+            image: archlinux:latest
+
+        steps:
+            - name: Update system and install dependencies
+              run: |
+                  pacman -Syu --noconfirm
+                  pacman -S --noconfirm base-devel git sudo
+
+            - name: Create build user
+              run: |
+                  useradd -m builder
+                  echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Change ownership to builder
+              run: chown -R builder:builder /github/workspace
+
+            - name: Build package
+              run: |
+                  cd /github/workspace
+                  sudo -u builder cd packaging && makepkg -sf --noconfirm
+
+            - name: List built packages
+              run: |
+                  ls -la *.pkg.tar.*
+
+            - name: Upload package artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: arch-packages
+                  path: "*.pkg.tar.*"
+                  retention-days: 30
+
+            - name: Get package info
+              run: |
+                  for pkg in *.pkg.tar.*; do
+                    echo "Package: $pkg"
+                    pacman -Qip "$pkg"
+                    echo "---"
+                  done
