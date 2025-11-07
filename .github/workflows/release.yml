@@ -6,7 +6,7 @@ permissions:
 
 on:
   workflow_run:
-    workflows: ["Test", "Lint"]
+    workflows: ["Test", "Lint", "Check Version Consistency"]
     types: [completed]
   push:
     tags:
