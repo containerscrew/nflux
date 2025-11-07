@@ -2,9 +2,9 @@ name: Build Arch Linux Package
 
 on:
     push:
-        branches: [main, master]
+        branches: [main]
     pull_request:
-        branches: [main, master]
+        branches: [main]
     workflow_dispatch:
 
 jobs:
@@ -17,12 +17,19 @@ jobs:
             - name: Update system and install dependencies
               run: |
                   pacman -Syu --noconfirm
-                  pacman -S --noconfirm base-devel git sudo
+                  pacman -S --noconfirm base-devel git sudo rustup llvm clang
 
             - name: Create build user
               run: |
                   useradd -m builder
                   echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+            - name: Setup Rust toolchain for builder user
+              run: |
+                  sudo -u builder rustup default stable
+                  sudo -u builder rustup toolchain install nightly
+                  sudo -u builder rustup target add bpfel-unknown-none --toolchain nightly
+                  sudo -u builder cargo install bpf-linker
 
             - name: Checkout repository
               uses: actions/checkout@v4
@@ -34,6 +41,9 @@ jobs:
               run: |
                   cd $GITHUB_WORKSPACE/packaging
                   sudo -u builder makepkg -sf --noconfirm
+              env:
+                  CARGO_HOME: /home/builder/.cargo
+                  RUSTUP_HOME: /home/builder/.rustup
 
             - name: List built packages
               run: |
