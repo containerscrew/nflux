@@ -1,5 +1,12 @@
-# name: Build 📦
-
+# name: Docker Build
+# on:
+#     pull_request:
+#     push:
+#         paths:
+#             - "**.rs"
+#             - ".github/workflows/build.yml"
+#         branches:
+#             - "**"
 # on:
 #   push:
 #     paths:

@@ -66,7 +66,6 @@ jobs:
         run: |
           cargo deb
 
-
       - name: Package zip
         run: |
           zip -j nflux-${{ matrix.platform.release_for }}-${{ env.TAG_NAME }}.zip target/release/nflux

@@ -616,7 +616,7 @@ dependencies = [
 
 [[package]]
 name = "nflux"
-version = "0.13.0"
+version = "1.0.0"
 dependencies = [
  "anyhow",
  "aya 0.13.1 (git+https://github.com/aya-rs/aya)",
