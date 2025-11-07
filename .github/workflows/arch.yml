@@ -1,4 +1,4 @@
-name: Compilar Paquete Arch
+name: Compilar Paquete Arch Limpio
 on: [push]
 
 jobs:
@@ -7,21 +7,23 @@ jobs:
 
         container:
             image: archlinux/archlinux:latest
-            options: --user nobody
 
         steps:
-            - name: Checkout Code
-              uses: actions/checkout@v4
+            - uses: actions/checkout@v4
 
-            - name: Prepare build environment
+            - name: Create non-root user
+              run: |
+                  useradd -m builder
+                  echo "builder ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/builder
+
+            - name: Install base dependencies as root
               run: |
                   pacman -Sy --noconfirm base-devel git
 
-            - name: Install PKGBUILD dependencies
-              run: makepkg -s --noconfirm --skippgpcheck
-
-            - name: Build package
-              run: cd packaging/ && makepkg --noconfirm --skippgpcheck
+            - name: Run makepkg as non-root user
+              run: |
+                  chown -R builder:builder $GITHUB_WORKSPACE
+                  sudo -u builder bash -c "cd packaging && makepkg -s --noconfirm --skippgpcheck"
 
             - name: Upload Package Artifact
               uses: actions/upload-artifact@v4
