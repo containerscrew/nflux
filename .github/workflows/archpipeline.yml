@@ -2,9 +2,9 @@ name: Build Arch Linux Package
 
 on:
     push:
-        branches: [main]
+        branches: [main, master]
     pull_request:
-        branches: [main]
+        branches: [main, master]
     workflow_dispatch:
 
 jobs:
@@ -28,26 +28,28 @@ jobs:
               uses: actions/checkout@v4
 
             - name: Change ownership to builder
-              run: chown -R builder:builder /github/workspace
+              run: chown -R builder:builder $GITHUB_WORKSPACE
 
             - name: Build package
               run: |
-                  cd /github/workspace
-                  sudo -u builder cd packaging && makepkg -sf --noconfirm
+                  cd $GITHUB_WORKSPACE/packaging
+                  sudo -u builder makepkg -sf --noconfirm
 
             - name: List built packages
               run: |
+                  cd $GITHUB_WORKSPACE/packaging
                   ls -la *.pkg.tar.*
 
             - name: Upload package artifacts
               uses: actions/upload-artifact@v4
               with:
                   name: arch-packages
-                  path: "*.pkg.tar.*"
+                  path: "packaging/*.pkg.tar.*"
                   retention-days: 30
 
             - name: Get package info
               run: |
+                  cd $GITHUB_WORKSPACE/packaging
                   for pkg in *.pkg.tar.*; do
                     echo "Package: $pkg"
                     pacman -Qip "$pkg"
