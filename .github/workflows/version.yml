@@ -20,13 +20,13 @@ jobs:
       - name: Extract version from Cargo.toml
         id: cargo
         run: |
-          ver=$(grep -E '^version\s*=' Cargo.toml | head -n1 | sed 's/.*=\s*"\(.*\)".*/\1/')
+          ver=$(grep -E '^version\s*=' nflux/Cargo.toml | head -n1 | sed 's/.*=\s*"\(.*\)".*/\1/')
           echo "version=$ver" >> $GITHUB_OUTPUT
 
       - name: Extract version from PKGBUILD
         id: pkgbuild
         run: |
-          ver=$(grep -E '^pkgver=' PKGBUILD | head -n1 | sed 's/pkgver=//')
+          ver=$(grep -E '^pkgver=' packaging/PKGBUILD | head -n1 | sed 's/pkgver=//')
           echo "version=$ver" >> $GITHUB_OUTPUT
 
       - name: Extract version from stable.txt
@@ -43,7 +43,7 @@ jobs:
 
           if [ "$CARGO_VERSION" != "$PKGBUILD_VERSION" ] || [ "$CARGO_VERSION" != "$STABLE_VERSION" ]; then
             echo "❌ Version mismatch detected"
-            echo "Cargo version: ${CARGO_VERSION}, PKGBUILD: ${PKGBUILD_VERSION}, stable.txt: ${STABLE_VERSION}"
+            echo "Cargo version: $CARGO_VERSION, PKGBUILD: $PKGBUILD_VERSION, stable.txt: $STABLE_VERSION"
             exit 1
           fi
 
