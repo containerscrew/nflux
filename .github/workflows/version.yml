@@ -1,54 +1,55 @@
 name: Check Version Consistency
 
 on:
-    push:
-        paths:
-            - "Cargo.toml"
-            - "PKGBUILD"
-            - "stable.txt"
-            - ".github/workflows/check-version.yml"
-    pull_request:
+  push:
+    paths:
+      - "Cargo.toml"
+      - "PKGBUILD"
+      - "stable.txt"
+      - ".github/workflows/check-version.yml"
+  pull_request:
 
 jobs:
-    check-version:
-        runs-on: ubuntu-latest
+  check-version:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-            - name: Extract version from Cargo.toml
-              id: cargo
-              run: |
-                  ver=$(grep -E '^version\s*=' Cargo.toml | head -n1 | sed 's/.*=\s*"\(.*\)".*/\1/')
-                  echo "version=$ver" >> $GITHUB_OUTPUT
+      - name: Extract version from Cargo.toml
+        id: cargo
+        run: |
+          ver=$(grep -E '^version\s*=' Cargo.toml | head -n1 | sed 's/.*=\s*"\(.*\)".*/\1/')
+          echo "version=$ver" >> $GITHUB_OUTPUT
 
-            - name: Extract version from PKGBUILD
-              id: pkgbuild
-              run: |
-                  ver=$(grep -E '^pkgver=' PKGBUILD | head -n1 | sed 's/pkgver=//')
-                  echo "version=$ver" >> $GITHUB_OUTPUT
+      - name: Extract version from PKGBUILD
+        id: pkgbuild
+        run: |
+          ver=$(grep -E '^pkgver=' PKGBUILD | head -n1 | sed 's/pkgver=//')
+          echo "version=$ver" >> $GITHUB_OUTPUT
 
-            - name: Extract version from stable.txt
-              id: stable
-              run: |
-                  ver=$(cat stable.txt | tr -d '[:space:]')
-                  echo "version=$ver" >> $GITHUB_OUTPUT
+      - name: Extract version from stable.txt
+        id: stable
+        run: |
+          ver=$(cat stable.txt | tr -d '[:space:]')
+          echo "version=$ver" >> $GITHUB_OUTPUT
 
-            - name: Compare versions
-              run: |
-                  echo "Cargo.toml:   ${CARGO_VERSION}"
-                  echo "PKGBUILD:     ${PKGBUILD_VERSION}"
-                  echo "stable.txt:   ${STABLE_VERSION}"
+      - name: Compare versions
+        run: |
+          echo "Cargo.toml:   ${CARGO_VERSION}"
+          echo "PKGBUILD:     ${PKGBUILD_VERSION}"
+          echo "stable.txt:   ${STABLE_VERSION}"
 
-                  if [ "$CARGO_VERSION" != "$PKGBUILD_VERSION" ] || [ "$CARGO_VERSION" != "$STABLE_VERSION" ]; then
-                    echo "❌ Version mismatch detected"
-                    exit 1
-                  fi
+          if [ "$CARGO_VERSION" != "$PKGBUILD_VERSION" ] || [ "$CARGO_VERSION" != "$STABLE_VERSION" ]; then
+            echo "❌ Version mismatch detected"
+            echo "Cargo version: ${CARGO_VERSION}, PKGBUILD: ${PKGBUILD_VERSION}, stable.txt: ${STABLE_VERSION}"
+            exit 1
+          fi
 
-                  echo "✅ Versions match"
+          echo "✅ Versions match"
 
-              env:
-                  CARGO_VERSION: ${{ steps.cargo.outputs.version }}
-                  PKGBUILD_VERSION: ${{ steps.pkgbuild.outputs.version }}
-                  STABLE_VERSION: ${{ steps.stable.outputs.version }}
+        env:
+          CARGO_VERSION: ${{ steps.cargo.outputs.version }}
+          PKGBUILD_VERSION: ${{ steps.pkgbuild.outputs.version }}
+          STABLE_VERSION: ${{ steps.stable.outputs.version }}
