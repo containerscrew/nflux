@@ -48,3 +48,43 @@ nflux-ebpf = { path = "../nflux-ebpf" }
 [[bin]]
 name = "nflux"
 path = "src/main.rs"
+
+
+[package.metadata.deb]
+maintainer = "Daniels <info@containerscrew.com>"
+copyright = "2025, Daniels <info@containerscrew.com>"
+license-file = ["../LICENSE-GPL3"]
+revision = "1"
+extended-description = """
+Simple network monitoring agent tool. Powered by eBPF & Rust 🐝
+"""
+maintainer-scripts = "../packaging/debian"
+section = "utils"
+priority = "optional"
+assets = [
+    [
+        "target/release/nflux",
+        "/usr/bin/nflux",
+        "0755",
+    ],
+    [
+        "../packaging/system/nflux.service",
+        "/lib/systemd/system/nflux.service",
+        "0644",
+    ],
+    [
+        "../packaging/system/nflux.logrotate",
+        "/etc/logrotate.d/nflux",
+        "0644",
+    ],
+    [
+        "../nflux.toml.example",
+        "/etc/nflux/nflux.toml",
+        "0644",
+    ],
+    [
+        "../LICENSE-GPL3",
+        "/usr/share/doc/nflux/LICENSE-GPL3",
+        "0644",
+    ],
+]

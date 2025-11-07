@@ -1,13 +1,16 @@
-name: Release 📦
+name: Release
 
 permissions:
   contents: write
   pull-requests: write
 
 on:
+  workflow_run:
+    workflows: ["Test", "Lint"]
+    types: [completed]
   push:
     tags:
-      - '*.*.*'
+      - "*.*.*"
 
 env:
   CARGO_TERM_COLOR: always
@@ -62,6 +65,7 @@ jobs:
       - name: Generate deb package
         run: |
           cargo deb
+
 
       - name: Package zip
         run: |

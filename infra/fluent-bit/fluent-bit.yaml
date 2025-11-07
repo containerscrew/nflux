@@ -1,0 +1,34 @@
+service:
+  Flush: 1
+  Daemon: Off
+  Log_Level: info
+  Parsers_File: /fluent-bit/etc/parsers.conf
+
+pipeline:
+  inputs:
+    - name: tail
+      tag: nflux
+      path: /var/log/nflux/lastlog
+      multiline: Off # Cada línea es un JSON independiente
+      parser: json # Indica que el input es JSON
+      read_from_head: true # Opcional: lee el archivo desde el inicio al arrancar
+
+  filters:
+    - name: geoip2
+      match: "*"
+      database: /opt/GeoLite2-City.mmdb
+      lookup_key: src_ip
+      record:
+        - country src_ip %{country.names.en}
+        - isocode src_ip %{country.iso_code}
+        - latitude src_ip %{location.latitude}
+        - longitude src_ip %{location.longitude}
+
+  # outputs:
+  #   - name: stdout
+  #     match: "*"
+  #     format: json_lines
+
+  outputs:
+    - name: es
+      host: elasticsearch

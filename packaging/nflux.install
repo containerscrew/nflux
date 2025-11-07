@@ -1,0 +1,26 @@
+post_install() {
+    echo ">>> Setting up nflux environment"
+    mkdir -p /var/log/nflux
+    touch /var/log/nflux/lastlog
+    chmod 644 /var/log/nflux/lastlog
+
+    systemctl daemon-reload
+
+    systemctl enable nflux.service
+}
+
+post_upgrade() {
+    mkdir -p /var/log/nflux
+    touch /var/log/nflux/lastlog
+
+    systemctl daemon-reload
+    systemctl restart nflux.service
+}
+
+pre_remove() {
+    systemctl disable --now nflux.service
+}
+
+post_remove() {
+    systemctl daemon-reload
+}

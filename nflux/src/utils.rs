@@ -32,6 +32,7 @@ pub fn convert_direction(direction: u8) -> &'static str {
 pub fn convert_protocol(protocol: u8) -> &'static str {
     match protocol {
         1 => "icmp",
+        2 => "igmp",
         6 => "tcp",
         17 => "udp",
         _ => {

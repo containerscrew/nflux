@@ -15,14 +15,17 @@
 
 # Strip debugging symbols to reduce binary size
 # RUN strip target/release/nflux
-#
+
 # FROM gcr.io/distroless/static-debian13:debug as release
 #
 # COPY --from=build-env /app/target/release/nflux /app/nflux
 #
 # CMD ["/app/nflux"]
+
 FROM docker.io/library/debian:bookworm-slim
 
 COPY ./target/release/nflux /usr/local/bin/nflux
+
+RUN strip /usr/local/bin/nflux
 
 CMD ["/usr/local/bin/nflux"]

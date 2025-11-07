@@ -1,5 +1,5 @@
 [Unit]
-Description=Nflux eBPF Privilege Escalation Detector
+Description=Simple network monitoring agent tool
 After=network-online.target nss-lookup.target
 Wants=network-online.target nss-lookup.target
 ConditionPathExists=/etc/nflux/nflux.toml
