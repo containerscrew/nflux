@@ -4,7 +4,7 @@ services:
     container_name: fluent-bit
     restart: unless-stopped
     networks:
-      - monitoring
+      - nflux
     volumes:
       - ./fluent-bit/fluent-bit.yaml:/fluent-bit/etc/fluent-bit.yaml
       - ./geoip/GeoLite2-City.mmdb:/opt/GeoLite2-City.mmdb:ro
@@ -37,7 +37,7 @@ services:
       - 9200:9200
       - 9600:9600
     networks:
-      - monitoring
+      - nflux
 
   opensearch-dashboards:
     image: docker.io/opensearchproject/opensearch-dashboards:latest
@@ -49,10 +49,10 @@ services:
     environment:
       OPENSEARCH_HOSTS: '["https://opensearch-node1:9200"]'
     networks:
-      - monitoring
+      - nflux
 
 networks:
-  monitoring:
+  nflux:
     external: false
     driver: bridge
 
