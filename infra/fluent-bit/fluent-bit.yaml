@@ -41,6 +41,7 @@ pipeline:
       http_passwd: ${OPENSEARCH_INITIAL_ADMIN_PASSWORD}
       tls: On
       type: "_doc"
+      Buffer_Size: False
       suppress_type_name: On
       # pipeline: fb_latlon_to_geopoint
       logstash_format: On
