@@ -37,8 +37,8 @@ services:
     volumes:
       - opensearch-data1:/usr/share/opensearch/data
     expose:
-      - 9200:9200
-      - 9600:9600
+      - 9200
+      - 9600
     networks:
       - nflux
 

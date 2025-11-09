@@ -38,3 +38,6 @@ pkg/
 
 # Sphinx documentation build files
 docs/build/
+
+# Environment variables file
+.env
