@@ -3,6 +3,8 @@ services:
     image: docker.io/fluent/fluent-bit:latest
     container_name: fluent-bit
     restart: unless-stopped
+    env_file:
+      - ./.env
     networks:
       - nflux
     volumes:

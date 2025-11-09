@@ -36,7 +36,7 @@ pipeline:
       tls.verify: Off
       time_key: "@es_time"
       http_user: admin
-      http_passwd: "rC8m2kP9sVq7Tz4FhL1w0yE!"
+      http_passwd: ${OPENSEARCH_INITIAL_ADMIN_PASSWORD}
       tls: On
       type: "_doc"
       suppress_type_name: On
