@@ -27,11 +27,13 @@ jobs:
                   # pip install -r docs/requirements.txt
 
             - name: Sphinx Build
-              run: make html
+              run: |
+                  make html
+                  cat ./docs/build/html/index.html
               working-directory: ./docs
 
             - name: Deploy to GitHub Pages
               uses: peaceiris/actions-gh-pages@v3
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
-                  publish_dir: ./docs/_build/html
+                  publish_dir: ./docs/build/html
