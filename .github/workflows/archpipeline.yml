@@ -2,10 +2,8 @@ name: Build Arch Linux Package
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-  workflow_dispatch:
+    tags:
+      - "*.*.*"
 
 jobs:
   build-arch-package:
