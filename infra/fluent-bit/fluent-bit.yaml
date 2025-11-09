@@ -3,8 +3,8 @@ service:
   Daemon: Off
   Log_Level: info
   Parsers_File: /fluent-bit/etc/parsers.conf
-  HTTP_Buffer_Size: 1M
-  HTTP_Buffer_Max_Size: 5M
+  HTTP_Buffer_Size: 2M
+  HTTP_Buffer_Max_Size: 10M
 
 pipeline:
   inputs:
