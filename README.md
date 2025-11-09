@@ -39,34 +39,9 @@ attaching a `XDP (Express Data Path)` program using eBPF technology. (... More c
 > [!WARNING]
 I am working on a new agent-mode implementation of `nflux` that can be deployed as a `systemd` service or a Docker container. The goal is to extract network statistics (using `eBPF` and `XDP`) from any Linux server and display them on a centralized `Grafana` dashboard. Version [`0.12.7`](https://github.com/containerscrew/nflux/tree/v0.12.4) is the latest released version that uses `nflux` as a `CLI` using `TC` (Traffic Control).
 
-# Installation and Usage
+# Documentation
 
-## Arch Linux
-
-```bash
-git clone https://github.com/containerscrew/nflux.git
-cd nflux
-makepkg -si # or makepkg -si --cleanbuild for a clean build
-# Clean
-rm -rf pkg src *.pkg.tar* && cargo clean
-```
-
-# Docker
-
-Edit the `nflux.toml` configuration file and set your default `iface` and other parameters as needed.
-
-```bash
-cp nflux.toml.example nflux.toml # then edit the file as needed
-podman build -f Dockerfile -t containerscrew/nflux:latest .
-sudo podman run -it --rm \
-  --name nflux \
-  -e NFLUX_CONFIG_FILE=/etc/nflux/nflux.toml \
-  -v $PWD/nflux.toml:/etc/nflux/nflux.toml \
-  --net=host \
-  --privileged \
-  localhost/containerscrew/nflux:latest
-```
-> Podman is `rootless` by default, that's why we use `sudo` here to run the container. With `Docker` probably you won't need `sudo`. With the flag `--privileged` is enough.`
+I'm trying to move all the documentation to this new site: https://containerscrew.github.io/nflux/
 
 # License
 
