@@ -23,7 +23,8 @@ services:
       - cluster.initial_cluster_manager_nodes=opensearch-node1
       - bootstrap.memory_lock=false
       - "OPENSEARCH_JAVA_OPTS=-Xms2g -Xmx2g"
-      - "OPENSEARCH_INITIAL_ADMIN_PASSWORD=rC8m2kP9sVq7Tz4FhL1w0yE!"
+      - "OPENSEARCH_INITIAL_ADMIN_PASSWORD=${OPENSEARCH_INITIAL_ADMIN_PASSWORD}"
+    restart: unless-stopped
     ulimits:
       memlock:
         soft: -1
@@ -33,7 +34,7 @@ services:
         hard: 65536
     volumes:
       - opensearch-data1:/usr/share/opensearch/data
-    ports:
+    expose:
       - 9200:9200
       - 9600:9600
     networks:
@@ -42,8 +43,8 @@ services:
   opensearch-dashboards:
     image: docker.io/opensearchproject/opensearch-dashboards:latest
     container_name: opensearch-dashboards
-    ports:
-      - 5601:5601
+    # ports:
+    #   - 5601:5601
     expose:
       - "5601"
     environment:
