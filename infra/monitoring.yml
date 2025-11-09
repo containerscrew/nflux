@@ -25,6 +25,8 @@ services:
       - "OPENSEARCH_JAVA_OPTS=-Xms2g -Xmx2g"
       - "OPENSEARCH_INITIAL_ADMIN_PASSWORD=${OPENSEARCH_INITIAL_ADMIN_PASSWORD}"
     restart: unless-stopped
+    env_file:
+      - ./.env
     ulimits:
       memlock:
         soft: -1
@@ -43,8 +45,8 @@ services:
   opensearch-dashboards:
     image: docker.io/opensearchproject/opensearch-dashboards:latest
     container_name: opensearch-dashboards
-    # ports:
-    #   - 5601:5601
+    ports:
+      - 127.0.0.1:5601:5601
     expose:
       - "5601"
     environment:
