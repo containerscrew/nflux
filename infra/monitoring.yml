@@ -60,6 +60,7 @@ networks:
   nflux:
     external: false
     driver: bridge
+    name: nflux
 
 volumes:
   opensearch-data1:
