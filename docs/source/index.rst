@@ -12,5 +12,6 @@ Welcome to the nflux documentation! This documentation is not yet complete.
    :maxdepth: 2
    :caption: Contents:
 
+   installation
    monitoring
 
