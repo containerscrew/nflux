@@ -1,0 +1,10 @@
+#services:
+  # nflux:
+  #   image: localhost/containerscrew/nflux:latest
+  #   command: "/usr/local/bin/nflux > /tmp/lastlog 2>&1"
+  #   net:
+  #     - host
+  #   environment:
+  #     - NFLUX_CONFIG_FILE=/etc/nflux/nflux.toml
+  #   volumes:
+  #     - ./nflux.toml:/etc/nflux/nflux.toml

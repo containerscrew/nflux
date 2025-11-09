@@ -1,0 +1,60 @@
+services:
+  fluent-bit:
+    image: docker.io/fluent/fluent-bit:latest
+    container_name: fluent-bit
+    restart: unless-stopped
+    networks:
+      - monitoring
+    volumes:
+      - ./fluent-bit/fluent-bit.yaml:/fluent-bit/etc/fluent-bit.yaml
+      - ./geoip/GeoLite2-City.mmdb:/opt/GeoLite2-City.mmdb:ro
+      - /var/log/nflux/lastlog:/var/log/nflux/lastlog:ro
+      - ./fluent-bit/parsers.conf:/fluent-bit/etc/parsers.conf
+    command:
+      ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.yaml"]
+
+  opensearch-node1:
+    image: docker.io/opensearchproject/opensearch:latest
+    container_name: opensearch-node1
+    environment:
+      - cluster.name=opensearch-cluster
+      - node.name=opensearch-node1
+      - discovery.seed_hosts=opensearch-node1
+      - cluster.initial_cluster_manager_nodes=opensearch-node1
+      - bootstrap.memory_lock=false
+      - "OPENSEARCH_JAVA_OPTS=-Xms1024m -Xmx1024m"
+      - "OPENSEARCH_INITIAL_ADMIN_PASSWORD=rC8m2kP9sVq7Tz4FhL1w0yE!"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - opensearch-data1:/usr/share/opensearch/data
+    ports:
+      - 9200:9200
+      - 9600:9600
+    networks:
+      - monitoring
+
+  opensearch-dashboards:
+    image: docker.io/opensearchproject/opensearch-dashboards:latest
+    container_name: opensearch-dashboards
+    ports:
+      - 5601:5601
+    expose:
+      - "5601"
+    environment:
+      OPENSEARCH_HOSTS: '["https://opensearch-node1:9200"]'
+    networks:
+      - monitoring
+
+networks:
+  monitoring:
+    external: false
+    driver: bridge
+
+volumes:
+  opensearch-data1:

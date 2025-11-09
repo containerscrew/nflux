@@ -9,10 +9,9 @@ pipeline:
     - name: tail
       tag: nflux
       path: /var/log/nflux/lastlog
-      multiline: Off # Cada línea es un JSON independiente
-      parser: json # Indica que el input es JSON
-      read_from_head: true # Opcional: lee el archivo desde el inicio al arrancar
-
+      multiline: Off
+      parser: json
+      read_from_head: true
   filters:
     - name: geoip2
       match: "*"
@@ -30,5 +29,19 @@ pipeline:
   #     format: json_lines
 
   outputs:
-    - name: es
-      host: elasticsearch
+    - name: opensearch
+      match: "*"
+      host: opensearch-node1
+      port: 9200
+      tls.verify: Off
+      time_key: "@es_time"
+      http_user: admin
+      http_passwd: "rC8m2kP9sVq7Tz4FhL1w0yE!"
+      tls: On
+      type: "_doc"
+      suppress_type_name: On
+      # pipeline: fb_latlon_to_geopoint
+      logstash_format: On
+      logstash_prefix: node
+      retry_limit: 10
+      replace_dots: On

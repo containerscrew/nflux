@@ -1,67 +1,67 @@
 name: Build Arch Linux Package
 
 on:
-    push:
-        branches: [main]
-    pull_request:
-        branches: [main]
-    workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
-    build-arch-package:
-        runs-on: ubuntu-latest
-        container:
-            image: archlinux:latest
+  build-arch-package:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
 
-        steps:
-            - name: Update system and install dependencies
-              run: |
-                  pacman -Syu --noconfirm
-                  pacman -S --noconfirm base-devel git sudo rustup llvm clang
+    steps:
+      - name: Update system and install dependencies
+        run: |
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm base-devel git sudo rustup llvm clang
 
-            - name: Create build user
-              run: |
-                  useradd -m builder
-                  echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+      - name: Create build user
+        run: |
+          useradd -m builder
+          echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-            - name: Setup Rust toolchain for builder user
-              run: |
-                  sudo -u builder rustup default stable
-                  sudo -u builder rustup toolchain install nightly
-                  sudo -u builder rustup target add bpfel-unknown-none --toolchain nightly
-                  sudo -u builder cargo install bpf-linker
+      - name: Setup Rust toolchain for builder user
+        run: |
+          sudo -u builder rustup update
+          sudo -u builder rustup install stable
+          sudo -u builder rustup toolchain install nightly --component rust-src
+          sudo -u builder cargo install bpf-linker
 
-            - name: Checkout repository
-              uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-            - name: Change ownership to builder
-              run: chown -R builder:builder $GITHUB_WORKSPACE
+      - name: Change ownership to builder
+        run: chown -R builder:builder $GITHUB_WORKSPACE
 
-            - name: Build package
-              run: |
-                  cd $GITHUB_WORKSPACE/packaging
-                  sudo -u builder makepkg -sf --noconfirm
-              env:
-                  CARGO_HOME: /home/builder/.cargo
-                  RUSTUP_HOME: /home/builder/.rustup
+      - name: Build package
+        run: |
+          cd $GITHUB_WORKSPACE/packaging
+          sudo -u builder makepkg -sf --noconfirm
+        env:
+          CARGO_HOME: /home/builder/.cargo
+          RUSTUP_HOME: /home/builder/.rustup
 
-            - name: List built packages
-              run: |
-                  cd $GITHUB_WORKSPACE/packaging
-                  ls -la *.pkg.tar.*
+      - name: List built packages
+        run: |
+          cd $GITHUB_WORKSPACE/packaging
+          ls -la *.pkg.tar.*
 
-            - name: Upload package artifacts
-              uses: actions/upload-artifact@v4
-              with:
-                  name: arch-packages
-                  path: "packaging/*.pkg.tar.*"
-                  retention-days: 30
+      - name: Upload package artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: arch-packages
+          path: "packaging/*.pkg.tar.*"
+          retention-days: 30
 
-            - name: Get package info
-              run: |
-                  cd $GITHUB_WORKSPACE/packaging
-                  for pkg in *.pkg.tar.*; do
-                    echo "Package: $pkg"
-                    pacman -Qip "$pkg"
-                    echo "---"
-                  done
+      - name: Get package info
+        run: |
+          cd $GITHUB_WORKSPACE/packaging
+          for pkg in *.pkg.tar.*; do
+            echo "Package: $pkg"
+            pacman -Qip "$pkg"
+            echo "---"
+          done
