@@ -3,7 +3,7 @@ Installation Guide
 
 
 Arch Linux
-===================
+----------
 
 .. code-block:: bash
 
