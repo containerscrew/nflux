@@ -1,5 +1,5 @@
 service:
-  Flush: 1
+  Flush: 5
   Daemon: Off
   Log_Level: info
   Parsers_File: /fluent-bit/etc/parsers.conf
