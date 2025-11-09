@@ -1,16 +1,18 @@
 name: Deploy Sphinx Docs to GitHub Pages
 
 permissions:
-    contents: write
-    pull-requests: write
+    contents: read
+    pages: write
+    id-token: write
 
 on:
     push:
         branches:
             - main
+    workflow_dispatch:
 
 jobs:
-    build-and-deploy:
+    build:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
@@ -21,19 +23,27 @@ jobs:
                   python-version: "3.x"
 
             - name: Install dependencies
-              run: |
-                  pip install sphinx sphinx-rtd-theme
-                  # Si tienes dependencias específicas para tu documentación, añádelas aquí:
-                  # pip install -r docs/requirements.txt
+              run: pip install sphinx sphinx-rtd-theme
 
             - name: Sphinx Build
-              run: |
-                  make html
-                  cat ./build/html/index.html
+              run: make html
               working-directory: ./docs
 
-            - name: Deploy to GitHub Pages
-              uses: peaceiris/actions-gh-pages@v3
+            - name: Setup Pages
+              uses: actions/configure-pages@v5
+
+            - name: Upload artifact
+              uses: actions/upload-pages-artifact@v3
               with:
-                  github_token: ${{ secrets.GITHUB_TOKEN }}
-                  publish_dir: ./docs/build/html
+                  path: "docs/build/html"
+
+    deploy:
+        needs: build
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        runs-on: ubuntu-latest
+        steps:
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v4
