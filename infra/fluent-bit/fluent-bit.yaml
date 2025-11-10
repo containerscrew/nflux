@@ -28,8 +28,7 @@ pipeline:
 
     - name: record_modifier
       match: "*"
-      record:
-        location ${latitude},${longitude}
+      record: location $latitude,$longitude
 
   # outputs:
   #   - name: stdout
