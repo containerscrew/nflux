@@ -62,3 +62,23 @@ Use the appropriate command depending on your container engine (Podman or Docker
     podman-compose -f monitoring.yml up -d
 
 *Alternatively, use `docker-compose -f monitoring.yml up -d` if you are using Docker.*
+
+9. **Open the dev tools in OpenSearch Dashboards and run the following command to create an index template mapping:**
+
+.. code-block:: bash
+
+   PUT _index_template/node-geo-template
+    {
+      "index_patterns": ["node*"],
+      "template": {
+        "mappings": {
+          "properties": {
+            "location": { "type": "geo_point" }
+          }
+        }
+      }
+    }
+
+    GET node-*/_mapping
+
+    DELETE node-*
