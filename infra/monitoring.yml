@@ -12,6 +12,7 @@ services:
       - ./geoip/GeoLite2-City.mmdb:/opt/GeoLite2-City.mmdb:ro
       - /var/log/nflux/lastlog:/var/log/nflux/lastlog:ro
       - ./fluent-bit/parsers.conf:/fluent-bit/etc/parsers.conf
+      - ./fluent-bit/geo.lua:/fluent-bit/scripts/geo.lua:ro
     command:
       ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.yaml"]
 

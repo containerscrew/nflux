@@ -26,9 +26,10 @@ pipeline:
         - latitude src_ip %{location.latitude}
         - longitude src_ip %{location.longitude}
 
-    - name: record_modifier
+    - name: lua
       match: "*"
-      record: location $latitude,$longitude
+      script: /fluent-bit/scripts/geo.lua
+      call: geo_point
 
   # outputs:
   #   - name: stdout
