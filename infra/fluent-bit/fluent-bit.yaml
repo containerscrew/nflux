@@ -14,6 +14,7 @@ pipeline:
       multiline: Off
       parser: json
       read_from_head: true
+
   filters:
     - name: geoip2
       match: "*"
@@ -24,6 +25,11 @@ pipeline:
         - isocode src_ip %{country.iso_code}
         - latitude src_ip %{location.latitude}
         - longitude src_ip %{location.longitude}
+
+    - name: record_modifier
+      match: "*"
+      record:
+        location ${latitude},${longitude}
 
   # outputs:
   #   - name: stdout
