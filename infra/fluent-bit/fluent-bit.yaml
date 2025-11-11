@@ -51,6 +51,6 @@ pipeline:
       suppress_type_name: On
       # pipeline: fb_latlon_to_geopoint
       logstash_format: On
-      logstash_prefix: node
+      logstash_prefix: nflux
       retry_limit: 10
       replace_dots: On
