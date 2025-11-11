@@ -18,6 +18,142 @@
 - ebpf folder and package structure - (938ef16) - containerscrew
 
 - - -
+## 1.0.0 - 2025-11-11
+#### Features
+- implementing xdp ipv6 packet - (ecca8f8) - containerscrew
+- add active connection track for xdp program - (a56c442) - containerscrew
+- handle tcp ports - (b81901c) - containerscrew
+- implementing xdp ingress sniffer - (ab45184) - containerscrew
+#### Bug Fixes
+- systemd append file - (b6faf39) - containerscrew
+- fluent bit flush - (ad4ba7a) - containerscrew
+- fluent bit buffer size - (19bf1f2) - containerscrew
+- fluent bit buffer size - (cc2bc81) - containerscrew
+- pipeline docs - (7a86375) - containerscrew
+- version pipeline - (e037dcf) - containerscrew
+- version pipeline - (b9c8a03) - containerscrew
+- version pipeline - (f0f1479) - containerscrew
+- arch linux pipeline - (1526b52) - containerscrew
+- arch linux pipeline - (f3bdbcc) - containerscrew
+- handle tcp and udp disable options - (7a35e0c) - containerscrew
+- headers and ipv famly for ipv6 - (5ddd1fb) - containerscrew
+- nflux log permissions - (7e36e05) - containerscrew
+- variable name - (1398364) - containerscrew
+- local-install.sh - (03ea6a8) - containerscrew
+- fix nflux config file - (ac3f070) - containerscrew
+- always inline in ebpf-xdp program - (6bd6a9c) - containerscrew
+- active connection key - (2840b50) - containerscrew
+- ebpf-xdp configmap - (f5964ec) - containerscrew
+- error when interface not found - (9905bb0) - containerscrew
+- error when interface not found - (5604626) - containerscrew
+- json logger in display network event - (05aa84a) - containerscrew
+- which dependency feature - (160bbca) - containerscrew
+- docs/index.html - (760af4d) - containerscrew
+#### Revert
+- version 0.13.0 - (2fd92fe) - containerscrew
+#### Documentation
+- update monitoring.rst - (8628824) - containerscrew
+- update intallation.rst - (d853987) - containerscrew
+- update intallation.rst - (103f36f) - containerscrew
+- update index.rst - (c2da5bd) - containerscrew
+- documentation - (954733e) - containerscrew
+- add folder docs/ and release.md doc - (f485aa2) - containerscrew
+- add folder docs/ and release.md doc - (7e333ad) - containerscrew
+#### Refactoring
+- index name in fluent-bit output - (877debe) - containerscrew
+- monitoring network name - (3a473fb) - containerscrew
+- folder structure and monitoring stack - (70596df) - containerscrew
+- nflux-ebpf code - (5f561f7) - containerscrew
+- grafana and loki stack - (e87d545) - containerscrew
+- misc files - (851eb51) - containerscrew
+- preparing release 0.13.0 & nflux installation - (c1823b7) - containerscrew
+- implementing arp & listen port filter - (a01f16a) - containerscrew
+- lima vm files - (ef454c9) - containerscrew
+- error message - (ab6b9a7) - containerscrew
+- wip - (c8059e2) - containerscrew
+- implementing configmap - (3b24476) - containerscrew
+- split ebpf maps to nflux-common - (081d041) - containerscrew
+- removing nflux as a cli (clap) - (a763426) - containerscrew
+- implementing nflux.toml config file - (1ed3c06) - containerscrew
+- xdp log and and code structure - (b8450a4) - containerscrew
+- cli submodule - (6f06b12) - containerscrew
+- events and log structure - (ba16d2a) - containerscrew
+- disable ebpf logger - (273fd66) - containerscrew
+- remove dropped packets feature (dpkt) - (fcd1f28) - containerscrew
+- remove dropped packets feature (dpkt) - (130ee93) - containerscrew
+- ebpf folder and package structure - (bb9a4e3) - containerscrew
+#### Miscellaneous Chores
+- (**deps**) bump aya-build from `4fbce44` to `d8f5497` - (bfcbcf1) - dependabot[bot]
+- (**deps**) bump aya-log-ebpf from `4fbce44` to `d8f5497` - (2553046) - dependabot[bot]
+- (**deps**) bump aya-ebpf from `4fbce44` to `d8f5497` - (6340106) - dependabot[bot]
+- (**deps**) bump aya-ebpf from `17573e0` to `4fbce44` - (0773ef0) - dependabot[bot]
+- (**deps**) bump aya-build from `17573e0` to `4fbce44` - (619a8f0) - dependabot[bot]
+- (**deps**) bump aya-log-ebpf from `17573e0` to `4fbce44` - (5dc0766) - dependabot[bot]
+- (**deps**) bump clap from 4.5.50 to 4.5.51 - (eca3384) - dependabot[bot]
+- (**deps**) bump clap from 4.5.49 to 4.5.50 - (0d36ec7) - dependabot[bot]
+- (**deps**) bump dns-lookup from 3.0.0 to 3.0.1 - (3439824) - dependabot[bot]
+- (**deps**) bump which from 6.0.3 to 8.0.0 - (29680c7) - dependabot[bot]
+- (**deps**) bump cargo_metadata from 0.19.2 to 0.23.0 - (35ca4b2) - dependabot[bot]
+- (**deps**) bump tokio from 1.47.1 to 1.48.0 - (1fced69) - dependabot[bot]
+- (**deps**) bump clap from 4.5.48 to 4.5.49 - (adff969) - dependabot[bot]
+- (**deps**) bump libc from 0.2.176 to 0.2.177 - (7c22509) - dependabot[bot]
+- (**deps**) bump serde_json from 1.0.143 to 1.0.145 - (c289b43) - dependabot[bot]
+- (**deps**) bump sysinfo from 0.37.1 to 0.37.2 - (99ed0fe) - dependabot[bot]
+- (**deps**) bump sysinfo from 0.37.0 to 0.37.1 - (1a3c41d) - dependabot[bot]
+- (**deps**) bump libc from 0.2.175 to 0.2.176 - (3c6fd5a) - dependabot[bot]
+- (**deps**) bump clap from 4.5.47 to 4.5.48 - (c40434c) - dependabot[bot]
+- (**deps**) bump anyhow from 1.0.99 to 1.0.100 - (1526cc2) - dependabot[bot]
+- (**version**) 0.13.0 - (f90c604) - containerscrew
+- push arch package - (ba6e9c4) - containerscrew
+- os nflux dashboard - (f535c51) - containerscrew
+- geo lua filter - (282860b) - containerscrew
+- fluent-bit location filter - (e077c64) - containerscrew
+- fluent-bit location filter - (444502e) - containerscrew
+- opensearch buffersize - (21cf3f5) - containerscrew
+- nflux network name - (4ac6f1d) - containerscrew
+- monitoring stack and doc - (4225a55) - containerscrew
+- monitoring stack and doc - (2ef4818) - containerscrew
+- monitoring stack and doc - (1d262fe) - containerscrew
+- monitoring stack - (1b9adbe) - containerscrew
+- docs pipeline - (6c7e8df) - containerscrew
+- docs pipeline - (f380717) - containerscrew
+- docs pipeline - (7dce01c) - containerscrew
+- docs pipeline - (8dcd40d) - containerscrew
+- docs pipeline - (6ad99c7) - containerscrew
+- setup docs with sphinx - (784c1f1) - containerscrew
+- monitoring setup - (2c77840) - containerscrew
+- arch pipeline - (091895b) - containerscrew
+- arch pipeline - (fe80a8b) - containerscrew
+- arch pipeline - (5d2cf01) - containerscrew
+- pipelines - (abe11fd) - containerscrew
+- test version pipeline - (634583a) - containerscrew
+- remove unused pipeline - (a7b8c04) - containerscrew
+- pipeline version - (a365608) - containerscrew
+- pipelines - (b3b488f) - containerscrew
+- arch compilation pipeline - (26e3a85) - containerscrew
+- preparing arch package PKGBUILD - (935dd0b) - containerscrew
+- Dockerfile multistage base image - (96365e3) - containerscrew
+- Dockerfile base image for release - (110208e) - containerscrew
+- add logrotate file - (0c428d2) - containerscrew
+- update README.md - (b51811a) - containerscrew
+- update Cargo.toml - (57b77cc) - containerscrew
+- update nflux.toml.example file - (9ac4626) - containerscrew
+- local-install.sh script - (b600774) - containerscrew
+- update nflux.toml from git - (55c5012) - containerscrew
+- update nflux.toml.example - (e5c79cd) - containerscrew
+- ignore maxmind geoip db - (141b5d2) - containerscrew
+- exporting xdp data to grafana geomap - (88dd311) - containerscrew
+- change log interval for xdp events - (9cf5c02) - containerscrew
+- add nflux.toml to the .gitignore - (bd12093) - containerscrew
+- update pre-commit script - (8192fa5) - containerscrew
+- remove clap dependency - (62e26c0) - containerscrew
+- update README.md - (6bde10e) - containerscrew
+- create initial docs/index.html - (c80d275) - containerscrew
+- update CHANGELOG.md for version 0.13.0 - (f9a1140) - containerscrew
+- update CHANGELOG.md for version 0.12.7 - (65eae9d) - containerscrew
+
+- - -
+
 
 ## 0.12.7 - 2025-09-25
 #### Bug Fixes
