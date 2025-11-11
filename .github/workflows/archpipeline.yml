@@ -55,6 +55,14 @@ jobs:
           path: "packaging/*.pkg.tar.*"
           retention-days: 30
 
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          generate_release_notes: true
+          files: |
+            $GITHUB_WORKSPACE/packaging/*.pkg.tar.*
+
       - name: Get package info
         run: |
           cd $GITHUB_WORKSPACE/packaging
