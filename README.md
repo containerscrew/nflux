@@ -6,16 +6,18 @@
 
 ---
 
-![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white)
-[![License - GPL3](https://img.shields.io/github/license/containerscrew/nflux)](/LICENSE-GPL3)
-[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
-![Code Size](https://img.shields.io/github/languages/code-size/containerscrew/nflux)
-[![Test Pipeline](https://github.com/containerscrew/nflux/actions/workflows/test.yml/badge.svg)](https://github.com/containerscrew/nflux/actions/workflows/test.yml)
-[![Build Pipeline](https://github.com/containerscrew/nflux/actions/workflows/build.yml/badge.svg)](https://github.com/containerscrew/nflux/actions/workflows/build.yml)
-[![Lint Pipeline](https://github.com/containerscrew/nflux/actions/workflows/lint.yml/badge.svg)](https://github.com/containerscrew/nflux/actions/workflows/lint.yml)
-[![Release Pipeline](https://github.com/containerscrew/nflux/actions/workflows/release.yml/badge.svg?event=push)](https://github.com/containerscrew/nflux/actions/workflows/release.yml)
-[![Release](https://img.shields.io/github/release/containerscrew/nflux)](https://github.com/containerscrew/nflux/releases/latest)
-[![GitHub Releases Stats](https://img.shields.io/github/downloads/containerscrew/nflux/total.svg?logo=github)](https://somsubhra.github.io/github-release-stats/?username=containerscrew&repository=nflux)
+<p align="center" >
+    <img alt="pre-commit" src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white">
+    <img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/containerscrew/nflux">
+    <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/containerscrew/nflux">
+    <img alt="GitHub issues" src="https://img.shields.io/github/issues/containerscrew/nflux">
+    <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/containerscrew/nflux">
+    <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/containerscrew/nflux?style=social">
+    <img alt="GitHub watchers" src="https://img.shields.io/github/watchers/containerscrew/nflux?style=social">
+    <img alt="Release" src="https://img.shields.io/github/v/release/containerscrew/nflux?style=flat&logo=github">
+    <img alt="Downloads" src="https://img.shields.io/github/downloads/containerscrew/nflux/total?style=flat&logo=github">
+    <img alt="License" src="https://img.shields.io/badge/License-GPLv3-blue.svg">
+</p>
 
 ---
 
