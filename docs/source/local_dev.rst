@@ -9,7 +9,7 @@ Prerequisites
 
 - Cargo installed
 
-...THIS DOCUMENTATION IS STILL UNDER CONSTRUCTION... 
+...THIS DOCUMENTATION IS STILL UNDER CONSTRUCTION...
 
 Setup Instructions
 ==================
