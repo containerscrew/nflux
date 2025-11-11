@@ -19,6 +19,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Check version tag and stable.txt
+        if: startsWith(github.ref, 'refs/tags/')
         run: |
           TAG_NAME=$(echo "${{ github.ref }}" | sed 's|.*/||')
           STABLE_VERSION=$(cat stable.txt | tr -d '[:space:]')
