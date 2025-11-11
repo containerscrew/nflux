@@ -4,10 +4,12 @@ on:
   pull_request:
   push:
     paths:
-      - '**.rs'
+      - "**.rs"
       - .github/workflows/test.yml
     branches:
-      - '**'
+      - "**"
+    tags:
+      - "*.*.*"
 
 env:
   CARGO_TERM_COLOR: always

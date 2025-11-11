@@ -4,27 +4,29 @@ on:
   pull_request:
   push:
     paths:
-      - '**.rs'
-      - '.github/workflows/lint.yml'
+      - "**.rs"
+      - ".github/workflows/lint.yml"
     branches:
-      - '**'
+      - "**"
+    tags:
+      - "*.*.*"
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   rusfmt:
-     runs-on: ubuntu-latest
-     steps:
-       - uses: actions/checkout@v4
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-       - uses: dtolnay/rust-toolchain@v1
-         with:
-           toolchain: nightly
-           components: rustfmt
+      - uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: nightly
+          components: rustfmt
 
-       - name: Check formatting
-         run: cargo fmt --all -- --check
+      - name: Check formatting
+        run: cargo fmt --all -- --check
 
   # clippy:
   #   runs-on: ubuntu-latest

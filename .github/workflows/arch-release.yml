@@ -5,6 +5,9 @@ permissions:
   pull-requests: write
 
 on:
+  workflow_run:
+    workflows: ["Test", "Lint", "Check Version Consistency"]
+    types: [completed]
   push:
     tags:
       - "*.*.*"
@@ -65,7 +68,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           generate_release_notes: true
           files: |
-            $GITHUB_WORKSPACE/packaging/*.pkg.tar.*
+            packaging/*.pkg.tar.*
 
       - name: Get package info
         run: |

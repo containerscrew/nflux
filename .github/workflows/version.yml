@@ -6,7 +6,8 @@ on:
       - "Cargo.toml"
       - "PKGBUILD"
       - "stable.txt"
-      - ".github/workflows/check-version.yml"
+      - ".github/workflows/version.yml"
+      - "**.rs"
   pull_request:
 
 jobs:
@@ -16,6 +17,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Check version tag and stable.txt
+        run: |
+          TAG_NAME=$(echo "${{ github.ref }}" | sed 's|.*/||')
+          STABLE_VERSION=$(cat stable.txt | tr -d '[:space:]')
+          if [ -n "$TAG_NAME" ]; then
+            if [ "$TAG_NAME" != "$STABLE_VERSION" ]; then
+              echo "❌ Tag version ($TAG_NAME) does not match stable.txt version ($STABLE_VERSION)"
+              exit 1
+            else
+              echo "✅ Tag version matches stable.txt version"
+            fi
+          else
+            echo "No tag push detected, skipping tag vs stable.txt check"
+          fi
 
       - name: Extract version from Cargo.toml
         id: cargo
