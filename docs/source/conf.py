@@ -26,3 +26,8 @@ exclude_patterns = []
 
 html_theme = 'alabaster'
 html_static_path = ['_static']
+
+html_theme_options = {
+    'github_user': 'containerscrew',
+    'github_repo': 'nflux',
+}
