@@ -14,5 +14,5 @@ Welcome to the nflux documentation! This documentation is not yet complete.
 
    installation
    monitoring
-   local_development
+   local_dev
 
