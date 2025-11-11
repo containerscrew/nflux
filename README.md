@@ -26,7 +26,8 @@
 ---
 
 <p align="center">
-    <img src="./examples/grafana-map.png" alt="example3"/>
+    <h3 align="center">Build your own network monitoring dashboard with Opensearch</h3>
+    <img src="./examples/opensearch-dashboard.png" alt="example3"/>
 </p>
 
 ---

@@ -1,3 +1,11 @@
+## Unreleased (7865059..af643bc)
+#### Bug Fixes
+- archlinux pipeline step - (af643bc) - containerscrew
+#### Miscellaneous Chores
+- update changelog for 1.0.0 - (7865059) - containerscrew
+
+- - -
+
 ## 1.0.0 - 2025-11-11
 #### Features
 - implementing xdp ipv6 packet - (ecca8f8) - containerscrew

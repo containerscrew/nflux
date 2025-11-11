@@ -13,10 +13,6 @@ target/
 .vscode/
 .zed/
 
-# Debian builds
-deb-build/
-*.deb
-
 # Lima VM machines
 lima.REJECTED.yaml
 
@@ -26,13 +22,10 @@ lima.REJECTED.yaml
 # Nflux config file
 nflux.toml
 
-# vmlinux.rs
-#vmlinux.rs
-
 # MaxMind DB files
 *.mmdb
 
-# Arch
+# Arch Linux build files
 pkg/
 *.pkg.tar.*
 
