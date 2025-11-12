@@ -32,6 +32,11 @@ Arch Linux
 
     Change the version number and architecture as needed. Visit the `releases page <https://github.com/containerscrew/nflux/releases/>`_ to find the latest version and available architectures.
 
+Fedora/CentOS/RHEL based
+-------------------------
+
+Pending to be implemented.
+
 Local Installation from Source
 --------------------------------
 
