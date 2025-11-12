@@ -1,8 +1,8 @@
 post_install() {
     echo ">>> Setting up nflux environment"
     mkdir -p /var/log/nflux
-    touch /var/log/nflux/lastlog
-    chmod 644 /var/log/nflux/lastlog
+    touch /var/log/nflux/nflux.log
+    chmod 644 /var/log/nflux/nflux.log
 
     systemctl daemon-reload
 
@@ -11,7 +11,7 @@ post_install() {
 
 post_upgrade() {
     mkdir -p /var/log/nflux
-    touch /var/log/nflux/lastlog
+    touch /var/log/nflux/nflux.log
 
     systemctl daemon-reload
     systemctl restart nflux.service

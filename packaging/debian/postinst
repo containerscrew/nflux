@@ -3,8 +3,8 @@ set -e
 
 if [ "$1" = "configure" ]; then
     mkdir -p /var/log/nflux
-    touch /var/log/nflux/lastlog
-    chmod 644 /var/log/nflux/lastlog
+    touch /var/log/nflux/nflux.log
+    chmod 644 /var/log/nflux/nflux.log
     chmod 755 /var/log/nflux
 
     if command -v systemctl >/dev/null 2>&1; then

@@ -5,9 +5,9 @@
     delaycompress
     missingok
     notifempty
-    create 0640 root adm
+    create 0644 root root
     sharedscripts
     postrotate
-        systemctl reload nflux.service >/dev/null 2>&1 || true
+        systemctl restart nflux.service >/dev/null 2>&1 || true
     endscript
 }

@@ -10,7 +10,7 @@ services:
     volumes:
       - ./fluent-bit/fluent-bit.yaml:/fluent-bit/etc/fluent-bit.yaml
       - ./geoip/GeoLite2-City.mmdb:/opt/GeoLite2-City.mmdb:ro
-      - /var/log/nflux/lastlog:/var/log/nflux/lastlog:ro
+      - /var/log/nflux/nflux.log:/var/log/nflux/nflux.log:ro
       - ./fluent-bit/parsers.conf:/fluent-bit/etc/parsers.conf
       - ./fluent-bit/geo.lua:/fluent-bit/scripts/geo.lua:ro
     command:

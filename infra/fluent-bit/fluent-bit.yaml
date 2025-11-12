@@ -10,7 +10,7 @@ pipeline:
   inputs:
     - name: tail
       tag: nflux
-      path: /var/log/nflux/lastlog
+      path: /var/log/nflux/nflux.log
       multiline: Off
       parser: json
       read_from_head: true

@@ -10,8 +10,8 @@ ExecStart=/usr/bin/nflux
 Restart=on-failure
 PIDFile=/run/nflux.pid
 Environment="NFLUX_CONFIG_FILE=/etc/nflux/nflux.toml"
-StandardOutput=append:/var/log/nflux/lastlog
-StandardError=append:/var/log/nflux/lastlog
+StandardOutput=append:/var/log/nflux/nflux.log
+StandardError=append:/var/log/nflux/nflux.log
 #StandardOutput=file:/var/log/nflux/lastlog
 #StandardError=file:/var/log/nflux/lastlog
 RestartSec=5s
