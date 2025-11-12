@@ -69,7 +69,7 @@ Use the appropriate command depending on your container engine (Podman or Docker
 
    PUT _index_template/node-geo-template
     {
-      "index_patterns": ["node*"],
+      "index_patterns": ["nflux*"],
       "template": {
         "mappings": {
           "properties": {
@@ -79,6 +79,10 @@ Use the appropriate command depending on your container engine (Podman or Docker
       }
     }
 
-    GET node-*/_mapping
+    GET nflux-*/_mapping
 
-    DELETE node-*
+    DELETE nflux-*
+
+10. **Create the index pattern in OpenSearch Dashboards:**
+
+- Visit the official Opensearch documentation to create an index pattern: `Creating index patterns <https://docs.opensearch.org/latest/dashboards/management/index-patterns/>`_.

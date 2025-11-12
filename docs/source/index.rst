@@ -14,6 +14,7 @@ Welcome to the nflux documentation! This documentation is not yet complete.
 
    introduction
    installation
+   usage
    monitoring
    local_dev
 
