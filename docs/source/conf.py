@@ -30,4 +30,6 @@ html_static_path = ['_static']
 html_theme_options = {
     'github_user': 'containerscrew',
     'github_repo': 'nflux',
+    'github_banner': True,
+    'fixed_sidebar': True,
 }
