@@ -33,10 +33,14 @@ The nflux program attaches directly to the physical network interface, enabling 
 > Egress traffic monitoring was available in earlier versions of nflux (prior to `1.0.0`). For versions `1.0.0` and above, it is currently not included, as the main focus of this software is tracking incoming connections.
 
 ---
+
+<h2 align="center">Example of nflux data visualized in OpenSearch Dashboards</h2>
+
 <p align="center">
-    <h3 align="center">nflux data visualization using OpenSearch Dashboards</h3>
-    <img src="docs/source/_static/opensearch-dashboard.png" alt="nflux-architecture" width="600"/>
+    <img src="./docs/source/_static/opensearch-dashboard.png" alt="example2"/>
 </p>
+
+---
 
 # Documentation
 
