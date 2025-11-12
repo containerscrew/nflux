@@ -44,7 +44,7 @@ The nflux program attaches directly to the physical network interface, enabling 
 
 # Documentation
 
-Documentation still in progress, but will be available soon in https://nflux.containerscrew.com
+https://nflux.containerscrew.com
 
 # License
 
