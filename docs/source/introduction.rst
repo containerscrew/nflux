@@ -1,6 +1,12 @@
 Introduction
 ===================
 
+Nflux is a network agent tool that monitors `incoming` traffic on a Linux system by
+attaching a `XDP (Express Data Path)` program using eBPF technology.
+
+Examples
+--------
+
 Monitor incoming traffic using XDP and eBPF with nflux, a high-performance network monitoring agent.
 
 .. image:: _static/example.png

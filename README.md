@@ -22,26 +22,6 @@
 
 ---
 
-<p align="center">
-    <h3 align="center">Monitor incoming traffic using XDP</h3>
-    <img src="./examples/example.png" alt="example"/>
-</p>
-
----
-
-<p align="center">
-    <h3 align="center">Nflux managed by systemd service (in future versions will be contiainerized)</h3>
-    <img src="./examples/example2.png" alt="example2"/>
-
----
-
-<p align="center">
-    <h3 align="center">Build your own network monitoring dashboard with Opensearch</h3>
-    <img src="./examples/opensearch-dashboard.png" alt="example3"/>
-</p>
-
----
-
 # What is nflux?
 
 Nflux is a network agent tool that monitors `incoming` traffic on a Linux system by
