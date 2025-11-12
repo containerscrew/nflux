@@ -5,6 +5,28 @@
 - update changelog for 1.0.0 - (7865059) - containerscrew
 
 - - -
+## 1.0.1 - 2025-11-12
+#### Bug Fixes
+- archlinux pipeline step - (af643bc) - containerscrew
+#### Documentation
+- update fixed html theme options - (c72d8c1) - containerscrew
+- html theme options - (d62b0c5) - containerscrew
+- fix index.rst - (9f09735) - containerscrew
+- update README - (48ddb96) - containerscrew
+- changelog, doc and scripts - (94b892a) - containerscrew
+- changelog, doc and scripts - (e05f4e3) - containerscrew
+#### Build system
+- new version 1.0.1 - (b2c6acf) - containerscrew
+#### Refactoring
+- nflux log file - (53e3185) - containerscrew
+#### Miscellaneous Chores
+- rollback sphinx to alabaster - (f94e350) - containerscrew
+- change sphinx theme - (eecba7b) - containerscrew
+- change sphinx theme - (3c30535) - containerscrew
+- update changelog for 1.0.0 - (7865059) - containerscrew
+
+- - -
+
 
 ## 1.0.0 - 2025-11-11
 #### Features
