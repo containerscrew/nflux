@@ -23,4 +23,5 @@ pre_remove() {
 
 post_remove() {
     systemctl daemon-reload
+    rm -rf /var/log/nflux
 }
