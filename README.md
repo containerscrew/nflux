@@ -1,4 +1,5 @@
 <p align="center">
+    <img src="docs/source/_static/logo.png" alt="logo" width="250"/>
     <h1 align="center">The nflux project</h1>
     <p align="center">Simple network monitoring agent tool. Powered by eBPF 🐝</p>
     <p align="center">Kernel and user space code written entirely in Rust ❤</p>
