@@ -30,7 +30,7 @@ The nflux program attaches directly to the physical network interface, enabling 
 > XDP can be used to redirect packets or drop them at the network interface. However, this software is not designed to act as a firewall or to redirect packets at this time. Its sole purpose is to monitor incoming traffic, allowing all packets to pass through without interference. `Multiple attachment` to different interfaces is not yet supported.
 
 > [!NOTE]
-> Egress traffic monitoring was available in earlier versions of nflux (prior to `1.0.0`). For versions `1.0.0` and above, it is currently not included, as the main focus of this software is tracking incoming connections.
+> Egress traffic monitoring was available in earlier versions of nflux (prior to `1.0.0`). For versions `1.0.0` and above, it is currently not included, as the main focus of this software is tracking incoming connections of servers which typically handle inbound traffic (e.g, web servers, etc).
 
 ---
 
