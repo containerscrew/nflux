@@ -12,4 +12,9 @@ enable_udp = false  # enable UDP monitoring (default: false)
 enable_tcp = true  # enable TCP monitoring (default: false)
 enable_icmp = false  # enable ICMP monitoring (default: false)
 enable_arp = false  # enable ARP monitoring (default: false)
-log_interval = 5  # How often same src_ip:port dst_ip:port connections are logged in seconds (default: 5). 0 means log every connection.
+
+# How often same src_ip:port dst_ip:port connections are logged in seconds (default: 5). 0 means log every connection.
+# If you want to have a nicer dashboard with real data in Opensearch, set this to 0 to print EVERY packet received.
+# If not real packet data and what you will see in the dashboard will not be accurate.
+# Combine this option with exclude_ports to reduce the amount of data logged for unnecessary connections (e.g., you are connected to your VPS using ssh and every ACK packet will be logged).
+log_interval = 5
