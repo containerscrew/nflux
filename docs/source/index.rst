@@ -12,6 +12,7 @@ Welcome to the nflux documentation! This documentation is not yet complete.
    :maxdepth: 2
    :caption: Contents:
 
+   introduction
    installation
    monitoring
    local_dev
