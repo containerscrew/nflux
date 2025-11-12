@@ -1,10 +1,3 @@
-## Unreleased (7865059..af643bc)
-#### Bug Fixes
-- archlinux pipeline step - (af643bc) - containerscrew
-#### Miscellaneous Chores
-- update changelog for 1.0.0 - (7865059) - containerscrew
-
-- - -
 ## 1.0.1 - 2025-11-12
 #### Bug Fixes
 - archlinux pipeline step - (af643bc) - containerscrew
@@ -20,6 +13,7 @@
 #### Refactoring
 - nflux log file - (53e3185) - containerscrew
 #### Miscellaneous Chores
+- (**version**) 1.0.1 - (ea97482) - containerscrew
 - rollback sphinx to alabaster - (f94e350) - containerscrew
 - change sphinx theme - (eecba7b) - containerscrew
 - change sphinx theme - (3c30535) - containerscrew
@@ -27,8 +21,7 @@
 
 - - -
 
-
-## 1.0.0 - 2025-11-11
+## 1.0.0 - 2025-11-12
 #### Features
 - implementing xdp ipv6 packet - (ecca8f8) - containerscrew
 - add active connection track for xdp program - (a56c442) - containerscrew
@@ -174,7 +167,7 @@
 
 - - -
 
-## 0.12.7 - 2025-11-11
+## 0.12.7 - 2025-11-12
 #### Features
 - new tag 0.12.7 - (e4c7b53) - containerscrew
 #### Bug Fixes
@@ -194,7 +187,7 @@
 
 - - -
 
-## 0.12.6 - 2025-11-11
+## 0.12.6 - 2025-11-12
 #### Bug Fixes
 - pre-commit scripts - (d3936b1) - containerscrew
 - pre-commit scripts - (66a01c2) - containerscrew
@@ -221,7 +214,7 @@
 
 - - -
 
-## 0.12.5 - 2025-11-11
+## 0.12.5 - 2025-11-12
 #### Features
 - (**doc**) add new examples section - (e07de1a) - containerscrew
 - (**exclude-ports**) new feature flag --exlude-ports from the logger) - (3a6d49c) - containerscrew
