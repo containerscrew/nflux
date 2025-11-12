@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-nflux documentation
+The Nflux project
 ===================
 
 Welcome to the nflux documentation! This documentation is not yet complete.
