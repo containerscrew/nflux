@@ -15,7 +15,7 @@ aya = { workspace = true }
 libc = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tracing-subscriber = { version = "0.3.22", features = ["json"] }
-tracing = "0.1.43"
+tracing = "0.1.44"
 aya-log = "0.2.1"
 dns-lookup = "3.0.1"
 sysinfo = "0.37.2"
