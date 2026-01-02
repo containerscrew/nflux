@@ -41,14 +41,14 @@ fn _ip_familiy_as_str(ip_family: u8) -> &'static str {
 fn event_kind(e: &NetworkEvent) -> &'static str {
     if let Some(flags) = e.tcp_flags {
         if flags.syn == 1 && flags.ack == 0 {
-            "start_connection"
+            "new_connection"
         } else if flags.fin == 1 || flags.rst == 1 {
             "end_connection"
         } else {
             "UNKNOWN"
         }
     } else {
-        "start_connection"
+        "new_connection"
     }
 }
 
