@@ -5,6 +5,6 @@ if command -v systemctl >/dev/null 2>&1; then
     systemctl daemon-reload || true
 fi
 
-rm /var/log/nflux/* 2>/dev/null || true
+rm -r /var/log/nflux 2>/dev/null || true
 
 exit 0

@@ -17,7 +17,7 @@ use network_types::{
     udp::UdpHdr,
 };
 use nflux_common::{
-    dto::{ActiveConnectionKey, ArpEvent, IpFamily, NetworkEvent, TcpFlags},
+    dto::{ActiveConnectionKey, ArpEvent, FlowState, IpFamily, NetworkEvent, TcpFlags},
     maps::{ACTIVE_CONNECTIONS, ARP_EVENTS, CONFIGMAP, NETWORK_EVENT},
 };
 
@@ -48,18 +48,11 @@ unsafe fn ptr_at<T>(
 fn handle_ports(
     ctx: &XdpContext,
     protocol: IpProto,
-    ip_family: IpFamily,
+    l4_offset: usize,
 ) -> Result<(u16, u16, Option<TcpFlags>), ()> {
-    // Calculate offset assuming Ethernet frame
-    let offset = match ip_family {
-        IpFamily::Ipv4 => EthHdr::LEN + Ipv4Hdr::LEN,
-        IpFamily::Ipv6 => EthHdr::LEN + Ipv6Hdr::LEN,
-        IpFamily::Unknown => 0,
-    };
-
     match protocol {
         IpProto::Tcp => {
-            let tcphdr: *const TcpHdr = unsafe { ptr_at(&ctx, offset)? };
+            let tcphdr: *const TcpHdr = unsafe { ptr_at(&ctx, l4_offset)? };
             unsafe {
                 let src_port = u16::from_be_bytes((*tcphdr).source);
                 let dst_port = u16::from_be_bytes((*tcphdr).dest);
@@ -79,14 +72,45 @@ fn handle_ports(
             }
         }
         IpProto::Udp => {
-            let udphdr: *const UdpHdr = unsafe { ptr_at(&ctx, offset)? };
+            let udphdr: *const UdpHdr = unsafe { ptr_at(&ctx, l4_offset)? };
             unsafe {
                 let src_port = u16::from_be_bytes((*udphdr).src);
                 let dst_port = u16::from_be_bytes((*udphdr).dst);
                 Ok((src_port, dst_port, None))
             }
         }
-        _ => Ok((0, 0, None)), // ICMP or other protocols
+        _ => Ok((0, 0, None)),
+    }
+}
+
+#[inline(always)]
+fn emit_event(
+    src_ip: [u8; 16],
+    dst_ip: [u8; 16],
+    total_len: u16,
+    ttl: u8,
+    src_port: u16,
+    dst_port: u16,
+    protocol: u8,
+    ip_family: IpFamily,
+    tcp_flags: Option<TcpFlags>,
+    direction: u8,
+) {
+    if let Some(mut data) = NETWORK_EVENT.reserve::<NetworkEvent>(0) {
+        let event = NetworkEvent {
+            src_ip,
+            dst_ip,
+            total_len,
+            ttl,
+            src_port,
+            dst_port,
+            protocol,
+            direction,
+            ip_family,
+            tcp_flags,
+        };
+        data.write(event);
+        data.submit(0);
     }
 }
 
@@ -98,34 +122,34 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
     match (*ethhdr).ether_type() {
         Ok(EtherType::Ipv4) => {
             let ipv4hdr: *const Ipv4Hdr = unsafe { ptr_at(&ctx, EthHdr::LEN)? };
+
             let mut src_ip = [0u8; 16];
             let mut dst_ip = [0u8; 16];
+            src_ip[12..].copy_from_slice(&(*ipv4hdr).src_addr);
+            dst_ip[12..].copy_from_slice(&(*ipv4hdr).dst_addr);
 
-            let r_src_ip = unsafe { (*ipv4hdr).src_addr };
-            let r_dst_ip = unsafe { (*ipv4hdr).dst_addr };
+            let total_len = u16::from_be_bytes((*ipv4hdr).tot_len);
+            let protocol = (*ipv4hdr).proto;
+            let ttl = (*ipv4hdr).ttl;
 
-            src_ip[12..].copy_from_slice(&r_src_ip);
-            dst_ip[12..].copy_from_slice(&r_dst_ip);
-
-            let total_len = u16::from_be_bytes(unsafe { (*ipv4hdr).tot_len });
-            let protocol = unsafe { (*ipv4hdr).proto };
-            let ttl = unsafe { (*ipv4hdr).ttl };
-
-            if config.enable_tcp == 0 && protocol == IpProto::Tcp {
-                return Ok(XDP_PASS);
-            } else if config.enable_udp == 0 && protocol == IpProto::Udp {
-                return Ok(XDP_PASS);
-            };
-
-            let (src_port, dst_port, tcp_flags) = handle_ports(&ctx, protocol, IpFamily::Ipv4)?;
-
-            if config.listen_port != 0
-                && (src_port != config.listen_port && dst_port != config.listen_port)
+            if (protocol == IpProto::Tcp && config.enable_tcp == 0)
+                || (protocol == IpProto::Udp && config.enable_udp == 0)
             {
                 return Ok(XDP_PASS);
             }
 
-            // Check if the active connection is already tracked
+            let ihl = ((*ipv4hdr).vihl & 0x0f) as usize;
+            let l4_offset = EthHdr::LEN + ihl * 4;
+
+            let (src_port, dst_port, tcp_flags) = handle_ports(&ctx, protocol, l4_offset)?;
+
+            if config.listen_port != 0
+                && src_port != config.listen_port
+                && dst_port != config.listen_port
+            {
+                return Ok(XDP_PASS);
+            }
+
             let key = ActiveConnectionKey {
                 protocol: protocol as u8,
                 src_port,
@@ -134,50 +158,107 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
                 dst_ip,
             };
 
-            let current_time = bpf_ktime_get_ns();
-            let log_interval = config.log_interval;
+            let had_entry = ACTIVE_CONNECTIONS.get(&key).is_some();
 
-            if let Some(last_log_time) = ACTIVE_CONNECTIONS.get(&key) {
-                if current_time - *last_log_time < log_interval {
-                    return Ok(XDP_PASS);
+            let now = bpf_ktime_get_ns();
+            let bytes = total_len as u64;
+
+            match ACTIVE_CONNECTIONS.get(&key) {
+                Some(st) => {
+                    let mut new_st = *st;
+                    new_st.last_seen_ns = now;
+                    new_st.packets += 1;
+                    new_st.bytes += bytes;
+                    ACTIVE_CONNECTIONS.insert(&key, &new_st, 0).ok();
+                }
+                None => {
+                    let st = FlowState {
+                        first_seen_ns: now,
+                        last_seen_ns: now,
+                        packets: 1,
+                        bytes,
+                    };
+                    ACTIVE_CONNECTIONS.insert(&key, &st, 0).ok();
                 }
             }
 
-            ACTIVE_CONNECTIONS.insert(&key, &current_time, 0).ok();
+            let direction = if config.listen_port != 0 && dst_port == config.listen_port {
+                0
+            } else if config.listen_port != 0 && src_port == config.listen_port {
+                1
+            } else {
+                0
+            };
 
-            if let Some(mut data) = NETWORK_EVENT.reserve::<NetworkEvent>(0) {
-                let event = NetworkEvent {
+            let mut should_emit = false;
+
+            if protocol == IpProto::Tcp {
+                if let Some(f) = tcp_flags {
+                    if !had_entry && f.syn != 0 && f.ack == 0 {
+                        should_emit = true;
+                    } else if had_entry && f.fin != 0 {
+                        should_emit = true;
+                    } // Final RST not logged
+                }
+            } else if protocol == IpProto::Udp {
+                if !had_entry {
+                    should_emit = true;
+                }
+            }
+
+            if should_emit {
+                emit_event(
                     src_ip,
                     dst_ip,
                     total_len,
                     ttl,
                     src_port,
                     dst_port,
-                    protocol: protocol as u8,
-                    direction: 0,
-                    ip_family: nflux_common::dto::IpFamily::Ipv4,
+                    protocol as u8,
+                    IpFamily::Ipv4,
                     tcp_flags,
-                };
-                data.write(event);
-                data.submit(0);
+                    direction,
+                );
+
+                if protocol == IpProto::Tcp {
+                    if let Some(f) = tcp_flags {
+                        if f.fin != 0 || f.rst != 0 {
+                            ACTIVE_CONNECTIONS.remove(&key);
+                        }
+                    }
+                }
             }
         }
+
         Ok(EtherType::Ipv6) => {
             let ipv6hdr: *const Ipv6Hdr = unsafe { ptr_at(&ctx, EthHdr::LEN)? };
-            let src_ip = unsafe { (*ipv6hdr).src_addr };
-            let dst_ip = unsafe { (*ipv6hdr).dst_addr };
-            let total_len = u16::from_be_bytes(unsafe { (*ipv6hdr).payload_len });
-            let protocol = unsafe { (*ipv6hdr).next_hdr };
-            let ttl = unsafe { (*ipv6hdr).hop_limit };
-            let (src_port, dst_port, tcp_flags) = handle_ports(&ctx, protocol, IpFamily::Ipv6)?;
 
-            if config.listen_port != 0
-                && (src_port != config.listen_port && dst_port != config.listen_port)
+            let src_ip = (*ipv6hdr).src_addr;
+            let dst_ip = (*ipv6hdr).dst_addr;
+            let total_len = u16::from_be_bytes((*ipv6hdr).payload_len);
+            let protocol = (*ipv6hdr).next_hdr;
+            let ttl = (*ipv6hdr).hop_limit;
+
+            if protocol != IpProto::Tcp && protocol != IpProto::Udp {
+                return Ok(XDP_PASS);
+            }
+
+            if (protocol == IpProto::Tcp && config.enable_tcp == 0)
+                || (protocol == IpProto::Udp && config.enable_udp == 0)
             {
                 return Ok(XDP_PASS);
             }
 
-            // Check if the active connection is already tracked
+            let l4_offset = EthHdr::LEN + Ipv6Hdr::LEN;
+            let (src_port, dst_port, tcp_flags) = handle_ports(&ctx, protocol, l4_offset)?;
+
+            if config.listen_port != 0
+                && src_port != config.listen_port
+                && dst_port != config.listen_port
+            {
+                return Ok(XDP_PASS);
+            }
+
             let key = ActiveConnectionKey {
                 protocol: protocol as u8,
                 src_port,
@@ -186,41 +267,85 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
                 dst_ip,
             };
 
-            let current_time = bpf_ktime_get_ns();
-            let log_interval = config.log_interval;
+            let had_entry = ACTIVE_CONNECTIONS.get(&key).is_some();
 
-            if let Some(last_log_time) = ACTIVE_CONNECTIONS.get(&key) {
-                if current_time - *last_log_time < log_interval {
-                    return Ok(XDP_PASS);
+            let now = bpf_ktime_get_ns();
+            let bytes = total_len as u64;
+
+            match ACTIVE_CONNECTIONS.get(&key) {
+                Some(st) => {
+                    let mut new_st = *st;
+                    new_st.last_seen_ns = now;
+                    new_st.packets += 1;
+                    new_st.bytes += bytes;
+                    ACTIVE_CONNECTIONS.insert(&key, &new_st, 0).ok();
+                }
+                None => {
+                    let st = FlowState {
+                        first_seen_ns: now,
+                        last_seen_ns: now,
+                        packets: 1,
+                        bytes,
+                    };
+                    ACTIVE_CONNECTIONS.insert(&key, &st, 0).ok();
                 }
             }
 
-            ACTIVE_CONNECTIONS.insert(&key, &current_time, 0).ok();
+            let direction = if config.listen_port != 0 && dst_port == config.listen_port {
+                0
+            } else if config.listen_port != 0 && src_port == config.listen_port {
+                1
+            } else {
+                0
+            };
 
-            if let Some(mut data) = NETWORK_EVENT.reserve::<NetworkEvent>(0) {
-                let event = NetworkEvent {
+            let mut should_emit = false;
+
+            if protocol == IpProto::Tcp {
+                if let Some(f) = tcp_flags {
+                    if !had_entry && f.syn != 0 && f.ack == 0 {
+                        should_emit = true;
+                    } else if had_entry && f.fin != 0 {
+                        should_emit = true;
+                    }
+                }
+            } else if protocol == IpProto::Udp {
+                if !had_entry {
+                    should_emit = true;
+                }
+            }
+
+            if should_emit {
+                emit_event(
                     src_ip,
                     dst_ip,
                     total_len,
                     ttl,
                     src_port,
                     dst_port,
-                    protocol: protocol as u8,
-                    direction: 0,
-                    ip_family: nflux_common::dto::IpFamily::Ipv6,
+                    protocol as u8,
+                    IpFamily::Ipv6,
                     tcp_flags,
-                };
-                data.write(event);
-                data.submit(0);
+                    direction,
+                );
+
+                if protocol == IpProto::Tcp {
+                    if let Some(f) = tcp_flags {
+                        if f.fin != 0 || f.rst != 0 {
+                            ACTIVE_CONNECTIONS.remove(&key);
+                        }
+                    }
+                }
             }
         }
+
         Ok(EtherType::Arp) => {
             let arphdr: *const ArpHdr = unsafe { ptr_at(&ctx, EthHdr::LEN)? };
-            let op_code = u16::from_be_bytes(unsafe { (*arphdr).oper });
+            let op_code = u16::from_be_bytes((*arphdr).oper);
 
-            let ip_family = match u16::from_be_bytes(unsafe { (*arphdr).ptype }) {
-                0x0800 => IpFamily::Ipv4, // AF_INET
-                0x86DD => IpFamily::Ipv6, // AF_INET6
+            let ip_family = match u16::from_be_bytes((*arphdr).ptype) {
+                0x0800 => IpFamily::Ipv4,
+                0x86DD => IpFamily::Ipv6,
                 _ => IpFamily::Unknown,
             };
 
@@ -233,13 +358,11 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
                 slot.submit(0);
             }
         }
-        _ => {
-            // Other packet
-            return Ok(XDP_PASS);
-        }
+
+        _ => {}
     }
 
-    Ok(xdp_action::XDP_PASS)
+    Ok(XDP_PASS)
 }
 
 #[cfg(not(test))]

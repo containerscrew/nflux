@@ -33,6 +33,15 @@ pub struct Configmap {
 }
 
 #[repr(C)]
+#[derive(Copy, Clone)]
+pub struct FlowState {
+    pub first_seen_ns: u64,
+    pub last_seen_ns: u64,
+    pub packets: u64,
+    pub bytes: u64,
+}
+
+#[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct NetworkEvent {
     pub src_ip: [u8; 16],

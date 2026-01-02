@@ -3,7 +3,7 @@ use aya_ebpf::{
     maps::{Array, LruHashMap, RingBuf},
 };
 
-use crate::dto::{ActiveConnectionKey, Configmap};
+use crate::dto::{ActiveConnectionKey, Configmap, FlowState};
 
 // Maps
 #[map]
@@ -16,5 +16,5 @@ pub static CONFIGMAP: Array<Configmap> = Array::with_max_entries(1, 0);
 pub static ARP_EVENTS: RingBuf = RingBuf::with_byte_size(1024, 0);
 
 #[map]
-pub static ACTIVE_CONNECTIONS: LruHashMap<ActiveConnectionKey, u64> =
+pub static ACTIVE_CONNECTIONS: LruHashMap<ActiveConnectionKey, FlowState> =
     LruHashMap::with_max_entries(4096, 0);

@@ -38,6 +38,20 @@ fn _ip_familiy_as_str(ip_family: u8) -> &'static str {
     }
 }
 
+fn event_kind(e: &NetworkEvent) -> &'static str {
+    if let Some(flags) = e.tcp_flags {
+        if flags.syn == 1 && flags.ack == 0 {
+            "start_connection"
+        } else if flags.fin == 1 || flags.rst == 1 {
+            "end_connection"
+        } else {
+            "UNKNOWN"
+        }
+    } else {
+        "start_connection"
+    }
+}
+
 pub async fn process_networking_event(
     mut ring_buf: RingBuf<MapData>,
     log_format: String,
@@ -50,6 +64,9 @@ pub async fn process_networking_event(
             if data.len() == size_of::<NetworkEvent>() {
                 let event: &NetworkEvent = unsafe { &*(data.as_ptr() as *const NetworkEvent) };
 
+                // Event kind
+                let kind = event_kind(event);
+
                 if let Some(ref ports) = exclude_ports {
                     if ports.contains(&event.src_port) || ports.contains(&event.dst_port) {
                         continue;
@@ -59,6 +76,7 @@ pub async fn process_networking_event(
                     "json" => {
                         let e = event;
                         info!(
+                            event = kind,
                             direction = %convert_direction(e.direction),
                             protocol = %convert_protocol(e.protocol),
                             ip_family = %e.ip_family.as_str(),
@@ -76,7 +94,7 @@ pub async fn process_networking_event(
                         );
                     }
                     _ => {
-                        info!("{}", DisplayNetworkEvent(*event));
+                        info!("[{}]{}", kind, DisplayNetworkEvent(*event));
                     }
                 }
             }
