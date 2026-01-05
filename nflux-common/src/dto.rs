@@ -90,4 +90,7 @@ pub mod user {
     use super::*;
 
     unsafe impl aya::Pod for Configmap {}
+    unsafe impl aya::Pod for FlowState {}
+    
+    unsafe impl aya::Pod for ActiveConnectionKey {}
 }

@@ -1,6 +1,0 @@
-{job="xdp-traffic", geoip_location_latitude!="" , geoip_location_longitude!=""}
-| line_format "{{.geoip_country_name}} ({{.geoip_location_latitude}}, {{.geoip_location_longitude}})"
-
-
-{job="xdp-traffic", geoip_location_latitude!="" , geoip_location_longitude!=""}
-| label_format latitude="{{.geoip_location_latitude}}", longitude="{{.geoip_location_longitude}}"

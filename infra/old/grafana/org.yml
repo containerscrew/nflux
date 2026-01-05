@@ -1,6 +1,0 @@
-apiVersion: 1
-
-organizations:
-  - name: Mi Organización de Monitoreo
-    id: 2
-    is_default: true

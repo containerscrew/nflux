@@ -1,8 +1,8 @@
 images:
-  - location: https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2
+  - location: https://cloud.debian.org/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2
     arch: x86_64
 
-  - location: https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-arm64.qcow2
+  - location: https://cloud.debian.org/images/cloud/trixie/latest/debian-13-genericcloud-arm64.qcow2
     arch: aarch64
 
 vmType: "vz"
@@ -14,6 +14,10 @@ rosetta:
   enabled: true
   binfmt: true
 
+
+networks:
+  - vzNAT: true
+
 user:
   name: "ebpf"
 
@@ -21,16 +25,9 @@ mounts:
   - location: "~/Documents/Code/Personal/nflux"
     writable: true
 
-  - location: "~/.ssh/lima"
-    mountPoint: "/tmp/lima"
-    writable: false
-
 memory: "2GiB"
 cpus: 2
 disk: "15GiB"
-ssh:
-  localPort: 2222
-  loadDotSSHPubKeys: true
 
 provision:
   - mode: system
@@ -49,5 +46,3 @@ provision:
       rustup install stable && rustup toolchain install nightly --component rust-src
       rustup default nightly
       cargo install bpf-linker
-      sudo cat /tmp/lima/lima.pub >> $HOME/.ssh/authorized_keys
-      sudo chmod 0644 $HOME/.ssh/authorized_keys
