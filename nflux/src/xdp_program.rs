@@ -9,7 +9,6 @@ use crate::{
     utils::wait_for_shutdown,
 };
 
-// Constantes de configuración (podrías pasarlas por parámetro también)
 const CLEANUP_INTERVAL: Duration = Duration::from_secs(5);
 const TCP_TIMEOUT_NS: u64 = 60 * 1_000_000_000;
 const UDP_TIMEOUT_NS: u64 = 30 * 1_000_000_000;
@@ -24,7 +23,6 @@ pub async fn clean_active_connections(
         let now_ns = get_boot_time_ns();
         let mut keys_to_delete = Vec::new();
 
-        // CORRECCIÓN: Iteramos directamente, sin match
         for item in active_connections.iter() {
             match item {
                 Ok((key, state)) => {
@@ -43,7 +41,6 @@ pub async fn clean_active_connections(
                 }
                 Err(e) => {
                     error!("Error reading map entry: {}", e);
-                    // Si falla la lectura de un item, continuamos con el siguiente
                     continue;
                 }
             }
@@ -60,7 +57,6 @@ pub async fn clean_active_connections(
     }
 }
 
-// Helper para obtener el tiempo compatible con bpf_ktime_get_ns (CLOCK_MONOTONIC)
 fn get_boot_time_ns() -> u64 {
     let mut ts = libc::timespec { tv_sec: 0, tv_nsec: 0 };
     unsafe {
