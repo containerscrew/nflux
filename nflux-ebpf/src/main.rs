@@ -196,9 +196,9 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
                 if let Some(f) = tcp_flags {
                     if !had_entry && f.syn != 0 && f.ack == 0 {
                         should_emit = true;
-                    } else if had_entry && f.fin != 0 {
+                    } else if had_entry && (f.fin != 0 || f.rst != 0) {
                         should_emit = true;
-                    } // Final RST not logged
+                    }
                 }
             } else if protocol == IpProto::Udp {
                 if !had_entry {
@@ -223,7 +223,7 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
                 if protocol == IpProto::Tcp {
                     if let Some(f) = tcp_flags {
                         if f.fin != 0 || f.rst != 0 {
-                            ACTIVE_CONNECTIONS.remove(&key);
+                            ACTIVE_CONNECTIONS.remove(&key).ok();
                         }
                     }
                 }
@@ -305,7 +305,7 @@ unsafe fn try_xdp_program(ctx: XdpContext) -> Result<u32, ()> {
                 if let Some(f) = tcp_flags {
                     if !had_entry && f.syn != 0 && f.ack == 0 {
                         should_emit = true;
-                    } else if had_entry && f.fin != 0 {
+                    } else if had_entry && (f.fin != 0 || f.rst != 0) {
                         should_emit = true;
                     }
                 }
