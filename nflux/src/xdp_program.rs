@@ -1,25 +1,28 @@
-use std::net::{Ipv4Addr, Ipv6Addr};
-use std::time::Duration;
-use aya::{Ebpf, maps::RingBuf};
-use tracing::{debug, error, info, warn};
-use aya::maps::{HashMap, MapData};
-use tokio::time::sleep;
-use nflux_common::dto::{ActiveConnectionKey, FlowState};
 use crate::{
     network_event::{process_arp_events, process_networking_event},
     utils::wait_for_shutdown,
 };
+use aya::maps::{HashMap, MapData};
+use aya::{Ebpf, maps::RingBuf};
+use nflux_common::dto::{ActiveConnectionKey, FlowState};
+use std::net::{Ipv4Addr, Ipv6Addr};
+use std::time::Duration;
+use tokio::time::sleep;
+use tracing::{debug, error, info, warn};
 
 const CLEANUP_INTERVAL: Duration = Duration::from_secs(5);
 const TCP_TIMEOUT_NS: u64 = 60 * 1_000_000_000; // 60 seconds
 const UDP_TIMEOUT_NS: u64 = 30 * 1_000_000_000; // 30 seconds
 
-fn fmt_ip(bytes: [u8; 16], protocol: u16) -> String {
+fn fmt_ip(
+    bytes: [u8; 16],
+    protocol: u16,
+) -> String {
     match protocol {
         _ if bytes[0..12].iter().all(|&x| x == 0) => {
             let ip = Ipv4Addr::new(bytes[12], bytes[13], bytes[14], bytes[15]);
             ip.to_string()
-        },
+        }
         _ => {
             let ip = Ipv6Addr::from(bytes);
             ip.to_string()
@@ -28,7 +31,7 @@ fn fmt_ip(bytes: [u8; 16], protocol: u16) -> String {
 }
 
 pub async fn clean_active_connections(
-    mut active_connections: HashMap<MapData, ActiveConnectionKey, FlowState>,
+    mut active_connections: HashMap<MapData, ActiveConnectionKey, FlowState>
 ) -> Result<(), anyhow::Error> {
     info!("Starting Active Connections Cleaner task...");
 
@@ -84,7 +87,10 @@ pub async fn clean_active_connections(
 }
 
 fn get_boot_time_ns() -> u64 {
-    let mut ts = libc::timespec { tv_sec: 0, tv_nsec: 0 };
+    let mut ts = libc::timespec {
+        tv_sec: 0,
+        tv_nsec: 0,
+    };
     unsafe {
         libc::clock_gettime(libc::CLOCK_MONOTONIC, &mut ts);
     }
