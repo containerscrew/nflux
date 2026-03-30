@@ -32,5 +32,18 @@ pkg/
 # Sphinx documentation build files
 docs/build/
 
+# IDE directories
+.idea/
+.vscode/
+
 # Environment variables file
 .env
+
+# Goreleaser artifacts
+dist/
+
+# GPG keys
+*.asc
+
+# Zig build artifacts
+.zig-cache/
