@@ -1,9 +1,9 @@
 [package]
 name = "nflux"
 version = "1.0.1"
-edition = "2024"
+edition.workspace = true
 authors = ["containerscrew info@containerscrew.com"]
-description = "Network monitoring tool & TLS/SSL sniffer using eBPF 🐝"
+description = "Simple network monitoring agent tool. Powered by eBPF 🐝"
 repository = "https://github.com/containerscrew/nflux"
 license.workspace = true
 

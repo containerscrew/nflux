@@ -1,10 +1,10 @@
 [package]
 name = "nflux-ebpf"
 version = "0.1.0"
-edition = "2021"
+edition.workspace = true
 
 [dependencies]
-nflux-common = { path = "../nflux-common/", version = "0.1.0" }
+nflux-common = { path = "../nflux-common/" }
 
 aya-ebpf = { workspace = true }
 aya-log-ebpf = { workspace = true }

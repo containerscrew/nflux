@@ -1,0 +1,183 @@
+version: 2
+project_name: nflux
+release:
+  github:
+    owner: containerscrew
+    name: nflux
+  name_template: '{{.Tag}}'
+homebrew_casks:
+  - name: nflux
+    repository:
+      owner: containerscrew
+      name: homebrew-tap
+      token: '{{ .Env.HOMEBREW_TAP_TOKEN }}'
+      branch: main
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    commit_msg_template: Brew cask update for {{ .ProjectName }} version {{ .Tag }}
+    directory: Casks
+    description: Simple network monitoring agent tool. Powered by eBPF and Rust.
+    homepage: https://github.com/containerscrew/nflux
+    binaries:
+      - nflux
+    url:
+      template: https://github.com/containerscrew/nflux/releases/download/{{ .Tag }}/{{ .ArtifactName }}
+      verified: github.com/containerscrew/nflux/
+builds:
+  - id: nflux
+    targets:
+      - x86_64-apple-darwin
+      - aarch64-apple-darwin
+      - x86_64-unknown-linux-gnu
+      - aarch64-unknown-linux-gnu
+    dir: .
+    main: .
+    binary: nflux
+    builder: rust
+    tool: cargo
+    command: zigbuild
+    flags:
+      - --release
+      - -p=nflux
+archives:
+  - id: nflux
+    builds_info:
+      mode: 493
+    name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+    formats:
+      - tar.gz
+    files:
+      - src: license*
+      - src: LICENSE*
+      - src: readme*
+      - src: README*
+      - src: changelog*
+      - src: CHANGELOG*
+nfpms:
+  - file_name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+    package_name: nflux
+    id: nflux
+    formats:
+      - apk
+      - deb
+      - rpm
+      - archlinux
+    vendor: containerscrew
+    homepage: https://github.com/containerscrew/nflux
+    maintainer: containerscrew <info@containerscrew.com>
+    description: Secure file encryption using pure Rust and AES
+    license: GPL3
+    bindir: /usr/bin
+    libdirs:
+      header: /usr/include
+      carchive: /usr/lib
+      cshared: /usr/lib
+srpm:
+  nfpmrpm: {}
+  package_name: nflux
+  file_name_template: '{{ .PackageName }}-{{ .Version }}.src.rpm'
+  bins:
+    nflux: '%{goipath}'
+snapshot:
+  version_template: '{{ .Tag }}'
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+docker_digest:
+  name_template: digests.txt
+changelog:
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+  sort: asc
+  use: github
+  format: '{{ .SHA }}: {{ .Message }} ({{ with .AuthorUsername }}@{{ . }}{{ else }}{{ .AuthorName }} <{{ .AuthorEmail }}>{{ end }})'
+dist: dist
+signs:
+  - id: default
+    cmd: gpg2
+    args:
+      - --batch
+      - -u
+      - '{{ .Env.GPG_FINGERPRINT }}'
+      - --output
+      - ${signature}
+      - --detach-sign
+      - ${artifact}
+    signature: ${artifact}.sig
+    artifacts: checksum
+    output: "true"
+env_files:
+  github_token: ~/.config/goreleaser/github_token
+  gitlab_token: ~/.config/goreleaser/gitlab_token
+  gitea_token: ~/.config/goreleaser/gitea_token
+source:
+  name_template: '{{ .ProjectName }}-{{ .Version }}'
+  format: tar.gz
+  enabled: true
+gomod:
+  gobinary: go
+announce:
+  twitter:
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+  mastodon:
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+    server: ""
+  reddit:
+    title_template: '{{ .ProjectName }} {{ .Tag }} is out!'
+    url_template: '{{ .ReleaseURL }}'
+  slack:
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+    username: GoReleaser
+  discord:
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+    author: GoReleaser
+    color: "3888754"
+    icon_url: https://goreleaser.com/static/avatar.png
+  teams:
+    title_template: '{{ .ProjectName }} {{ .Tag }} is out!'
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+    color: '#2D313E'
+    icon_url: https://goreleaser.com/static/avatar.png
+  smtp:
+    subject_template: '{{ .ProjectName }} {{ .Tag }} is out!'
+    body_template: 'You can view details from: {{ .ReleaseURL }}'
+  mattermost:
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+    title_template: '{{ .ProjectName }} {{ .Tag }} is out!'
+    username: GoReleaser
+  linkedin:
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+  telegram:
+    message_template: '{{ print .ProjectName " " .Tag " is out! Check it out at " .ReleaseURL | mdv2escape }}'
+    parse_mode: MarkdownV2
+  webhook:
+    message_template: '{ "message": "{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}"}'
+    content_type: application/json; charset=utf-8
+    expected_status_codes:
+      - 200
+      - 201
+      - 202
+      - 204
+  opencollective:
+    title_template: '{{ .Tag }}'
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out!<br/>Check it out at <a href="{{ .ReleaseURL }}">{{ .ReleaseURL }}</a>'
+  bluesky:
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+  discourse:
+    title_template: '{{ .ProjectName }} {{ .Tag }} is out!'
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+    username: system
+git:
+  tag_sort: -version:refname
+mcp:
+  name: ""
+  title: ""
+  auth:
+    type: none
+github_urls:
+  download: https://github.com
+gitlab_urls:
+  download: https://gitlab.com

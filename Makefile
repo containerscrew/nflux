@@ -52,3 +52,7 @@ generate-vmlinux: ## Generate vmlinux for kernel data structures
 
 setup-hooks:
 	git config core.hooksPath .git-hooks
+
+goreleaser: ## Generate binaries using goreleaser (brew install goreleaser and brew install zig)
+	# Needs cargo install cargo-zigbuild & dnf install zig
+	goreleaser release --snapshot --clean --skip sign

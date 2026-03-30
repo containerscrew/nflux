@@ -5,6 +5,7 @@ default-members = ["nflux", "nflux-common"]
 
 [workspace.package]
 license = "GPL-3.0"
+edition = "2024"
 
 [workspace.dependencies]
 aya = { git = "https://github.com/aya-rs/aya", default-features = false }

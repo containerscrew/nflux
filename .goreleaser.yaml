@@ -1,0 +1,144 @@
+version: 2
+
+project_name: nflux
+
+builds:
+  - id: nflux
+    builder: rust
+    binary: nflux
+    targets:
+      - x86_64-apple-darwin
+      - aarch64-apple-darwin
+      - x86_64-unknown-linux-gnu
+      - aarch64-unknown-linux-gnu
+    flags:
+      - --release
+      - -p=nflux
+
+archives:
+  - id: nflux
+    formats: ["tar.gz"]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+
+nfpms:
+  - id: nflux
+    package_name: nflux
+    file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    homepage: https://github.com/containerscrew/nflux
+    vendor: containerscrew
+    description: Secure file encryption using pure Rust and AES
+    maintainer: containerscrew <info@containerscrew.com>
+    license: GPL3
+    formats:
+      - apk
+      - deb
+      - rpm
+      - archlinux
+
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+signs:
+  - artifacts: checksum
+    cmd: gpg2
+    output: true
+    args:
+      [
+        "--batch",
+        "-u",
+        "{{ .Env.GPG_FINGERPRINT }}",
+        "--output",
+        "${signature}",
+        "--detach-sign",
+        "${artifact}",
+      ]
+
+snapshot:
+  version_template: "{{ .Tag }}"
+
+release:
+  draft: false
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+
+homebrew_casks:
+  - name: nflux
+    binaries:
+      - nflux
+    url:
+      template: "https://github.com/containerscrew/nflux/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+      verified: "github.com/containerscrew/nflux/"
+    homepage: "https://github.com/containerscrew/nflux"
+    description: "Simple network monitoring agent tool. Powered by eBPF and Rust."
+
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+
+    repository:
+      owner: containerscrew
+      name: homebrew-tap
+      branch: main
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+
+source:
+  enabled: true
+  name_template: "{{ .ProjectName }}-{{ .Version }}"
+  format: "tar.gz"
+
+# aur_sources:
+#   - name: nflux
+#     homepage: "https://github.com/containerscrew/nflux"
+#     description: "Simple network monitoring agent tool. Powered by eBPF and Rust."
+#     maintainers:
+#       - "containerscrew <info@containerscrew.com>"
+#     license: "GPL3"
+
+#     git_url: "ssh://aur@aur.archlinux.org/nflux.git"
+#     private_key: "{{ .Env.AUR_KEY }}"
+
+#     depends: []
+#     makedepends:
+#       - rust
+#       - cargo
+
+#     build: |-
+#       cargo build --release --locked
+
+#     package: |-
+#       install -Dm755 "target/release/nflux" "$pkgdir/usr/bin/nflux"
+#       install -Dm644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"
+#       install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+
+#     commit_msg_template: "Update to {{ .Tag }}"
+
+# aurs:
+#   - name: nflux-bin
+#     homepage: "https://github.com/containerscrew/nflux"
+#     description: "Simple network monitoring agent tool. Powered by eBPF and Rust."
+#     maintainers:
+#       - "containerscrew <info@containerscrew.com>"
+#     license: "GPL3"
+
+#     git_url: "ssh://aur@aur.archlinux.org/nflux-bin.git"
+#     private_key: "{{ .Env.AUR_KEY }}"
+
+#     provides:
+#       - nflux
+#     conflicts:
+#       - nflux
+
+#     package: |-
+#       install -Dm755 "nflux" "$pkgdir/usr/bin/nflux"
+#       install -Dm644 "README.md" "$pkgdir/usr/share/doc/nflux/README.md"
+#       install -Dm644 "LICENSE" "$pkgdir/usr/share/licenses/nflux/LICENSE"
+
+#     commit_msg_template: "Update nflux-bin to {{ .Tag }}"
