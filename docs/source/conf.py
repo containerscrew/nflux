@@ -7,7 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "nflux"
-copyright = "2025, containerscrew"
+copyright = "2026, containerscrew"
 author = "containerscrew"
 release = "1.0.0"
 
