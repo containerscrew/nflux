@@ -22,7 +22,7 @@ sysinfo = "0.39.2"
 chrono = "0.4.44"
 default-net = "0.22.0"
 colored = "3.1.1"
-serde_json = "1.0.149"
+serde_json = "1.0.150"
 serde = { version = "1.0.228", features = ["derive"] }
 toml = "1.1.2"
 
