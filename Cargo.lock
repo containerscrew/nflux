@@ -3,12 +3,6 @@
 version = 4
 
 [[package]]
-name = "allocator-api2"
-version = "0.2.21"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "683d7910e743518b0e34f1186f92494becacb047c7b6bf616c96772180fef923"
-
-[[package]]
 name = "android_system_properties"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -37,20 +31,20 @@ checksum = "c08606f8c3cbf4ce6ec8e28fb0014a2c086708fe954eaa885384a6165172e7e8"
 
 [[package]]
 name = "aya"
-version = "0.13.1"
+version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d18bc4e506fbb85ab7392ed993a7db4d1a452c71b75a246af4a80ab8c9d2dd50"
+checksum = "66e644424fada9fff4fdc63848db1732fb69b626e8328202ef55c03df1f4d939"
 dependencies = [
  "assert_matches",
- "aya-obj 0.2.1",
+ "aya-obj 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "bitflags 2.11.0",
- "bytes",
+ "hashbrown 0.17.0",
  "libc",
  "log",
- "object 0.36.7",
+ "object",
  "once_cell",
- "thiserror 1.0.69",
- "tokio",
+ "scopeguard",
+ "thiserror 2.0.18",
 ]
 
 [[package]]
@@ -59,12 +53,12 @@ version = "0.14.0"
 source = "git+https://github.com/aya-rs/aya#231e54f29f5de163924671029e72da4672eba274"
 dependencies = [
  "assert_matches",
- "aya-obj 0.3.0",
+ "aya-obj 0.3.0 (git+https://github.com/aya-rs/aya)",
  "bitflags 2.11.0",
  "hashbrown 0.17.0",
  "libc",
  "log",
- "object 0.39.0",
+ "object",
  "once_cell",
  "scopeguard",
  "thiserror 2.0.18",
@@ -123,23 +117,21 @@ dependencies = [
 
 [[package]]
 name = "aya-log"
-version = "0.2.1"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b600d806c1d07d3b81ab5f4a2a95fd80f479a0d3f1d68f29064d660865f85f02"
+checksum = "476912cd6322ecf481a48f9db82207406a472563875eef014e927800522aac5c"
 dependencies = [
- "aya 0.13.1",
- "aya-log-common 0.1.15",
- "bytes",
+ "aya 0.14.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "aya-log-common 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log",
- "thiserror 1.0.69",
- "tokio",
+ "thiserror 2.0.18",
 ]
 
 [[package]]
 name = "aya-log-common"
-version = "0.1.15"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "befef9fe882e63164a2ba0161874e954648a72b0e1c4b361f532d590638c4eec"
+checksum = "d14c56374a63b20cb1d76108bf9ff2a75e137d47f57f32f2841ef74153b2186a"
 dependencies = [
  "num_enum",
 ]
@@ -158,7 +150,7 @@ version = "0.2.0"
 source = "git+https://github.com/aya-rs/aya#231e54f29f5de163924671029e72da4672eba274"
 dependencies = [
  "aya-ebpf",
- "aya-log-common 0.2.0",
+ "aya-log-common 0.2.0 (git+https://github.com/aya-rs/aya)",
  "aya-log-ebpf-macros",
 ]
 
@@ -167,7 +159,7 @@ name = "aya-log-ebpf-macros"
 version = "0.2.0"
 source = "git+https://github.com/aya-rs/aya#231e54f29f5de163924671029e72da4672eba274"
 dependencies = [
- "aya-log-common 0.2.0",
+ "aya-log-common 0.2.0 (git+https://github.com/aya-rs/aya)",
  "aya-log-parser",
  "proc-macro2",
  "quote",
@@ -179,21 +171,19 @@ name = "aya-log-parser"
 version = "0.2.0"
 source = "git+https://github.com/aya-rs/aya#231e54f29f5de163924671029e72da4672eba274"
 dependencies = [
- "aya-log-common 0.2.0",
+ "aya-log-common 0.2.0 (git+https://github.com/aya-rs/aya)",
 ]
 
 [[package]]
 name = "aya-obj"
-version = "0.2.1"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c51b96c5a8ed8705b40d655273bc4212cbbf38d4e3be2788f36306f154523ec7"
+checksum = "8c76b9c75d9cdc155ff8f6a06d61e873f67bf47be8cfa92a3b5aaea43f4b4077"
 dependencies = [
  "bytes",
- "core-error",
- "hashbrown 0.15.5",
  "log",
- "object 0.36.7",
- "thiserror 1.0.69",
+ "object",
+ "thiserror 2.0.18",
 ]
 
 [[package]]
@@ -203,7 +193,7 @@ source = "git+https://github.com/aya-rs/aya#231e54f29f5de163924671029e72da4672eb
 dependencies = [
  "bytes",
  "log",
- "object 0.39.0",
+ "object",
  "thiserror 2.0.18",
 ]
 
@@ -306,15 +296,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "faf9468729b8cbcea668e36183cb69d317348c2e08e994829fb56ebfdfbaac34"
 dependencies = [
  "windows-sys 0.61.2",
-]
-
-[[package]]
-name = "core-error"
-version = "0.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "efcdb2972eb64230b4c50646d8498ff73f5128d196a90c7236eec4cbe8619b8f"
-dependencies = [
- "version_check",
 ]
 
 [[package]]
@@ -457,26 +438,9 @@ checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
 
 [[package]]
 name = "foldhash"
-version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d9c4f5dac5e15c24eb999c26181a6ca40b39fe946cbe4c263c7209467bc83af2"
-
-[[package]]
-name = "foldhash"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "77ce24cb58228fbb8aa041425bb1050850ac19177686ea6e0f41a70416f56fdb"
-
-[[package]]
-name = "hashbrown"
-version = "0.15.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9229cfe53dfd69f0609a49f65461bd93001ea1ef889cd5529dd176593f5338a1"
-dependencies = [
- "allocator-api2",
- "equivalent",
- "foldhash 0.1.5",
-]
 
 [[package]]
 name = "hashbrown"
@@ -484,7 +448,7 @@ version = "0.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "841d1cc9bed7f9236f321df977030373f4a4163ae1a7dbfe1a51a2c1a51d9100"
 dependencies = [
- "foldhash 0.2.0",
+ "foldhash",
 ]
 
 [[package]]
@@ -494,7 +458,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4f467dd6dccf739c208452f8014c75c18bb8301b050ad1cfb27153803edb0f51"
 dependencies = [
  "equivalent",
- "foldhash 0.2.0",
+ "foldhash",
 ]
 
 [[package]]
@@ -667,7 +631,7 @@ name = "nflux"
 version = "1.0.1"
 dependencies = [
  "anyhow",
- "aya 0.14.0",
+ "aya 0.14.0 (git+https://github.com/aya-rs/aya)",
  "aya-build",
  "aya-log",
  "cargo_metadata",
@@ -691,7 +655,7 @@ dependencies = [
 name = "nflux-common"
 version = "0.1.0"
 dependencies = [
- "aya 0.14.0",
+ "aya 0.14.0 (git+https://github.com/aya-rs/aya)",
  "aya-ebpf",
 ]
 
@@ -821,18 +785,6 @@ dependencies = [
  "objc2",
  "objc2-core-foundation",
  "objc2-foundation",
-]
-
-[[package]]
-name = "object"
-version = "0.36.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "62948e14d923ea95ea2c7c86c71013138b66525b86bdc08d2dcc262bdb497b87"
-dependencies = [
- "crc32fast",
- "hashbrown 0.15.5",
- "indexmap",
- "memchr",
 ]
 
 [[package]]
