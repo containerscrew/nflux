@@ -50,7 +50,7 @@ dependencies = [
 [[package]]
 name = "aya"
 version = "0.14.0"
-source = "git+https://github.com/aya-rs/aya#773ca715385b97eb0c26a581b53246c0c4306959"
+source = "git+https://github.com/aya-rs/aya#b40b7c5d44a42430a2935f6ee5d2b57f0878b5cd"
 dependencies = [
  "assert_matches",
  "aya-obj 0.3.0 (git+https://github.com/aya-rs/aya)",
@@ -67,7 +67,7 @@ dependencies = [
 [[package]]
 name = "aya-build"
 version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#773ca715385b97eb0c26a581b53246c0c4306959"
+source = "git+https://github.com/aya-rs/aya#b40b7c5d44a42430a2935f6ee5d2b57f0878b5cd"
 dependencies = [
  "anyhow",
  "cargo_metadata",
@@ -78,7 +78,7 @@ dependencies = [
 [[package]]
 name = "aya-ebpf"
 version = "0.2.1"
-source = "git+https://github.com/aya-rs/aya#773ca715385b97eb0c26a581b53246c0c4306959"
+source = "git+https://github.com/aya-rs/aya#b40b7c5d44a42430a2935f6ee5d2b57f0878b5cd"
 dependencies = [
  "aya-build",
  "aya-ebpf-bindings",
@@ -90,7 +90,7 @@ dependencies = [
 [[package]]
 name = "aya-ebpf-bindings"
 version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#773ca715385b97eb0c26a581b53246c0c4306959"
+source = "git+https://github.com/aya-rs/aya#b40b7c5d44a42430a2935f6ee5d2b57f0878b5cd"
 dependencies = [
  "aya-build",
  "aya-ebpf-cty",
@@ -99,7 +99,7 @@ dependencies = [
 [[package]]
 name = "aya-ebpf-cty"
 version = "0.3.0"
-source = "git+https://github.com/aya-rs/aya#773ca715385b97eb0c26a581b53246c0c4306959"
+source = "git+https://github.com/aya-rs/aya#b40b7c5d44a42430a2935f6ee5d2b57f0878b5cd"
 dependencies = [
  "aya-build",
 ]
@@ -107,7 +107,7 @@ dependencies = [
 [[package]]
 name = "aya-ebpf-macros"
 version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#773ca715385b97eb0c26a581b53246c0c4306959"
+source = "git+https://github.com/aya-rs/aya#b40b7c5d44a42430a2935f6ee5d2b57f0878b5cd"
 dependencies = [
  "proc-macro2",
  "proc-macro2-diagnostics",
@@ -139,7 +139,7 @@ dependencies = [
 [[package]]
 name = "aya-log-common"
 version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#773ca715385b97eb0c26a581b53246c0c4306959"
+source = "git+https://github.com/aya-rs/aya#b40b7c5d44a42430a2935f6ee5d2b57f0878b5cd"
 dependencies = [
  "num_enum",
 ]
@@ -147,7 +147,7 @@ dependencies = [
 [[package]]
 name = "aya-log-ebpf"
 version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#773ca715385b97eb0c26a581b53246c0c4306959"
+source = "git+https://github.com/aya-rs/aya#b40b7c5d44a42430a2935f6ee5d2b57f0878b5cd"
 dependencies = [
  "aya-ebpf",
  "aya-log-common 0.2.0 (git+https://github.com/aya-rs/aya)",
@@ -157,7 +157,7 @@ dependencies = [
 [[package]]
 name = "aya-log-ebpf-macros"
 version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#773ca715385b97eb0c26a581b53246c0c4306959"
+source = "git+https://github.com/aya-rs/aya#b40b7c5d44a42430a2935f6ee5d2b57f0878b5cd"
 dependencies = [
  "aya-log-common 0.2.0 (git+https://github.com/aya-rs/aya)",
  "aya-log-parser",
@@ -169,7 +169,7 @@ dependencies = [
 [[package]]
 name = "aya-log-parser"
 version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#773ca715385b97eb0c26a581b53246c0c4306959"
+source = "git+https://github.com/aya-rs/aya#b40b7c5d44a42430a2935f6ee5d2b57f0878b5cd"
 dependencies = [
  "aya-log-common 0.2.0 (git+https://github.com/aya-rs/aya)",
 ]
@@ -189,7 +189,7 @@ dependencies = [
 [[package]]
 name = "aya-obj"
 version = "0.3.0"
-source = "git+https://github.com/aya-rs/aya#773ca715385b97eb0c26a581b53246c0c4306959"
+source = "git+https://github.com/aya-rs/aya#b40b7c5d44a42430a2935f6ee5d2b57f0878b5cd"
 dependencies = [
  "bytes",
  "log",
