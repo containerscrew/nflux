@@ -50,7 +50,7 @@ dependencies = [
 [[package]]
 name = "aya"
 version = "0.14.0"
-source = "git+https://github.com/aya-rs/aya#427a194c1fe53cee2a3f9deb7388d4bb32310c50"
+source = "git+https://github.com/aya-rs/aya#9e943b24ca2256eecce7db73de43c8d2b49c0c33"
 dependencies = [
  "assert_matches",
  "aya-obj 0.3.0 (git+https://github.com/aya-rs/aya)",
@@ -67,7 +67,7 @@ dependencies = [
 [[package]]
 name = "aya-build"
 version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#427a194c1fe53cee2a3f9deb7388d4bb32310c50"
+source = "git+https://github.com/aya-rs/aya#9e943b24ca2256eecce7db73de43c8d2b49c0c33"
 dependencies = [
  "anyhow",
  "cargo_metadata",
@@ -78,7 +78,7 @@ dependencies = [
 [[package]]
 name = "aya-ebpf"
 version = "0.2.1"
-source = "git+https://github.com/aya-rs/aya#427a194c1fe53cee2a3f9deb7388d4bb32310c50"
+source = "git+https://github.com/aya-rs/aya#9e943b24ca2256eecce7db73de43c8d2b49c0c33"
 dependencies = [
  "aya-build",
  "aya-ebpf-bindings",
@@ -90,7 +90,7 @@ dependencies = [
 [[package]]
 name = "aya-ebpf-bindings"
 version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#427a194c1fe53cee2a3f9deb7388d4bb32310c50"
+source = "git+https://github.com/aya-rs/aya#9e943b24ca2256eecce7db73de43c8d2b49c0c33"
 dependencies = [
  "aya-build",
  "aya-ebpf-cty",
@@ -99,7 +99,7 @@ dependencies = [
 [[package]]
 name = "aya-ebpf-cty"
 version = "0.3.0"
-source = "git+https://github.com/aya-rs/aya#427a194c1fe53cee2a3f9deb7388d4bb32310c50"
+source = "git+https://github.com/aya-rs/aya#9e943b24ca2256eecce7db73de43c8d2b49c0c33"
 dependencies = [
  "aya-build",
 ]
@@ -107,12 +107,11 @@ dependencies = [
 [[package]]
 name = "aya-ebpf-macros"
 version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#427a194c1fe53cee2a3f9deb7388d4bb32310c50"
+source = "git+https://github.com/aya-rs/aya#9e943b24ca2256eecce7db73de43c8d2b49c0c33"
 dependencies = [
  "proc-macro2",
- "proc-macro2-diagnostics",
  "quote",
- "syn 2.0.117",
+ "syn 3.0.2",
 ]
 
 [[package]]
@@ -139,7 +138,7 @@ dependencies = [
 [[package]]
 name = "aya-log-common"
 version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#427a194c1fe53cee2a3f9deb7388d4bb32310c50"
+source = "git+https://github.com/aya-rs/aya#9e943b24ca2256eecce7db73de43c8d2b49c0c33"
 dependencies = [
  "num_enum",
 ]
@@ -147,7 +146,7 @@ dependencies = [
 [[package]]
 name = "aya-log-ebpf"
 version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#427a194c1fe53cee2a3f9deb7388d4bb32310c50"
+source = "git+https://github.com/aya-rs/aya#9e943b24ca2256eecce7db73de43c8d2b49c0c33"
 dependencies = [
  "aya-ebpf",
  "aya-log-common 0.2.0 (git+https://github.com/aya-rs/aya)",
@@ -157,19 +156,19 @@ dependencies = [
 [[package]]
 name = "aya-log-ebpf-macros"
 version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#427a194c1fe53cee2a3f9deb7388d4bb32310c50"
+source = "git+https://github.com/aya-rs/aya#9e943b24ca2256eecce7db73de43c8d2b49c0c33"
 dependencies = [
  "aya-log-common 0.2.0 (git+https://github.com/aya-rs/aya)",
  "aya-log-parser",
  "proc-macro2",
  "quote",
- "syn 2.0.117",
+ "syn 3.0.2",
 ]
 
 [[package]]
 name = "aya-log-parser"
 version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#427a194c1fe53cee2a3f9deb7388d4bb32310c50"
+source = "git+https://github.com/aya-rs/aya#9e943b24ca2256eecce7db73de43c8d2b49c0c33"
 dependencies = [
  "aya-log-common 0.2.0 (git+https://github.com/aya-rs/aya)",
 ]
@@ -189,7 +188,7 @@ dependencies = [
 [[package]]
 name = "aya-obj"
 version = "0.3.0"
-source = "git+https://github.com/aya-rs/aya#427a194c1fe53cee2a3f9deb7388d4bb32310c50"
+source = "git+https://github.com/aya-rs/aya#9e943b24ca2256eecce7db73de43c8d2b49c0c33"
 dependencies = [
  "bytes",
  "log",
@@ -856,18 +855,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "proc-macro2-diagnostics"
-version = "0.10.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "af066a9c399a26e020ada66a034357a868728e72cd426f3adcd35f80d88d88c8"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.117",
- "version_check",
-]
-
-[[package]]
 name = "quote"
 version = "1.0.45"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1270,12 +1257,6 @@ name = "valuable"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ba73ea9cf16a25df0c8caa16c51acb937d5712a8429db78a3ee29d5dcacd3a65"
-
-[[package]]
-name = "version_check"
-version = "0.9.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
 name = "wasi"
