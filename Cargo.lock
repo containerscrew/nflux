@@ -41,7 +41,7 @@ dependencies = [
  "hashbrown 0.17.0",
  "libc",
  "log",
- "object",
+ "object 0.39.0",
  "once_cell",
  "scopeguard",
  "thiserror 2.0.18",
@@ -50,7 +50,7 @@ dependencies = [
 [[package]]
 name = "aya"
 version = "0.14.0"
-source = "git+https://github.com/aya-rs/aya#25661e9c8bba0a9c0a919f841adf04c2fc08322f"
+source = "git+https://github.com/aya-rs/aya#47ef24bb2bda8ed811f36cf7f7855e2bb15ffb0c"
 dependencies = [
  "assert_matches",
  "aya-obj 0.3.0 (git+https://github.com/aya-rs/aya)",
@@ -58,7 +58,7 @@ dependencies = [
  "hashbrown 0.17.0",
  "libc",
  "log",
- "object",
+ "object 0.40.0",
  "once_cell",
  "scopeguard",
  "thiserror 2.0.18",
@@ -67,7 +67,7 @@ dependencies = [
 [[package]]
 name = "aya-build"
 version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#25661e9c8bba0a9c0a919f841adf04c2fc08322f"
+source = "git+https://github.com/aya-rs/aya#47ef24bb2bda8ed811f36cf7f7855e2bb15ffb0c"
 dependencies = [
  "anyhow",
  "cargo_metadata",
@@ -78,7 +78,7 @@ dependencies = [
 [[package]]
 name = "aya-ebpf"
 version = "0.2.1"
-source = "git+https://github.com/aya-rs/aya#25661e9c8bba0a9c0a919f841adf04c2fc08322f"
+source = "git+https://github.com/aya-rs/aya#47ef24bb2bda8ed811f36cf7f7855e2bb15ffb0c"
 dependencies = [
  "aya-build",
  "aya-ebpf-bindings",
@@ -90,7 +90,7 @@ dependencies = [
 [[package]]
 name = "aya-ebpf-bindings"
 version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#25661e9c8bba0a9c0a919f841adf04c2fc08322f"
+source = "git+https://github.com/aya-rs/aya#47ef24bb2bda8ed811f36cf7f7855e2bb15ffb0c"
 dependencies = [
  "aya-build",
  "aya-ebpf-cty",
@@ -99,7 +99,7 @@ dependencies = [
 [[package]]
 name = "aya-ebpf-cty"
 version = "0.3.0"
-source = "git+https://github.com/aya-rs/aya#25661e9c8bba0a9c0a919f841adf04c2fc08322f"
+source = "git+https://github.com/aya-rs/aya#47ef24bb2bda8ed811f36cf7f7855e2bb15ffb0c"
 dependencies = [
  "aya-build",
 ]
@@ -107,7 +107,7 @@ dependencies = [
 [[package]]
 name = "aya-ebpf-macros"
 version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#25661e9c8bba0a9c0a919f841adf04c2fc08322f"
+source = "git+https://github.com/aya-rs/aya#47ef24bb2bda8ed811f36cf7f7855e2bb15ffb0c"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -138,7 +138,7 @@ dependencies = [
 [[package]]
 name = "aya-log-common"
 version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#25661e9c8bba0a9c0a919f841adf04c2fc08322f"
+source = "git+https://github.com/aya-rs/aya#47ef24bb2bda8ed811f36cf7f7855e2bb15ffb0c"
 dependencies = [
  "num_enum",
 ]
@@ -146,7 +146,7 @@ dependencies = [
 [[package]]
 name = "aya-log-ebpf"
 version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#25661e9c8bba0a9c0a919f841adf04c2fc08322f"
+source = "git+https://github.com/aya-rs/aya#47ef24bb2bda8ed811f36cf7f7855e2bb15ffb0c"
 dependencies = [
  "aya-ebpf",
  "aya-log-common 0.2.0 (git+https://github.com/aya-rs/aya)",
@@ -156,7 +156,7 @@ dependencies = [
 [[package]]
 name = "aya-log-ebpf-macros"
 version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#25661e9c8bba0a9c0a919f841adf04c2fc08322f"
+source = "git+https://github.com/aya-rs/aya#47ef24bb2bda8ed811f36cf7f7855e2bb15ffb0c"
 dependencies = [
  "aya-log-common 0.2.0 (git+https://github.com/aya-rs/aya)",
  "aya-log-parser",
@@ -168,7 +168,7 @@ dependencies = [
 [[package]]
 name = "aya-log-parser"
 version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#25661e9c8bba0a9c0a919f841adf04c2fc08322f"
+source = "git+https://github.com/aya-rs/aya#47ef24bb2bda8ed811f36cf7f7855e2bb15ffb0c"
 dependencies = [
  "aya-log-common 0.2.0 (git+https://github.com/aya-rs/aya)",
 ]
@@ -181,18 +181,18 @@ checksum = "8c76b9c75d9cdc155ff8f6a06d61e873f67bf47be8cfa92a3b5aaea43f4b4077"
 dependencies = [
  "bytes",
  "log",
- "object",
+ "object 0.39.0",
  "thiserror 2.0.18",
 ]
 
 [[package]]
 name = "aya-obj"
 version = "0.3.0"
-source = "git+https://github.com/aya-rs/aya#25661e9c8bba0a9c0a919f841adf04c2fc08322f"
+source = "git+https://github.com/aya-rs/aya#47ef24bb2bda8ed811f36cf7f7855e2bb15ffb0c"
 dependencies = [
  "bytes",
  "log",
- "object",
+ "object 0.40.0",
  "thiserror 2.0.18",
 ]
 
@@ -492,12 +492,12 @@ checksum = "b9e0384b61958566e926dc50660321d12159025e767c18e043daf26b70104c39"
 
 [[package]]
 name = "indexmap"
-version = "2.13.0"
+version = "2.14.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7714e70437a7dc3ac8eb7e6f8df75fd8eb422675fc7678aff7364301092b1017"
+checksum = "cc4e190f5d26ca7051642629da2c52fc03bde85a03197c99408dcd291734c855"
 dependencies = [
  "equivalent",
- "hashbrown 0.16.1",
+ "hashbrown 0.17.0",
 ]
 
 [[package]]
@@ -794,6 +794,18 @@ checksum = "63944c133d03f44e75866bbd160b95af0ec3f6a13d936d69d31c81078cbc5baf"
 dependencies = [
  "crc32fast",
  "hashbrown 0.16.1",
+ "indexmap",
+ "memchr",
+]
+
+[[package]]
+name = "object"
+version = "0.40.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dd229a0361b9d0d4396176e02d65897f487eebeab7caa6d443855ee152ca0b9c"
+dependencies = [
+ "crc32fast",
+ "hashbrown 0.17.0",
  "indexmap",
  "memchr",
 ]
