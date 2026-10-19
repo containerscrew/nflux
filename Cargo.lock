@@ -36,7 +36,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "66e644424fada9fff4fdc63848db1732fb69b626e8328202ef55c03df1f4d939"
 dependencies = [
  "assert_matches",
- "aya-obj 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "aya-obj 0.3.0",
  "bitflags 2.11.0",
  "hashbrown 0.17.0",
  "libc",
@@ -50,10 +50,10 @@ dependencies = [
 [[package]]
 name = "aya"
 version = "0.14.0"
-source = "git+https://github.com/aya-rs/aya#0822f9191d2541bc8ed5fc73108443449b821a39"
+source = "git+https://github.com/aya-rs/aya#67e54c2d8e3e37fd7c122c47cf5f9944e0b8c8fe"
 dependencies = [
  "assert_matches",
- "aya-obj 0.3.0 (git+https://github.com/aya-rs/aya)",
+ "aya-obj 0.5.0",
  "bitflags 2.11.0",
  "hashbrown 0.17.0",
  "libc",
@@ -66,8 +66,8 @@ dependencies = [
 
 [[package]]
 name = "aya-build"
-version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#0822f9191d2541bc8ed5fc73108443449b821a39"
+version = "0.2.1"
+source = "git+https://github.com/aya-rs/aya#67e54c2d8e3e37fd7c122c47cf5f9944e0b8c8fe"
 dependencies = [
  "anyhow",
  "cargo_metadata",
@@ -78,7 +78,7 @@ dependencies = [
 [[package]]
 name = "aya-ebpf"
 version = "0.2.1"
-source = "git+https://github.com/aya-rs/aya#0822f9191d2541bc8ed5fc73108443449b821a39"
+source = "git+https://github.com/aya-rs/aya#67e54c2d8e3e37fd7c122c47cf5f9944e0b8c8fe"
 dependencies = [
  "aya-build",
  "aya-ebpf-bindings",
@@ -90,7 +90,7 @@ dependencies = [
 [[package]]
 name = "aya-ebpf-bindings"
 version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#0822f9191d2541bc8ed5fc73108443449b821a39"
+source = "git+https://github.com/aya-rs/aya#67e54c2d8e3e37fd7c122c47cf5f9944e0b8c8fe"
 dependencies = [
  "aya-build",
  "aya-ebpf-cty",
@@ -99,15 +99,15 @@ dependencies = [
 [[package]]
 name = "aya-ebpf-cty"
 version = "0.3.0"
-source = "git+https://github.com/aya-rs/aya#0822f9191d2541bc8ed5fc73108443449b821a39"
+source = "git+https://github.com/aya-rs/aya#67e54c2d8e3e37fd7c122c47cf5f9944e0b8c8fe"
 dependencies = [
  "aya-build",
 ]
 
 [[package]]
 name = "aya-ebpf-macros"
-version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#0822f9191d2541bc8ed5fc73108443449b821a39"
+version = "0.3.0"
+source = "git+https://github.com/aya-rs/aya#67e54c2d8e3e37fd7c122c47cf5f9944e0b8c8fe"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -121,7 +121,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "476912cd6322ecf481a48f9db82207406a472563875eef014e927800522aac5c"
 dependencies = [
  "aya 0.14.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "aya-log-common 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "aya-log-common 0.2.0",
  "log",
  "thiserror 2.0.18",
 ]
@@ -137,8 +137,8 @@ dependencies = [
 
 [[package]]
 name = "aya-log-common"
-version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#0822f9191d2541bc8ed5fc73108443449b821a39"
+version = "0.3.0"
+source = "git+https://github.com/aya-rs/aya#67e54c2d8e3e37fd7c122c47cf5f9944e0b8c8fe"
 dependencies = [
  "num_enum",
 ]
@@ -146,19 +146,19 @@ dependencies = [
 [[package]]
 name = "aya-log-ebpf"
 version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#0822f9191d2541bc8ed5fc73108443449b821a39"
+source = "git+https://github.com/aya-rs/aya#67e54c2d8e3e37fd7c122c47cf5f9944e0b8c8fe"
 dependencies = [
  "aya-ebpf",
- "aya-log-common 0.2.0 (git+https://github.com/aya-rs/aya)",
+ "aya-log-common 0.3.0",
  "aya-log-ebpf-macros",
 ]
 
 [[package]]
 name = "aya-log-ebpf-macros"
 version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#0822f9191d2541bc8ed5fc73108443449b821a39"
+source = "git+https://github.com/aya-rs/aya#67e54c2d8e3e37fd7c122c47cf5f9944e0b8c8fe"
 dependencies = [
- "aya-log-common 0.2.0 (git+https://github.com/aya-rs/aya)",
+ "aya-log-common 0.3.0",
  "aya-log-parser",
  "proc-macro2",
  "quote",
@@ -168,9 +168,9 @@ dependencies = [
 [[package]]
 name = "aya-log-parser"
 version = "0.2.0"
-source = "git+https://github.com/aya-rs/aya#0822f9191d2541bc8ed5fc73108443449b821a39"
+source = "git+https://github.com/aya-rs/aya#67e54c2d8e3e37fd7c122c47cf5f9944e0b8c8fe"
 dependencies = [
- "aya-log-common 0.2.0 (git+https://github.com/aya-rs/aya)",
+ "aya-log-common 0.3.0",
 ]
 
 [[package]]
@@ -187,8 +187,8 @@ dependencies = [
 
 [[package]]
 name = "aya-obj"
-version = "0.3.0"
-source = "git+https://github.com/aya-rs/aya#0822f9191d2541bc8ed5fc73108443449b821a39"
+version = "0.5.0"
+source = "git+https://github.com/aya-rs/aya#67e54c2d8e3e37fd7c122c47cf5f9944e0b8c8fe"
 dependencies = [
  "bytes",
  "log",
