@@ -31,17 +31,17 @@ checksum = "c08606f8c3cbf4ce6ec8e28fb0014a2c086708fe954eaa885384a6165172e7e8"
 
 [[package]]
 name = "aya"
-version = "0.14.0"
+version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "66e644424fada9fff4fdc63848db1732fb69b626e8328202ef55c03df1f4d939"
+checksum = "3c193744eaa31250fd29ceb101a85219ae3cc26ea595a2cdb848df5a866cf19e"
 dependencies = [
  "assert_matches",
- "aya-obj 0.3.0",
+ "aya-obj 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "bitflags 2.11.0",
- "hashbrown 0.17.0",
+ "hashbrown",
  "libc",
  "log",
- "object 0.39.0",
+ "object",
  "once_cell",
  "scopeguard",
  "thiserror 2.0.18",
@@ -53,12 +53,12 @@ version = "0.16.0"
 source = "git+https://github.com/aya-rs/aya#6eb465001efbf00fcfff04e97f7cbfcad8ad93cf"
 dependencies = [
  "assert_matches",
- "aya-obj 0.6.0",
+ "aya-obj 0.6.0 (git+https://github.com/aya-rs/aya)",
  "bitflags 2.11.0",
- "hashbrown 0.17.0",
+ "hashbrown",
  "libc",
  "log",
- "object 0.40.0",
+ "object",
  "once_cell",
  "scopeguard",
  "thiserror 2.0.18",
@@ -116,21 +116,21 @@ dependencies = [
 
 [[package]]
 name = "aya-log"
-version = "0.3.0"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "476912cd6322ecf481a48f9db82207406a472563875eef014e927800522aac5c"
+checksum = "425a0093e7b0f87ef6fd0fcc33c33c7e9658dc2a2693b657195785c8b36efb04"
 dependencies = [
- "aya 0.14.0",
- "aya-log-common 0.2.0",
+ "aya 0.16.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "aya-log-common 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log",
  "thiserror 2.0.18",
 ]
 
 [[package]]
 name = "aya-log-common"
-version = "0.2.0"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d14c56374a63b20cb1d76108bf9ff2a75e137d47f57f32f2841ef74153b2186a"
+checksum = "ab343b69a6419491a44f99d37e1782226f0c59bcf1c26e00e3df537a5f87d676"
 dependencies = [
  "num_enum",
 ]
@@ -149,7 +149,7 @@ version = "0.3.0"
 source = "git+https://github.com/aya-rs/aya#6eb465001efbf00fcfff04e97f7cbfcad8ad93cf"
 dependencies = [
  "aya-ebpf",
- "aya-log-common 0.3.0",
+ "aya-log-common 0.3.0 (git+https://github.com/aya-rs/aya)",
  "aya-log-ebpf-macros",
 ]
 
@@ -158,7 +158,7 @@ name = "aya-log-ebpf-macros"
 version = "0.3.0"
 source = "git+https://github.com/aya-rs/aya#6eb465001efbf00fcfff04e97f7cbfcad8ad93cf"
 dependencies = [
- "aya-log-common 0.3.0",
+ "aya-log-common 0.3.0 (git+https://github.com/aya-rs/aya)",
  "aya-log-parser",
  "proc-macro2",
  "quote",
@@ -170,18 +170,18 @@ name = "aya-log-parser"
 version = "0.3.0"
 source = "git+https://github.com/aya-rs/aya#6eb465001efbf00fcfff04e97f7cbfcad8ad93cf"
 dependencies = [
- "aya-log-common 0.3.0",
+ "aya-log-common 0.3.0 (git+https://github.com/aya-rs/aya)",
 ]
 
 [[package]]
 name = "aya-obj"
-version = "0.3.0"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8c76b9c75d9cdc155ff8f6a06d61e873f67bf47be8cfa92a3b5aaea43f4b4077"
+checksum = "66254e485eda05c8ab20b83fb55ea4bde22a8436981f435e35cffa5e6aa6196d"
 dependencies = [
  "bytes",
  "log",
- "object 0.39.0",
+ "object",
  "thiserror 2.0.18",
 ]
 
@@ -192,7 +192,7 @@ source = "git+https://github.com/aya-rs/aya#6eb465001efbf00fcfff04e97f7cbfcad8ad
 dependencies = [
  "bytes",
  "log",
- "object 0.40.0",
+ "object",
  "thiserror 2.0.18",
 ]
 
@@ -443,15 +443,6 @@ checksum = "77ce24cb58228fbb8aa041425bb1050850ac19177686ea6e0f41a70416f56fdb"
 
 [[package]]
 name = "hashbrown"
-version = "0.16.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "841d1cc9bed7f9236f321df977030373f4a4163ae1a7dbfe1a51a2c1a51d9100"
-dependencies = [
- "foldhash",
-]
-
-[[package]]
-name = "hashbrown"
 version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4f467dd6dccf739c208452f8014c75c18bb8301b050ad1cfb27153803edb0f51"
@@ -497,7 +488,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cc4e190f5d26ca7051642629da2c52fc03bde85a03197c99408dcd291734c855"
 dependencies = [
  "equivalent",
- "hashbrown 0.17.0",
+ "hashbrown",
 ]
 
 [[package]]
@@ -630,7 +621,7 @@ name = "nflux"
 version = "1.0.1"
 dependencies = [
  "anyhow",
- "aya 0.16.0",
+ "aya 0.16.0 (git+https://github.com/aya-rs/aya)",
  "aya-build",
  "aya-log",
  "cargo_metadata",
@@ -654,7 +645,7 @@ dependencies = [
 name = "nflux-common"
 version = "0.1.0"
 dependencies = [
- "aya 0.16.0",
+ "aya 0.16.0 (git+https://github.com/aya-rs/aya)",
  "aya-ebpf",
 ]
 
@@ -788,24 +779,12 @@ dependencies = [
 
 [[package]]
 name = "object"
-version = "0.39.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "63944c133d03f44e75866bbd160b95af0ec3f6a13d936d69d31c81078cbc5baf"
-dependencies = [
- "crc32fast",
- "hashbrown 0.16.1",
- "indexmap",
- "memchr",
-]
-
-[[package]]
-name = "object"
 version = "0.40.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dd229a0361b9d0d4396176e02d65897f487eebeab7caa6d443855ee152ca0b9c"
 dependencies = [
  "crc32fast",
- "hashbrown 0.17.0",
+ "hashbrown",
  "indexmap",
  "memchr",
 ]
